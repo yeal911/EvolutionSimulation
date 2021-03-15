@@ -38,14 +38,14 @@ class Gene:
         else:
             return self.geneDigits[x-1]
 
-    # Gene variate, return a new Gene object
+    # Gene variation, return a new Gene object
     def variate(self):
-        variateCopy = copy.deepcopy(self)
+        variationCopy = copy.deepcopy(self)
         variationDigitCount = random.randint(Gene.__geneVariationMinValue, Gene.__geneVariationMaxValue)
         exclude = []
         while variationDigitCount > 0:
             variationBit = random.choice([i for i in range(0,9) if i not in exclude])
             exclude.append(variationBit)
-            variateCopy.geneDigits[variationBit] = random.randint(Gene.__geneBitMinValue, Gene.__geneBitMaxValue)
+            variationCopy.geneDigits[variationBit] = random.randint(Gene.__geneBitMinValue, Gene.__geneBitMaxValue)
             variationDigitCount -= 1
-        return variateCopy
+        return variationCopy

@@ -35,7 +35,7 @@ class Wolf(Population):
 
     def __init__(self, gene_set):
         self.geneSet = gene_set
-        # add computation for properties based on gene set
+        # add computation for properties based on gene set, each property has a base value.
 
     # forage behaviour of wolf
     def forage(self):
@@ -55,5 +55,5 @@ class Wolf(Population):
 
     # breed behaviour of a wolf
     def breed(self):
-        
+
 

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import Population
-
+import Gene
 
 class Wolf(Population):
     """this class defines the properties and behaviours of wolf population"""

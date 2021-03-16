@@ -6,9 +6,9 @@ from abc import ABCMeta, abstractmethod
 class Population(metaclass=ABCMeta):
     """this abstract class defines the common actions of population"""
 
-    # forage behaviour of a population
-    @abstractmethod
-    def forage(self): pass
+    # # forage behaviour of a population
+    # @abstractmethod
+    # def forage(self): pass
 
     # grow behaviour of a population
     @abstractmethod

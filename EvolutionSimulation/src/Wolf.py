@@ -13,6 +13,9 @@ class Wolf(Population):
     # lifespan
     lifespan = None
 
+    # age
+    age = None
+
     # gender
     gender = None
 
@@ -58,10 +61,9 @@ class Wolf(Population):
         # add computation for properties based on gene set
 
 
-    # forage behaviour of wolf
-    # tesettttt
-    def forage(self):
-        return None
+    # # forage behaviour of wolf
+    # def forage(self):
+    #     return None
 
     # grow behaviour of a wolf
     def grow(self):

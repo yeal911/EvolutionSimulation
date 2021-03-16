@@ -2,6 +2,7 @@
 import random
 import copy
 
+
 class Gene:
     """this class defines the properties and behaviours of generic gene"""
 
@@ -32,11 +33,11 @@ class Gene:
 
     # return specific bit of a gene
     def returnXBitOfGene(self, x):
-        if x>Gene.__geneLength or x<0 or not isinstance(x, int):
+        if x > Gene.__geneLength or x < 0 or not isinstance(x, int):
             print("returnXBitOfGene: X out of gene bit range!")
             return None
         else:
-            return self.geneDigits[x-1]
+            return self.geneDigits[x - 1]
 
     # Gene variation, return a new Gene object
     def variate(self):
@@ -44,7 +45,7 @@ class Gene:
         variationDigitCount = random.randint(Gene.__geneVariationMinValue, Gene.__geneVariationMaxValue)
         exclude = []
         while variationDigitCount > 0:
-            variationBit = random.choice([i for i in range(0,9) if i not in exclude])
+            variationBit = random.choice([i for i in range(0, 9) if i not in exclude])
             exclude.append(variationBit)
             variationCopy.geneDigits[variationBit] = random.randint(Gene.__geneBitMinValue, Gene.__geneBitMaxValue)
             variationDigitCount -= 1

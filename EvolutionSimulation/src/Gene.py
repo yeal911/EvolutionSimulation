@@ -22,13 +22,16 @@ class Gene:
     __geneVariationMaxValue = 5
 
     # gene digits
-    geneDigits = []
+    geneDigits = [0]
 
     # initialize a new gene
     def __init__(self):
         i = 0
         while i < Gene.__geneLength:
-            self.geneDigits[i] = random.randint(Gene.__geneBitMinValue, Gene.__geneBitMaxValue)
+            self.geneDigits.append(random.randint(Gene.__geneBitMinValue, Gene.__geneBitMaxValue))
+            print(self.geneDigits[i])
+            print("i = " + str(i))
+           # self.geneDigits[i] = random.randint(Gene.__geneBitMinValue, Gene.__geneBitMaxValue)
             i += 1
 
     # return specific bit of a gene

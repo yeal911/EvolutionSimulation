@@ -20,8 +20,7 @@ sheep3 = Sheep()
 gene = sheep1.breed(sheep2)
 print(gene, "here")
 if gene != None:
-    # sheep3.set_gene(gene)
-    sheep3.gene=gene
+    sheep3.set_gene(gene)
     print("s" + str(sheep3.gene.geneDigits))
 
 

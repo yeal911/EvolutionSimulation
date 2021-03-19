@@ -22,10 +22,10 @@ class Gene:
     __geneVariationMaxValue = 5
 
     # initialize a new gene
-    def __init__(self, gene=None):
+    def __init__(self, first_generation=True):
         # gene digits
         self.geneDigits = []
-        if gene == None:
+        if first_generation:
             i = 0
             while i < Gene.__geneLength:
                 self.geneDigits.append(random.randint(Gene.__geneBitMinValue, Gene.__geneBitMaxValue))
@@ -58,7 +58,7 @@ class Gene:
         return variationCopy
 
     def recombine(self, spouse):
-        recombineGene = Gene()
+        recombineGene = Gene(False)
         for i in range(0, Gene.__geneLength):
             randomNum = random.randint(0, 1)
             if randomNum == 0:

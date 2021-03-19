@@ -10,38 +10,11 @@ class Sheep(Population):
     # Gene count for sheep
     __geneCount = 10
 
-    # breeding times for each individual
-    breedingTimes = 2
-
     # lower growth period
     lowerGrowthPeriod = 5
 
     # upper growth period
     upperGrowthPeriod = 10
-
-    # lifespan
-    lifespan = None
-
-    # age
-    age = 0
-
-    # gender
-    gender = None
-
-    # hungry level
-    hungryLevel = None
-
-    # attack possibility
-    attackPossibility = None
-
-    # defend possibility
-    defendPossibility = None
-
-    # fight capability
-    fightCapability = None
-
-    # population name
-    name = None
 
     # gene set
     geneSet = []
@@ -50,16 +23,19 @@ class Sheep(Population):
     def populationName(cls):
         return "Sheep"
 
-    def __init__(self, attackPossibility, defendPossibility):
+    def __init__(self):
         # initialize gene set
-        self.geneSet.append(Gene())
+        self.gene = Gene()
         # initialize the property value, each property has a base value
+        # breeding times for each individual
+        self.breedingTimes = 2
+        self.age = 8
         self.lifespan = 15
         self.fightCapability = 5
         genderGroup = ["M", "F"]
         self.gender = genderGroup[random.randint(0, 1)]
-        self.attackPossibility = attackPossibility
-        self.defendPossibility = defendPossibility
+        self.attackPossibility = 6
+        self.defendPossibility = 7
         self.hungryLevel = 5
         self.name = "sheep"
 
@@ -122,7 +98,11 @@ class Sheep(Population):
 
     # breed behaviour of a sheep
     def breed(self, spouse: Population):
+        if self.gender == spouse.gender:
+            print("Same gender, no breed")
+            return
         if self.breedingTimes > 0:
             if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
                 self.breedingTimes -= 1
-                return Sheep().self.geneSet.append(Gene().variate())
+                self.gene.recombine(spouse.gene)
+                return

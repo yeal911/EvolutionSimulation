@@ -24,4 +24,4 @@ class Population(metaclass=ABCMeta):
 
     # breed behaviour of a population
     @abstractmethod
-    def breed(self, father, mother): pass
+    def breed(self, spouse): pass

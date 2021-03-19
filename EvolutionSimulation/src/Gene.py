@@ -22,17 +22,16 @@ class Gene:
     __geneVariationMaxValue = 5
 
     # gene digits
-    geneDigits = [0]
+    geneDigits = []
 
     # initialize a new gene
     def __init__(self):
         i = 0
         while i < Gene.__geneLength:
             self.geneDigits.append(random.randint(Gene.__geneBitMinValue, Gene.__geneBitMaxValue))
-            print(self.geneDigits[i])
             print("i = " + str(i))
-           # self.geneDigits[i] = random.randint(Gene.__geneBitMinValue, Gene.__geneBitMaxValue)
             i += 1
+        print("Gene length is " + str(len(self.geneDigits)))
 
     # return specific bit of a gene
     def returnXBitOfGene(self, x):
@@ -46,10 +45,13 @@ class Gene:
     def variate(self):
         variationCopy = copy.deepcopy(self)
         variationDigitCount = random.randint(Gene.__geneVariationMinValue, Gene.__geneVariationMaxValue)
+        print("variationDigitCount " + str(variationDigitCount))
         exclude = []
         while variationDigitCount > 0:
             variationBit = random.choice([i for i in range(0, 9) if i not in exclude])
+            print("variationBit " + str(variationBit))
             exclude.append(variationBit)
             variationCopy.geneDigits[variationBit] = random.randint(Gene.__geneBitMinValue, Gene.__geneBitMaxValue)
             variationDigitCount -= 1
+        print("variationCopy " + str(len(variationCopy.geneDigits)))
         return variationCopy

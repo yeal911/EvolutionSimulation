@@ -23,7 +23,7 @@ class Sheep(Population):
     lifespan = None
 
     # age
-    age = None
+    age = 0
 
     # gender
     gender = None
@@ -50,8 +50,7 @@ class Sheep(Population):
     def populationName(cls):
         return "Sheep"
 
-    def __init__(self):
-        # self.geneSet = []
+    def __init__(self, attackPossibility, defendPossibility):
         # initialize gene set
         self.geneSet.append(Gene())
         # initialize the property value, each property has a base value
@@ -59,8 +58,8 @@ class Sheep(Population):
         self.fightCapability = 5
         genderGroup = ["M", "F"]
         self.gender = genderGroup[random.randint(0, 1)]
-        self.attackPossibility = 5
-        self.defendPossibility = 5
+        self.attackPossibility = attackPossibility
+        self.defendPossibility = defendPossibility
         self.hungryLevel = 5
         self.name = "sheep"
 
@@ -68,13 +67,11 @@ class Sheep(Population):
 
     # # forage behaviour of sheep
     def forage(self):
-        print("Hi")
         if self.hungryLevel == 0:
             return False
         else:
             self.hungryLevel -= 1
             return True
-
 
     # grow behaviour of a sheep
     def grow(self):
@@ -97,12 +94,13 @@ class Sheep(Population):
 
     # attack behaviour of a sheep
     def attack(self, population: Population):
+        print("attackPossibility " + str(self.attackPossibility) + " defendPossibility " + str(population.defendPossibility))
         # attackPossibility increase in the growth period
         if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
             self.attackPossibility += 1
         # attack successfully
         if self.attackPossibility > population.defendPossibility:
-            print(self.name + "attack" + population.name + "successfully! Fight happened")
+            print(self.name + " attack" + population.name + " successfully! Fight happened")
             return True
         # attack unsuccessfully, fight not happen
         else:
@@ -110,21 +108,21 @@ class Sheep(Population):
 
     # defend behaviour of a sheep
     def defend(self, population: Population):
+        print(" defendPossibility " + str(self.defendPossibility) + " attackPossibility " + str(population.attackPossibility))
         # defendPossibility increase in the growth period
         if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
             self.defendPossibility += 1
         # escape successfully
         if self.defendPossibility > population.attackPossibility:
-            print(self.name + "escape successfully! No fight happened")
+            print(self.name + " escape successfully! No fight happened")
             return True
         # escape unsuccessfully,fight may happen
         else:
             return False
 
     # breed behaviour of a sheep
-    def breed(self, father, mother):
+    def breed(self, spouse: Population):
         if self.breedingTimes > 0:
-            if 5 < self.lifespan < 15:
+            if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
                 self.breedingTimes -= 1
-        else:
-            return
+                return Sheep().self.geneSet.append(Gene().variate())

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import random
 import copy
-
+import typing
 
 class Gene:
     """this class defines the properties and behaviours of generic gene"""
@@ -22,13 +22,17 @@ class Gene:
     __geneVariationMaxValue = 5
 
     # initialize a new gene
-    def __init__(self):
+    def __init__(self, gene=None):
         # gene digits
         self.geneDigits = []
-        i = 0
-        while i < Gene.__geneLength:
-            self.geneDigits.append(random.randint(Gene.__geneBitMinValue, Gene.__geneBitMaxValue))
-            i += 1
+        if gene == None:
+            i = 0
+            while i < Gene.__geneLength:
+                self.geneDigits.append(random.randint(Gene.__geneBitMinValue, Gene.__geneBitMaxValue))
+                i += 1
+
+
+
 
     # return specific bit of a gene
     def returnXBitOfGene(self, x):
@@ -55,15 +59,14 @@ class Gene:
 
     def recombine(self, spouse):
         recombineGene = Gene()
-        recombineGene.geneDigits.clear()
         for i in range(0, Gene.__geneLength):
             randomNum = random.randint(0, 1)
             if randomNum == 0:
                 recombineGene.geneDigits.append(self.geneDigits[i])
             else:
                 recombineGene.geneDigits.append(spouse.geneDigits[i])
-        print("Gene recombination result is ")
-        print(recombineGene.geneDigits)
+        print("Gene recombination result is " + str(recombineGene.geneDigits))
+        return recombineGene
 
 
 

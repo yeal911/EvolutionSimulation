@@ -7,17 +7,6 @@ from Gene import Gene
 
 class Sheep(Population):
     """this class defines the properties and behaviours of sheep population"""
-    # Gene count for sheep
-    __geneCount = 10
-
-    # lower growth period
-    lowerGrowthPeriod = 5
-
-    # upper growth period
-    upperGrowthPeriod = 10
-
-    # gene set
-    geneSet = []
 
     @classmethod  # static method of a class
     def populationName(cls):
@@ -26,20 +15,39 @@ class Sheep(Population):
     def __init__(self):
         # initialize gene set
         self.gene = Gene()
-        # initialize the property value, each property has a base value
+
         # breeding times for each individual
         self.breedingTimes = 2
-        self.age = 8
-        self.lifespan = 15
+        self.age = 6
         self.fightCapability = 5
-        genderGroup = ["M", "F"]
-        self.gender = genderGroup[random.randint(0, 1)]
-        self.attackPossibility = 6
-        self.defendPossibility = 7
-        self.hungryLevel = 5
         self.name = "sheep"
 
         # add computation for properties based on gene set
+
+        # lifespan in 2 times first 2 digits of gene
+        self.lifespan = 2 * (self.gene.geneDigits[0] + self.gene.geneDigits[1])
+
+        # gender
+        if self.gene.geneDigits[2] / 2 == 0:
+            self.gender = "M"
+        else:
+            self.gender = "F"
+
+        # attackPossibility
+        self.attackPossibility = self.gene.geneDigits[3]
+
+        # defendPossibility
+        self.defendPossibility = self.gene.geneDigits[4]
+
+        # hungryLevel
+        self.hungryLevel = (self.gene.geneDigits[5] + self.gene.geneDigits[6]) / 2
+
+        # lower limit of growth period
+        # self.lowerGrowthPeriod = self.lifespan / 3
+        self.lowerGrowthPeriod = 5
+
+        # upper limit of growth period
+        self.upperGrowthPeriod = 2 * self.lowerGrowthPeriod
 
     # # forage behaviour of sheep
     def forage(self):
@@ -104,5 +112,7 @@ class Sheep(Population):
         if self.breedingTimes > 0:
             if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
                 self.breedingTimes -= 1
-                self.gene.recombine(spouse.gene)
-                return
+                return self.gene.recombine(spouse.gene)
+
+    def set_gene(self, gene: Gene):
+        self.gene = gene

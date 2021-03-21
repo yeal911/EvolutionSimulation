@@ -3,6 +3,7 @@ import random
 import copy
 import typing
 
+
 class Gene:
     """this class defines the properties and behaviours of generic gene"""
 
@@ -31,9 +32,6 @@ class Gene:
                 self.geneDigits.append(random.randint(Gene.__geneBitMinValue, Gene.__geneBitMaxValue))
                 i += 1
 
-
-
-
     # return specific bit of a gene
     def returnXBitOfGene(self, x):
         if x > Gene.__geneLength or x < 0 or not isinstance(x, int):
@@ -54,7 +52,6 @@ class Gene:
             exclude.append(variationBit)
             variationCopy.geneDigits[variationBit] = random.randint(Gene.__geneBitMinValue, Gene.__geneBitMaxValue)
             variationDigitCount -= 1
-        print("variationCopy " + str(len(variationCopy.geneDigits)))
         return variationCopy
 
     def recombine(self, spouse):
@@ -65,8 +62,9 @@ class Gene:
                 recombineGene.geneDigits.append(self.geneDigits[i])
             else:
                 recombineGene.geneDigits.append(spouse.geneDigits[i])
+        randomNum = random.randint(0, 9)
+        if randomNum == 9:
+            recombineGene = recombineGene.variate()
+            print("Random number is " + str(randomNum) + " gene variates")
         print("Gene recombination result is " + str(recombineGene.geneDigits))
         return recombineGene
-
-
-

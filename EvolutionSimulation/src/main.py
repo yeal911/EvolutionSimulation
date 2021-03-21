@@ -1,27 +1,34 @@
 from EvolutionSimulation.src.Sheep import Sheep
-from Gene import Gene
+import random
 
-sheep1 = Sheep()
-sheep2 = Sheep()
-# gene = Gene()
-# gene1 = Gene()
+sheep = []
 
-# print(gene.geneDigits)
-# print(gene1.geneDigits)
-print("sheep1 gene " + str(sheep1.gene.geneDigits))
-print("sheep1 attackPossibility " + str(sheep1.attackPossibility))
-print("sheep1 gender " + str(sheep1.gender))
+for i in range(0, 5):
+    sheep.append(Sheep())
+    print("Sheep" + str(i) + " is " + str(sheep[i].gene.geneDigits))
+j = 0
+while j != 200:
+    for i in range(0, len(sheep)):
+        randomNum = i
+        sheep[i].grow()
+        sheep[i].forage()
+        while randomNum == i:
+            randomNum = random.randint(0, len(sheep) - 1)
+        sheep[i].attack(sheep[randomNum])
+        sheep[i].defend(sheep[randomNum])
+        new_sheep = sheep[i].breed(sheep[randomNum])
+        if new_sheep is not None:
+            sheep.append(new_sheep)
+        sheep[i].grow()
+        print("len is " + str(len(sheep)) + " i is " + str(i))
+    print("j is " + str(j))
+    j += 1
 
-print("sheep2 gene " + str(sheep2.gene.geneDigits))
-print("sheep2 defendPossibility " + str(sheep2.defendPossibility))
-print("sheep2 gender " + str(sheep2.gender))
-
-sheep3 = Sheep()
-gene = sheep1.breed(sheep2)
-print(gene, "here")
-if gene != None:
-    sheep3.set_gene(gene)
-    print("s" + str(sheep3.gene.geneDigits))
+# gene = sheep1.breed(sheep2)
+# sheep3.set_gene(gene)
+# print(gene, "here")
+# if gene is not None:
+#     print("s " + str(sheep3.gene.geneDigits))
 
 
 # gene.recombine(gene1)

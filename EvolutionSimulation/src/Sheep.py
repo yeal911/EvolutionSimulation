@@ -12,13 +12,16 @@ class Sheep(Population):
     def populationName(cls):
         return "Sheep"
 
-    def __init__(self):
+    def __init__(self, gene=None):
         # initialize gene set
-        self.gene = Gene()
+        if gene is None:
+            self.gene = Gene()
+        else:
+            self.gene = gene
 
         # breeding times for each individual
         self.breedingTimes = 2
-        self.age = 6
+        self.age = 2
         self.fightCapability = 5
         self.name = "sheep"
 
@@ -61,7 +64,7 @@ class Sheep(Population):
     def grow(self):
         # If lifespan is over 15, it should die
         if self.age == self.lifespan:
-            print("Lifespan is" + self.lifespan + "," + "Now should die :(")
+            print("Lifespan is " + str(self.lifespan) + "," + "Now should die :(")
             return False
         # Otherwise it will increase
         self.age += 1
@@ -78,7 +81,8 @@ class Sheep(Population):
 
     # attack behaviour of a sheep
     def attack(self, population: Population):
-        print("attackPossibility " + str(self.attackPossibility) + " defendPossibility " + str(population.defendPossibility))
+        print("attackPossibility " + str(self.attackPossibility) + " defendPossibility " + str(
+            population.defendPossibility))
         # attackPossibility increase in the growth period
         if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
             self.attackPossibility += 1
@@ -92,7 +96,8 @@ class Sheep(Population):
 
     # defend behaviour of a sheep
     def defend(self, population: Population):
-        print(" defendPossibility " + str(self.defendPossibility) + " attackPossibility " + str(population.attackPossibility))
+        print(" defendPossibility " + str(self.defendPossibility) + " attackPossibility " + str(
+            population.attackPossibility))
         # defendPossibility increase in the growth period
         if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
             self.defendPossibility += 1
@@ -112,7 +117,11 @@ class Sheep(Population):
         if self.breedingTimes > 0:
             if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
                 self.breedingTimes -= 1
-                return self.gene.recombine(spouse.gene)
+                gene = self.gene.recombine(spouse.gene)
+                print("Father is " + str(self.gene.geneDigits) + " Mother is " + str(spouse.gene.geneDigits))
+                new_sheep = Sheep(gene)
+                return new_sheep
 
+    # set gene
     def set_gene(self, gene: Gene):
         self.gene = gene

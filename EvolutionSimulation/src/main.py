@@ -12,7 +12,7 @@ for i in range(0, 5):
     print("Sheep" + str(i) + " is " + str(sheep[i].gene.geneDigits))
 
 j = 0
-while j != 50:
+while j != 100:
     for i in range(0, len(sheep)):
         randomNum = i
         sheep[i].grow()
@@ -27,7 +27,7 @@ while j != 50:
         sheep[i].grow()
         x.append(j)
         y.append(len(sheep))
-        # 生成图形
+        # generate plot
         plt.plot(x, y, 'r')
         plt.xlabel("day")
         plt.ylabel("number of sheep")
@@ -35,17 +35,11 @@ while j != 50:
 
     j += 1
 
-# x = np.linspace(-3, 3, 50)
-# x = len(sheep)
-# y = 2 * x
 
-# # 生成数据
-# x = np.arange(0, 10, 0.1) # 横坐标数据为从0到10之间，步长为0.1的等差数组
-# y = np.sin(x) # 纵坐标数据为 x 对应的 sin(x) 值
-
-
-# 显示图形
+# save plot
 plt.savefig("./test.jpg")
+
+# show plot
 plt.show()
 # gene = sheep1.breed(sheep2)
 # sheep3.set_gene(gene)

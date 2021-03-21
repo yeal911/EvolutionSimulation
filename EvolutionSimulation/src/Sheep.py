@@ -21,7 +21,7 @@ class Sheep(Population):
 
         # breeding times for each individual
         self.breedingTimes = 2
-        self.age = 2
+        self.age = 0
         self.fightCapability = 5
         self.name = "sheep"
 
@@ -31,7 +31,7 @@ class Sheep(Population):
         self.lifespan = 2 * (self.gene.geneDigits[0] + self.gene.geneDigits[1])
 
         # gender
-        if self.gene.geneDigits[2] / 2 == 0:
+        if self.gene.geneDigits[2] % 2 == 0:
             self.gender = "M"
         else:
             self.gender = "F"

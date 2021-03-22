@@ -2,8 +2,8 @@
 import math
 import random
 
-import Population
-import Gene
+from Population import Population
+from Gene import Gene
 
 
 class Wolf(Population):
@@ -36,7 +36,7 @@ class Wolf(Population):
     # geneSet = []
     #
     # # breeding times for each individual
-    # breedingTimes = 2
+    # remainingBreedingTimes = 2
 
     @classmethod  # static method of a class
     def populationName(cls):
@@ -59,7 +59,7 @@ class Wolf(Population):
         # static properties initialization
         genderGroup = ["M", "F"]
         self.gender = genderGroup[random.randint(0, 1)]
-        self.name = "wolf-" + id(self)  # name it with self's address in memory
+        self.name = "wolf-" + str(id(self))  # name it with self's address in memory
 
         # dynamic properties initialization
         self.hungryLevel = 5
@@ -152,14 +152,19 @@ class Wolf(Population):
             return False
 
     # breed behaviour of a wolf
-    def breed(self, spouse: Population):
-        if self.gender == spouse.gender:
-            print("Same gender, no breed")
+    def breed(self, spouse):
+        if spouse.__class__.__name__ != "Wolf" or self.gender == spouse.gender:
+            print("Different population or same gender, no breed")
             return None
-        if self.breedingTimes > 0:
-            if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-                self.breedingTimes -= 1
-                gene = self.gene.recombine(spouse.gene)
-                print("Father is " + str(self.gene.geneDigits) + " Mother is " + str(spouse.gene.geneDigits))
-                new_sheep = Sheep(gene)
-                return new_sheep
+        if self.remainingBreedingTimes > 0 and self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
+            self.remainingBreedingTimes -= 1
+            # rebuild gene_set for new baby wolf, get first half gene set from self, another half from spouse
+            childGeneSet = []
+            # get first half gene set from self after variation
+            for i in range(0, int(Wolf.__geneCount/2)):
+                childGeneSet.append(self.gene_set[i].variate())
+            # get another half gene set from self after variation
+            for i in range(int(Wolf.__geneCount/2), Wolf.__geneCount):
+                childGeneSet.append(spouse.gene_set[i].variate())
+            return Wolf(childGeneSet)
+        return None

@@ -32,13 +32,13 @@ class Gene:
                 self.geneDigits.append(random.randint(Gene.__geneBitMinValue, Gene.__geneBitMaxValue))
                 i += 1
 
-    # return specific bit of a gene
-    def returnXBitOfGene(self, x):
-        if x > Gene.__geneLength or x < 0 or not isinstance(x, int):
-            print("returnXBitOfGene: X out of gene bit range!")
-            return None
-        else:
-            return self.geneDigits[x - 1]
+    # # return specific bit of a gene
+    # def returnXBitOfGene(self, x):
+    #     if x > Gene.__geneLength or x < 0 or not isinstance(x, int):
+    #         print("returnXBitOfGene: X out of gene bit range!")
+    #         return None
+    #     else:
+    #         return self.geneDigits[x - 1]
 
     # Gene variation, return a new Gene object
     def variate(self):
@@ -68,3 +68,10 @@ class Gene:
             print("Random number is " + str(randomNum) + " gene variates")
         print("Gene recombination result is " + str(recombineGene.geneDigits))
         return recombineGene
+
+    # return the summary of all digits in the gene
+    def sumGeneDigits(self):
+        summaryValue = 0
+        for i in range(0, Gene.__geneLength):
+            summaryValue += self.geneDigits[i]
+        return summaryValue

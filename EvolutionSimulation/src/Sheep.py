@@ -47,7 +47,7 @@ class Sheep(Population):
 
         # lower limit of growth period
         # self.lowerGrowthPeriod = self.lifespan / 3
-        self.lowerGrowthPeriod = 5
+        self.lowerGrowthPeriod = self.lifespan / 3
 
         # upper limit of growth period
         self.upperGrowthPeriod = 2 * self.lowerGrowthPeriod
@@ -89,6 +89,12 @@ class Sheep(Population):
         # attack successfully
         if self.attackPossibility > population.defendPossibility:
             print(self.name + " attack" + population.name + " successfully! Fight happened")
+            if self.attackPossibility - population.defendPossibility > 2:
+                self.attackPossibility += 1
+                population.attackPossibility -= 1
+            else:
+                population.defendPossibility += 1
+                self.attackPossibility -= 1
             return True
         # attack unsuccessfully, fight not happen
         else:
@@ -107,6 +113,12 @@ class Sheep(Population):
             return True
         # escape unsuccessfully,fight may happen
         else:
+            if population.attackPossibility - self.defendPossibility > 2:
+                self.attackPossibility -= 1
+                population.attackPossibility += 1
+            else:
+                population.defendPossibility -= 1
+                self.attackPossibility += 1
             return False
 
     # breed behaviour of a sheep

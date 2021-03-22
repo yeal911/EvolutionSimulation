@@ -64,6 +64,7 @@ class Wolf(Population):
         # dynamic properties initialization
         self.hungryLevel = 5
         self.age = 0
+        self.lifeStatus = "Alive"
 
         # gene related properties initialization
         self.lifespan = 10  # initialize life with 10, maximum 15 after computation based on gene_set
@@ -85,8 +86,7 @@ class Wolf(Population):
         self.remainingBreedingTimes += math.ceil((self.gene_set[8].sumGeneDigits() + self.gene_set[9].sumGeneDigits()) / 60)
 
         # lower limit of growth period
-        # self.lowerGrowthPeriod = self.lifespan / 3
-        self.lowerGrowthPeriod = 5
+        self.lowerGrowthPeriod = math.ceil(self.lifespan / 3)
 
         # upper limit of growth period
         self.upperGrowthPeriod = 2 * self.lowerGrowthPeriod
@@ -102,29 +102,32 @@ class Wolf(Population):
     # grow behaviour of a wolf
     def grow(self):
         # If age is over lifespan, it should die
-        if self.age == self.lifespan:
-            print("Lifespan is " + str(self.lifespan) + "," + "Now should die :(")
+        if self.age >= self.lifespan:
+            print(self.name + "lifespan is " + str(self.lifespan) + "," + "Now should die :(")
+            self.lifeStatus = "Dead"
             return False
         # Otherwise it will increase
         self.age += 1
-        self.hungryLevel += 1
+        if self.hungryLevel < 10:
+            self.hungryLevel += 1
         if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-            self.defendPossibility += 1
-            self.attackPossibility += 1
-            self.fightCapability += 1
+            self.defendPossibility += 0.1
+            self.attackPossibility += 0.2
+            self.fightCapability += 0.2
         elif self.age >= self.upperGrowthPeriod:
-            self.defendPossibility -= 1
-            self.attackPossibility -= 1
-            self.hungryLevel -= 1
-            self.fightCapability -= 1
+            self.defendPossibility -= 0.1
+            self.attackPossibility -= 0.2
+            self.fightCapability -= 0.2
+            if self.hungryLevel > 1:
+                self.hungryLevel -= 1
 
-    # attack behaviour of a sheep
+    # attack behaviour of a wolf
     def attack(self, population: Population):
         print("attackPossibility " + str(self.attackPossibility) + " defendPossibility " + str(
             population.defendPossibility))
         # attackPossibility increase in the growth period
-        if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-            self.attackPossibility += 1
+        # if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
+        #     self.attackPossibility += 1
         # attack successfully
         if self.attackPossibility > population.defendPossibility:
             print(self.name + " attack" + population.name + " successfully! Fight happened")
@@ -133,26 +136,26 @@ class Wolf(Population):
         else:
             return False
 
-    # defend behaviour of a sheep
+    # defend behaviour of a wolf
     def defend(self, population: Population):
         print(" defendPossibility " + str(self.defendPossibility) + " attackPossibility " + str(
             population.attackPossibility))
         # defendPossibility increase in the growth period
-        if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-            self.defendPossibility += 1
+        # if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
+        #     self.defendPossibility += 1
         # escape successfully
-        if self.defendPossibility > population.attackPossibility:
-            print(self.name + " escape successfully! No fight happened")
+        if self.defendPossibility >= population.attackPossibility:
+            print(self.name + " defended successfully!")
             return True
-        # escape unsuccessfully,fight may happen
+        # defend unsuccessfully
         else:
             return False
 
-    # breed behaviour of a sheep
+    # breed behaviour of a wolf
     def breed(self, spouse: Population):
         if self.gender == spouse.gender:
             print("Same gender, no breed")
-            return
+            return None
         if self.breedingTimes > 0:
             if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
                 self.breedingTimes -= 1

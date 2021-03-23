@@ -74,16 +74,16 @@ class Wolf(Population):
         self.remainingBreedingTimes = 2  # initialize remaining breeding times with 2, maximum 5 after computation based on gene_set
 
         # add computation for properties based on gene set
-        # the 1st & 2nd Gene control lifespan, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,180], then compute the addition to be added to initial value of lifespan
-        self.lifespan += math.ceil((self.gene_set[0].sumGeneDigits() + self.gene_set[1].sumGeneDigits()) / 36)
-        # the 3rd & 4th Gene control fightCapability, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,180], then compute the addition to be added to initial value of fightCapability
-        self.fightCapability += math.ceil((self.gene_set[2].sumGeneDigits() + self.gene_set[3].sumGeneDigits()) / 3.6)
-        # the 5th & 6th Gene control attackPossibility, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,180], then compute the addition to be added to initial value of attackPossibility
-        self.attackPossibility += math.ceil((self.gene_set[4].sumGeneDigits() + self.gene_set[5].sumGeneDigits()) / 3.6)
-        # the 7th & 8th Gene control defendPossibility, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,180], then compute the addition to be added to initial value of defendPossibility
-        self.defendPossibility += math.ceil((self.gene_set[6].sumGeneDigits() + self.gene_set[7].sumGeneDigits()) / 3.6)
-        # the 9th & 10th Gene control remainingBreedingTimes, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,180], then compute the addition to be added to initial value of remainingBreedingTimes
-        self.remainingBreedingTimes += math.ceil((self.gene_set[8].sumGeneDigits() + self.gene_set[9].sumGeneDigits()) / 60)
+        # the 1st & 2nd Gene control lifespan, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980], then compute the addition to be added to initial value of lifespan
+        self.lifespan += math.ceil((self.gene_set[0].sumGeneDigits() + self.gene_set[1].sumGeneDigits()) / 396)
+        # the 3rd & 4th Gene control fightCapability, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980], then compute the addition to be added to initial value of fightCapability
+        self.fightCapability += math.ceil((self.gene_set[2].sumGeneDigits() + self.gene_set[3].sumGeneDigits()) / 39.6)
+        # the 5th & 6th Gene control attackPossibility, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980], then compute the addition to be added to initial value of attackPossibility
+        self.attackPossibility += math.ceil((self.gene_set[4].sumGeneDigits() + self.gene_set[5].sumGeneDigits()) / 39.6)
+        # the 7th & 8th Gene control defendPossibility, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980], then compute the addition to be added to initial value of defendPossibility
+        self.defendPossibility += math.ceil((self.gene_set[6].sumGeneDigits() + self.gene_set[7].sumGeneDigits()) / 39.6)
+        # the 9th & 10th Gene control remainingBreedingTimes, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980], then compute the addition to be added to initial value of remainingBreedingTimes
+        self.remainingBreedingTimes += math.ceil((self.gene_set[8].sumGeneDigits() + self.gene_set[9].sumGeneDigits()) / 660)
 
         # lower limit of growth period
         self.lowerGrowthPeriod = math.ceil(self.lifespan / 5)

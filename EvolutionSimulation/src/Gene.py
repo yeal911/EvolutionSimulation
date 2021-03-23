@@ -14,7 +14,7 @@ class Gene:
     __geneBitMinValue = 0
 
     # gene bit max value
-    __geneBitMaxValue = 9
+    __geneBitMaxValue = 99
 
     # gene variation min digits
     __geneVariationMinValue = 0

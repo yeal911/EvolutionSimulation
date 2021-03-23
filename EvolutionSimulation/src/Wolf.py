@@ -71,7 +71,7 @@ class Wolf(Population):
         self.fightCapability = 50  # initialize fight capability with 50, maximum 100 after computation based on gene_set
         self.attackPossibility = 50  # initialize attack possibility with 50, maximum 100 after computation based on gene_set
         self.defendPossibility = 50  # initialize defend possibility with 50, maximum 100 after computation based on gene_set
-        self.remainingBreedingTimes = 2  # initialize remaining breeding times with 2, maximum 5 after computation based on gene_set
+        self.remainingBreedingTimes = 1  # initialize remaining breeding times with 1, maximum 3 after computation based on gene_set
 
         # add computation for properties based on gene set
         # the 1st & 2nd Gene control lifespan, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980], then compute the addition to be added to initial value of lifespan
@@ -83,13 +83,13 @@ class Wolf(Population):
         # the 7th & 8th Gene control defendPossibility, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980], then compute the addition to be added to initial value of defendPossibility
         self.defendPossibility += math.ceil((self.gene_set[6].sumGeneDigits() + self.gene_set[7].sumGeneDigits()) / 39.6)
         # the 9th & 10th Gene control remainingBreedingTimes, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980], then compute the addition to be added to initial value of remainingBreedingTimes
-        self.remainingBreedingTimes += math.ceil((self.gene_set[8].sumGeneDigits() + self.gene_set[9].sumGeneDigits()) / 660)
+        self.remainingBreedingTimes += math.round((self.gene_set[8].sumGeneDigits() + self.gene_set[9].sumGeneDigits()) / 990)
 
         # lower limit of growth period
-        self.lowerGrowthPeriod = math.ceil(self.lifespan / 5)
+        self.lowerGrowthPeriod = math.ceil(self.lifespan / 3)
 
         # upper limit of growth period
-        self.upperGrowthPeriod = 4 * self.lowerGrowthPeriod
+        self.upperGrowthPeriod = 2 * self.lowerGrowthPeriod
 
     # forage behaviour of wolf
     def forage(self):

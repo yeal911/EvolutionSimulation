@@ -42,7 +42,7 @@ class Wolf(Population):
     def populationName(cls):
         return "Wolf"
 
-    def __init__(self, gene_set=None):
+    def __init__(self, gene_set=None, generation=1):
         # initialize gene_set, if no input parameter gene_set or input gene_set is incorrect, randomly generate genes
         if gene_set is None:
             self.gene_set = []
@@ -60,6 +60,7 @@ class Wolf(Population):
         genderGroup = ["M", "F"]
         self.gender = genderGroup[random.randint(0, 1)]
         self.name = "wolf-" + str(id(self))  # name it with self's address in memory
+        self.generation = generation
 
         # dynamic properties initialization
         self.hungryLevel = 5
@@ -74,15 +75,20 @@ class Wolf(Population):
         self.remainingBreedingTimes = 1  # initialize remaining breeding times with 1, maximum 3 after computation based on gene_set
 
         # add computation for properties based on gene set
-        # the 1st & 2nd Gene control lifespan, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980], then compute the addition to be added to initial value of lifespan
+        # the 1st & 2nd Gene control lifespan, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980],
+        # then compute the addition to be added to initial value of lifespan
         self.lifespan += math.ceil((self.gene_set[0].sumGeneDigits() + self.gene_set[1].sumGeneDigits()) / 396)
-        # the 3rd & 4th Gene control fightCapability, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980], then compute the addition to be added to initial value of fightCapability
+        # the 3rd & 4th Gene control fightCapability, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980],
+        # then compute the addition to be added to initial value of fightCapability
         self.fightCapability += math.ceil((self.gene_set[2].sumGeneDigits() + self.gene_set[3].sumGeneDigits()) / 39.6)
-        # the 5th & 6th Gene control attackPossibility, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980], then compute the addition to be added to initial value of attackPossibility
+        # the 5th & 6th Gene control attackPossibility, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980],
+        # then compute the addition to be added to initial value of attackPossibility
         self.attackPossibility += math.ceil((self.gene_set[4].sumGeneDigits() + self.gene_set[5].sumGeneDigits()) / 39.6)
-        # the 7th & 8th Gene control defendPossibility, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980], then compute the addition to be added to initial value of defendPossibility
+        # the 7th & 8th Gene control defendPossibility, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980],
+        # then compute the addition to be added to initial value of defendPossibility
         self.defendPossibility += math.ceil((self.gene_set[6].sumGeneDigits() + self.gene_set[7].sumGeneDigits()) / 39.6)
-        # the 9th & 10th Gene control remainingBreedingTimes, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980], then compute the addition to be added to initial value of remainingBreedingTimes
+        # the 9th & 10th Gene control remainingBreedingTimes, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980],
+        # then compute the addition to be added to initial value of remainingBreedingTimes
         self.remainingBreedingTimes += math.round((self.gene_set[8].sumGeneDigits() + self.gene_set[9].sumGeneDigits()) / 990)
 
         # lower limit of growth period
@@ -123,8 +129,7 @@ class Wolf(Population):
 
     # attack behaviour of a wolf
     def attack(self, population: Population):
-        print("attackPossibility " + str(self.attackPossibility) + " defendPossibility " + str(
-            population.defendPossibility))
+        print("attackPossibility " + str(self.attackPossibility) + " defendPossibility " + str(population.defendPossibility))
         # attackPossibility increase in the growth period
         # if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
         #     self.attackPossibility += 1
@@ -138,8 +143,7 @@ class Wolf(Population):
 
     # defend behaviour of a wolf
     def defend(self, population: Population):
-        print(" defendPossibility " + str(self.defendPossibility) + " attackPossibility " + str(
-            population.attackPossibility))
+        print(" defendPossibility " + str(self.defendPossibility) + " attackPossibility " + str(population.attackPossibility))
         # defendPossibility increase in the growth period
         # if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
         #     self.defendPossibility += 1
@@ -166,5 +170,5 @@ class Wolf(Population):
             # get another half gene set from self after variation
             for i in range(int(Wolf.__geneCount/2), Wolf.__geneCount):
                 childGeneSet.append(spouse.gene_set[i].variate())
-            return Wolf(childGeneSet)
+            return Wolf(childGeneSet, round((self.generation + spouse.generation)/2))
         return None

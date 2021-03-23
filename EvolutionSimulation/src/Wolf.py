@@ -117,24 +117,24 @@ class Wolf(Population):
         if self.hungryLevel < 10:
             self.hungryLevel += 1
         if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-            self.defendPossibility += 1
-            self.attackPossibility += 1
+            # self.defendPossibility += 1
+            # self.attackPossibility += 1
             self.fightCapability += 1
         elif self.age >= self.upperGrowthPeriod:
-            self.defendPossibility -= 1
-            self.attackPossibility -= 1
+            # self.defendPossibility -= 1
+            # self.attackPossibility -= 1
             self.fightCapability -= 1
             if self.hungryLevel > 1:
                 self.hungryLevel -= 1
 
     # attack behaviour of a wolf
     def attack(self, population: Population):
-        print("attackPossibility " + str(self.attackPossibility) + " defendPossibility " + str(population.defendPossibility))
+        print("self.fightCapability " + str(self.fightCapability) + "competitor.fightCapability " + str(population.fightCapability))
         # attackPossibility increase in the growth period
         # if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
         #     self.attackPossibility += 1
         # attack successfully
-        if self.attackPossibility > population.defendPossibility:
+        if self.fightCapability > population.fightCapability:
             print(self.name + " attack" + population.name + " successfully! Fight happened")
             return True
         # attack unsuccessfully, fight not happen
@@ -143,12 +143,12 @@ class Wolf(Population):
 
     # defend behaviour of a wolf
     def defend(self, population: Population):
-        print(" defendPossibility " + str(self.defendPossibility) + " attackPossibility " + str(population.attackPossibility))
-        # defendPossibility increase in the growth period
+        print("self.fightCapability " + str(self.fightCapability) + "competitor.fightCapability " + str(population.fightCapability))
+        # fightCapability increase in the growth period
         # if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-        #     self.defendPossibility += 1
+        #     self.fightCapability += 1
         # escape successfully
-        if self.defendPossibility >= population.attackPossibility:
+        if self.fightCapability >= population.fightCapability:
             print(self.name + " defended successfully!")
             return True
         # defend unsuccessfully

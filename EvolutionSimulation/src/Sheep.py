@@ -46,7 +46,7 @@ class Sheep(Population):
         self.defendPossibility = self.gene.geneDigits[4]
 
         # fightPossibility
-        self.fightCapability = min(45, self.gene.geneDigits[7])
+        self.fightCapability = min(60, self.gene.geneDigits[7])
 
         # hungryLevel
         self.hungryLevel = (self.gene.geneDigits[5] + self.gene.geneDigits[6]) / 2

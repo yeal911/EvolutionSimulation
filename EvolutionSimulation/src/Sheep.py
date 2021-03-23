@@ -44,6 +44,8 @@ class Sheep(Population):
         # defendPossibility
         self.defendPossibility = self.gene.geneDigits[4]
 
+        # fightPossibility
+        self.fightCapability  = self.gene.geneDigits[7]
         # hungryLevel
         self.hungryLevel = (self.gene.geneDigits[5] + self.gene.geneDigits[6]) / 2
 
@@ -83,20 +85,20 @@ class Sheep(Population):
 
     # attack behaviour of a sheep
     def attack(self, population: Population):
-        print("attackPossibility " + str(self.attackPossibility) + " defendPossibility " + str(
-            population.defendPossibility))
+        print("fightCapability " + str(self.fightCapability) + " fightCapability " + str(
+            population.fightCapability))
         # attackPossibility increase in the growth period
         if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-            self.attackPossibility += 1
+            self.fightCapability += 1
         # attack successfully
-        if self.attackPossibility > population.defendPossibility:
+        if self.fightCapability > population.fightCapability:
             print(self.name + " attack" + population.name + " successfully! Fight happened")
-            if self.attackPossibility - population.defendPossibility > 2:
-                self.attackPossibility += 1
-                population.attackPossibility -= 1
+            if self.fightCapability - population.fightCapability > 2:
+                self.fightCapability += 1
+                population.fightCapability -= 1
             else:
-                population.defendPossibility += 1
-                self.attackPossibility -= 1
+                population.fightCapability += 1
+                self.fightCapability -= 1
             return True
         # attack unsuccessfully, fight not happen
         else:
@@ -104,23 +106,23 @@ class Sheep(Population):
 
     # defend behaviour of a sheep
     def defend(self, population: Population):
-        print(" defendPossibility " + str(self.defendPossibility) + " attackPossibility " + str(
-            population.attackPossibility))
+        print(" fightCapability " + str(self.fightCapability) + " fightCapability " + str(
+            population.fightCapability))
         # defendPossibility increase in the growth period
         if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-            self.defendPossibility += 1
+            self.fightCapability += 1
         # escape successfully
-        if self.defendPossibility > population.attackPossibility:
+        if self.fightCapability > population.fightCapability:
             print(self.name + " escape successfully! No fight happened")
             return True
         # escape unsuccessfully,fight may happen
         else:
-            if population.attackPossibility - self.defendPossibility > 2:
-                self.attackPossibility -= 1
-                population.attackPossibility += 1
+            if population.fightCapability - self.fightCapability > 2:
+                self.fightCapability -= 1
+                population.fightCapability += 1
             else:
-                population.defendPossibility -= 1
-                self.attackPossibility += 1
+                population.fightCapability -= 1
+                self.fightCapability += 1
             return False
         # self.age += 1
 

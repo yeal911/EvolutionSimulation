@@ -68,28 +68,28 @@ class Wolf(Population):
 
         # gene related properties initialization
         self.lifespan = 10  # initialize life with 10, maximum 15 after computation based on gene_set
-        self.fightCapability = 5  # initialize fight capability with 5, maximum 10 after computation based on gene_set
-        self.attackPossibility = 5  # initialize attack possibility with 5, maximum 10 after computation based on gene_set
-        self.defendPossibility = 5  # initialize defend possibility with 5, maximum 10 after computation based on gene_set
+        self.fightCapability = 50  # initialize fight capability with 50, maximum 100 after computation based on gene_set
+        self.attackPossibility = 50  # initialize attack possibility with 50, maximum 100 after computation based on gene_set
+        self.defendPossibility = 50  # initialize defend possibility with 50, maximum 100 after computation based on gene_set
         self.remainingBreedingTimes = 2  # initialize remaining breeding times with 2, maximum 5 after computation based on gene_set
 
         # add computation for properties based on gene set
         # the 1st & 2nd Gene control lifespan, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,180], then compute the addition to be added to initial value of lifespan
         self.lifespan += math.ceil((self.gene_set[0].sumGeneDigits() + self.gene_set[1].sumGeneDigits()) / 36)
         # the 3rd & 4th Gene control fightCapability, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,180], then compute the addition to be added to initial value of fightCapability
-        self.fightCapability += math.ceil((self.gene_set[2].sumGeneDigits() + self.gene_set[3].sumGeneDigits()) / 36)
+        self.fightCapability += math.ceil((self.gene_set[2].sumGeneDigits() + self.gene_set[3].sumGeneDigits()) / 3.6)
         # the 5th & 6th Gene control attackPossibility, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,180], then compute the addition to be added to initial value of attackPossibility
-        self.attackPossibility += math.ceil((self.gene_set[4].sumGeneDigits() + self.gene_set[5].sumGeneDigits()) / 36)
+        self.attackPossibility += math.ceil((self.gene_set[4].sumGeneDigits() + self.gene_set[5].sumGeneDigits()) / 3.6)
         # the 7th & 8th Gene control defendPossibility, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,180], then compute the addition to be added to initial value of defendPossibility
-        self.defendPossibility += math.ceil((self.gene_set[6].sumGeneDigits() + self.gene_set[7].sumGeneDigits()) / 36)
+        self.defendPossibility += math.ceil((self.gene_set[6].sumGeneDigits() + self.gene_set[7].sumGeneDigits()) / 3.6)
         # the 9th & 10th Gene control remainingBreedingTimes, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,180], then compute the addition to be added to initial value of remainingBreedingTimes
         self.remainingBreedingTimes += math.ceil((self.gene_set[8].sumGeneDigits() + self.gene_set[9].sumGeneDigits()) / 60)
 
         # lower limit of growth period
-        self.lowerGrowthPeriod = math.ceil(self.lifespan / 3)
+        self.lowerGrowthPeriod = math.ceil(self.lifespan / 5)
 
         # upper limit of growth period
-        self.upperGrowthPeriod = 2 * self.lowerGrowthPeriod
+        self.upperGrowthPeriod = 4 * self.lowerGrowthPeriod
 
     # forage behaviour of wolf
     def forage(self):

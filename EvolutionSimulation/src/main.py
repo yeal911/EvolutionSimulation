@@ -24,17 +24,10 @@ for i in range(0, 10):
 j = 0
 
 
-# def out_lifespan(population: Population):
-#     for i in range(0, len(population)):
-#         if population[i].age == population[i].lifespan:
-#             population.remove(population[i])
-#             i -= 1
-#             if i == len(population) - 1:
-#                 return
 def out_lifespan(population: Population, index: int):
-    if population[index].age == population[index].lifespan:
+    if population[index].lifeStatus == "Dead":
+        print("Remove ok!！！！" + population[index].name)
         population.remove(population[index])
-        print("Remove ok!！！！")
 
 
 def population_grow(population: Population):
@@ -50,14 +43,13 @@ def population_grow(population: Population):
 def population_fight(population: Population, competitor: Population):
     for i in range(0, len(population)):
         randNum = choice([n for n in range(0, len(competitor)) if n != i])
-        population[i].attack(competitor[randNum])
-
-        randNum = choice([n for n in range(0, len(competitor)) if n != i])
-        population[i].defend(competitor[randNum])
+        population[i].fight(competitor[randNum])
+        competitor[randNum].fight(population[i])
 
 
 def population_reproduce(population: Population):
     for i in range(0, len(population)):
+        print("population is  " + str(population))
         randNum = choice([n for n in range(0, len(population)) if n != i])
         new_population = population[i].breed(population[randNum])
         if new_population is not None:
@@ -80,7 +72,6 @@ def evolution(population: Population, competitor: Population, cycle: int):
     population_grow(competitor)
 
     population_fight(population, competitor)
-    population_fight(competitor, population)
 
     population_reproduce(population)
     population_reproduce(competitor)
@@ -90,11 +81,15 @@ def evolution(population: Population, competitor: Population, cycle: int):
 
 start = time.time()
 
-while j != 200:
+while j != 20:
+    print("j is " + str(j))
+    print("sheep " + str(len(sheep)))
+    print("wolf " + str(len(wolf)))
     evolution(sheep, wolf, j)
+
     j += 1
     end = time.time()
-    if end-start > 180:
+    if end-start > 100:
         break
 
 print(end - start)

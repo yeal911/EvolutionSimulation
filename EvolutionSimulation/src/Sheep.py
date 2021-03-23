@@ -25,6 +25,7 @@ class Sheep(Population):
         self.age = 0
         self.fightCapability = 5
         self.name = "sheep"
+        self.lifeStatus = "Alive"
 
         # add computation for properties based on gene set
 
@@ -45,7 +46,8 @@ class Sheep(Population):
         self.defendPossibility = self.gene.geneDigits[4]
 
         # fightPossibility
-        self.fightCapability  = self.gene.geneDigits[7]
+        self.fightCapability = min(45, self.gene.geneDigits[7])
+
         # hungryLevel
         self.hungryLevel = (self.gene.geneDigits[5] + self.gene.geneDigits[6]) / 2
 
@@ -69,6 +71,7 @@ class Sheep(Population):
         # If lifespan is over 15, it should die
         if self.age >= self.lifespan:
             print("Lifespan is " + str(self.lifespan) + "," + "Now should die :(")
+            self.lifeStatus = "Dead"
             return False
         # Otherwise it will increase
         self.age += 1
@@ -125,6 +128,17 @@ class Sheep(Population):
                 self.fightCapability += 1
             return False
         # self.age += 1
+
+    def fight(self, population: Population):
+        if self.fightCapability > population.fightCapability:
+            if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
+                self.fightCapability += 1
+                return "Success"
+        elif self.fightCapability == population.fightCapability:
+            return "Peace"
+        else:
+            self.lifeStatus = "Dead"
+            return "Failure"
 
     # breed behaviour of a sheep
     def breed(self, spouse: Population):

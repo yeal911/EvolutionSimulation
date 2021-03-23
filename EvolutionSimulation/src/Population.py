@@ -16,11 +16,11 @@ class Population(metaclass=ABCMeta):
 
     # attack behaviour of a population
     @abstractmethod
-    def attack(self): pass
+    def fight(self, population): pass
 
-    # defend behaviour of a population
-    @abstractmethod
-    def defend(self): pass
+    # # defend behaviour of a population
+    # @abstractmethod
+    # def defend(self): pass
 
     # breed behaviour of a population
     @abstractmethod

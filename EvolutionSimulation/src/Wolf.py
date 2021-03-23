@@ -127,33 +127,31 @@ class Wolf(Population):
             if self.hungryLevel > 1:
                 self.hungryLevel -= 1
 
-    # attack behaviour of a wolf
-    def attack(self, population: Population):
-        print("self.fightCapability " + str(self.fightCapability) + "competitor.fightCapability " + str(population.fightCapability))
-        # attackPossibility increase in the growth period
-        # if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-        #     self.attackPossibility += 1
-        # attack successfully
+    # fight behaviour of a wolf
+    def fight(self, population: Population):
         if self.fightCapability > population.fightCapability:
-            print(self.name + " attack" + population.name + " successfully! Fight happened")
-            return True
-        # attack unsuccessfully, fight not happen
+            if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
+                self.fightCapability += 1
+            return "Success"
+        elif self.fightCapability == population.fightCapability:
+            return "Peace"
         else:
-            return False
+            self.lifeStatus = "Dead"
+            return "Failure"
 
-    # defend behaviour of a wolf
-    def defend(self, population: Population):
-        print("self.fightCapability " + str(self.fightCapability) + "competitor.fightCapability " + str(population.fightCapability))
-        # fightCapability increase in the growth period
-        # if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-        #     self.fightCapability += 1
-        # escape successfully
-        if self.fightCapability >= population.fightCapability:
-            print(self.name + " defended successfully!")
-            return True
-        # defend unsuccessfully
-        else:
-            return False
+    # # defend behaviour of a wolf
+    # def defend(self, population: Population):
+    #     print("self.fightCapability " + str(self.fightCapability) + "competitor.fightCapability " + str(population.fightCapability))
+    #     # fightCapability increase in the growth period
+    #     # if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
+    #     #     self.fightCapability += 1
+    #     # escape successfully
+    #     if self.fightCapability >= population.fightCapability:
+    #         print(self.name + " defended successfully!")
+    #         return True
+    #     # defend unsuccessfully
+    #     else:
+    #         return False
 
     # breed behaviour of a wolf
     def breed(self, spouse):

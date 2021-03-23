@@ -111,13 +111,13 @@ class Wolf(Population):
         if self.hungryLevel < 10:
             self.hungryLevel += 1
         if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-            self.defendPossibility += 0.1
-            self.attackPossibility += 0.2
-            self.fightCapability += 0.2
+            self.defendPossibility += 1
+            self.attackPossibility += 1
+            self.fightCapability += 1
         elif self.age >= self.upperGrowthPeriod:
-            self.defendPossibility -= 0.1
-            self.attackPossibility -= 0.2
-            self.fightCapability -= 0.2
+            self.defendPossibility -= 1
+            self.attackPossibility -= 1
+            self.fightCapability -= 1
             if self.hungryLevel > 1:
                 self.hungryLevel -= 1
 

@@ -83,7 +83,7 @@ class Wolf(Population):
         # the 7th & 8th Gene control defendPossibility, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980], then compute the addition to be added to initial value of defendPossibility
         self.defendPossibility += math.ceil((self.gene_set[6].sumGeneDigits() + self.gene_set[7].sumGeneDigits()) / 39.6)
         # the 9th & 10th Gene control remainingBreedingTimes, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980], then compute the addition to be added to initial value of remainingBreedingTimes
-        self.remainingBreedingTimes += math.round((self.gene_set[8].sumGeneDigits() + self.gene_set[9].sumGeneDigits()) / 990)
+        self.remainingBreedingTimes += round((self.gene_set[8].sumGeneDigits() + self.gene_set[9].sumGeneDigits()) / 990)
 
         # lower limit of growth period
         self.lowerGrowthPeriod = math.ceil(self.lifespan / 3)

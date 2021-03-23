@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import math
 import random
 
 from Population import Population
@@ -20,7 +21,7 @@ class Sheep(Population):
             self.gene = gene
 
         # breeding times for each individual
-        self.breedingTimes = 2
+        self.breedingTimes = 3
         self.age = 0
         self.fightCapability = 5
         self.name = "sheep"
@@ -28,14 +29,15 @@ class Sheep(Population):
         # add computation for properties based on gene set
 
         # lifespan in 2 times first 2 digits of gene
-        self.lifespan = 2 * (self.gene.geneDigits[0] + self.gene.geneDigits[1])
-
+        self.lifespan = math.floor((self.gene.geneDigits[0] + self.gene.geneDigits[1])) / 9
+        print("life span is " + str(self.lifespan))
         # gender
         if self.gene.geneDigits[2] % 2 == 0:
             self.gender = "M"
         else:
             self.gender = "F"
-
+        genderGroup = ["M", "F"]
+        self.gender = genderGroup[random.randint(0, 1)]
         # attackPossibility
         self.attackPossibility = self.gene.geneDigits[3]
 
@@ -63,7 +65,7 @@ class Sheep(Population):
     # grow behaviour of a sheep
     def grow(self):
         # If lifespan is over 15, it should die
-        if self.age == self.lifespan:
+        if self.age >= self.lifespan:
             print("Lifespan is " + str(self.lifespan) + "," + "Now should die :(")
             return False
         # Otherwise it will increase
@@ -120,6 +122,7 @@ class Sheep(Population):
                 population.defendPossibility -= 1
                 self.attackPossibility += 1
             return False
+        # self.age += 1
 
     # breed behaviour of a sheep
     def breed(self, spouse: Population):

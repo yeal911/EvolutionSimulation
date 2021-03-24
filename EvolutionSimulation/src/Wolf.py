@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import math
 import random
+import threading
 
 from Population import Population
 from Gene import Gene
@@ -170,3 +171,15 @@ class Wolf(Population):
                 childGeneSet.append(spouse.gene_set[i].variate())
             return Wolf(childGeneSet, round((self.generation + spouse.generation)/2))
         return None
+
+
+class WolfThread(threading.Thread):
+    """Thread for wolf population, to evolute all the individuals of wolf population"""
+
+    # initialize wolf thread
+    def __init__(self):
+        self.wolves = []
+
+    # monitor all wolves, and execute for all their actions
+    def run(self):
+

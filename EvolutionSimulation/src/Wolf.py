@@ -3,7 +3,8 @@ import math
 import random
 import threading
 
-from Population import Population
+from EvolutionSimulation.src.Dreamland import Dreamland
+from Population import Population, PopulationThread
 from Gene import Gene
 
 
@@ -173,13 +174,20 @@ class Wolf(Population):
         return None
 
 
-class WolfThread(threading.Thread):
+class WolfThread(threading.Thread,PopulationThread):
     """Thread for wolf population, to evolute all the individuals of wolf population"""
+    # initialization wolf count
+    __initWolfCount__ = 10
 
     # initialize wolf thread
     def __init__(self):
         self.wolves = []
+        for i in range(0, WolfThread.__initWolfCount__):
+            self.wolves.append(Wolf())
 
     # monitor all wolves, and execute for all their actions
-    def run(self):
+    def run(self, dreamland: Dreamland): pass
+        # add logic for population run, handle all behaviours of each individual in this population
 
+    def getIndividualCount(self):
+        return WolfThread.__initWolfCount__

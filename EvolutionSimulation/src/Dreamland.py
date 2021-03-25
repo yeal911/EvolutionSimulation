@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from EvolutionSimulation.src.Population import PopulationThread
 
 
-class Dreamland():
+class Dreamland:
     """the playground of all populations, with X & Y coordinates"""
     # # dreamland size X
     # __sizeX__ = 1000

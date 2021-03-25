@@ -12,6 +12,7 @@ class Wolf(Population):
     """this class defines the properties and behaviours of wolf population"""
     # Gene count for wolf
     __geneCount = 10
+
     #
     # # lifespan
     # lifespan = None
@@ -85,13 +86,16 @@ class Wolf(Population):
         self.fightCapability += math.ceil((self.gene_set[2].sumGeneDigits() + self.gene_set[3].sumGeneDigits()) / 39.6)
         # the 5th & 6th Gene control attackPossibility, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980],
         # then compute the addition to be added to initial value of attackPossibility
-        self.attackPossibility += math.ceil((self.gene_set[4].sumGeneDigits() + self.gene_set[5].sumGeneDigits()) / 39.6)
+        self.attackPossibility += math.ceil(
+            (self.gene_set[4].sumGeneDigits() + self.gene_set[5].sumGeneDigits()) / 39.6)
         # the 7th & 8th Gene control defendPossibility, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980],
         # then compute the addition to be added to initial value of defendPossibility
-        self.defendPossibility += math.ceil((self.gene_set[6].sumGeneDigits() + self.gene_set[7].sumGeneDigits()) / 39.6)
+        self.defendPossibility += math.ceil(
+            (self.gene_set[6].sumGeneDigits() + self.gene_set[7].sumGeneDigits()) / 39.6)
         # the 9th & 10th Gene control remainingBreedingTimes, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980],
         # then compute the addition to be added to initial value of remainingBreedingTimes
-        self.remainingBreedingTimes += round((self.gene_set[8].sumGeneDigits() + self.gene_set[9].sumGeneDigits()) / 990)
+        self.remainingBreedingTimes += round(
+            (self.gene_set[8].sumGeneDigits() + self.gene_set[9].sumGeneDigits()) / 990)
 
         # lower limit of growth period
         self.lowerGrowthPeriod = math.ceil(self.lifespan / 3)
@@ -165,16 +169,16 @@ class Wolf(Population):
             # rebuild gene_set for new baby wolf, get first half gene set from self, another half from spouse
             childGeneSet = []
             # get first half gene set from self after variation
-            for i in range(0, int(Wolf.__geneCount/2)):
+            for i in range(0, int(Wolf.__geneCount / 2)):
                 childGeneSet.append(self.gene_set[i].variate())
             # get another half gene set from self after variation
-            for i in range(int(Wolf.__geneCount/2), Wolf.__geneCount):
+            for i in range(int(Wolf.__geneCount / 2), Wolf.__geneCount):
                 childGeneSet.append(spouse.gene_set[i].variate())
-            return Wolf(childGeneSet, round((self.generation + spouse.generation)/2))
+            return Wolf(childGeneSet, round((self.generation + spouse.generation) / 2))
         return None
 
 
-class WolfThread(threading.Thread,PopulationThread):
+class WolfThread(threading.Thread, PopulationThread):
     """Thread for wolf population, to evolute all the individuals of wolf population"""
     # initialization wolf count
     __initWolfCount__ = 10
@@ -187,7 +191,8 @@ class WolfThread(threading.Thread,PopulationThread):
 
     # monitor all wolves, and execute for all their actions
     def run(self, dreamland: Dreamland): pass
-        # add logic for population run, handle all behaviours of each individual in this population
+
+    # add logic for population run, handle all behaviours of each individual in this population
 
     def getIndividualCount(self):
         return WolfThread.__initWolfCount__

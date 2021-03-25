@@ -1,23 +1,26 @@
 import sys
+
+from EvolutionSimulation.src.Dreamland import Dreamland
 from EvolutionSimulation.src.Gene import Gene
 import numpy as np
 import matplotlib.pyplot as plt
 
+print(Dreamland.returnSlotNo(109, 54))
 
-N = 10
-x = np.random.rand(N)
-y = np.random.rand(N)
-x2 = np.random.rand(N)
-y2 = np.random.rand(N)
-x3 = np.random.rand(N)
-y3 = np.random.rand(N)
-area = np.random.rand(N) * 1000
-fig = plt.figure()
-ax = plt.subplot()
-ax.scatter(x, y, s=area, alpha=0.5)
-ax.scatter(x2, y2, s=area, c='green', alpha=0.6)  # https://blog.csdn.net/qq_36387683/article/details/101378036
-ax.scatter(x3, y3, s=area, c=area, marker='v', cmap='Reds', alpha=0.7)  # 更换标记样式，另一种颜色的样式
-plt.show()
+# N = 10
+# x = np.random.rand(N)
+# y = np.random.rand(N)
+# x2 = np.random.rand(N)
+# y2 = np.random.rand(N)
+# x3 = np.random.rand(N)
+# y3 = np.random.rand(N)
+# area = np.random.rand(N) * 1000
+# fig = plt.figure()
+# ax = plt.subplot()
+# ax.scatter(x, y, s=area, alpha=0.5)
+# ax.scatter(x2, y2, s=area, c='green', alpha=0.6)  # https://blog.csdn.net/qq_36387683/article/details/101378036
+# ax.scatter(x3, y3, s=area, c=area, marker='v', cmap='Reds', alpha=0.7)  # 更换标记样式，另一种颜色的样式
+# plt.show()
 
 # # 散点图
 # n = 1024

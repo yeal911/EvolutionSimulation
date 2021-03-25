@@ -4,7 +4,8 @@ import random
 import threading
 
 from EvolutionSimulation.src.Dreamland import Dreamland
-from Population import Population, PopulationThread
+from EvolutionSimulation.src.PopulationThread import PopulationThread
+from Population import Population
 from Gene import Gene
 
 
@@ -69,6 +70,9 @@ class Wolf(Population):
         self.hungryLevel = 5
         self.age = 0
         self.lifeStatus = "Alive"
+        self.coordinateX = 0
+        self.coordinateY = 0
+        self.slotCode = ""
 
         # gene related properties initialization
         self.lifespan = 10  # initialize life with 10, maximum 15 after computation based on gene_set
@@ -184,13 +188,20 @@ class WolfThread(threading.Thread, PopulationThread):
     __initWolfCount__ = 10
 
     # initialize wolf thread
-    def __init__(self):
+    def __init__(self, dreamland: Dreamland):
+        self.dreamland = dreamland
         self.wolves = []
         for i in range(0, WolfThread.__initWolfCount__):
-            self.wolves.append(Wolf())
+            # need to randomly initialize the coordinates of the wolf
+            wolf = Wolf()
+            wolf.coordinateX = random.randint(0, self.dreamland.sizeX)
+            wolf.coordinateY = random.randint(0, self.dreamland.sizeY)
+            # set the slot code in the dreamland
+            wolf.slotCode = Dreamland.returnSlotNo(wolf.coordinateX, wolf.coordinateY)
+            self.wolves.append(wolf)
 
     # monitor all wolves, and execute for all their actions
-    def run(self, dreamland: Dreamland): pass
+    def run(self): pass
 
     # add logic for population run, handle all behaviours of each individual in this population
 

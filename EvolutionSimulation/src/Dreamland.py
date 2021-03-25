@@ -2,11 +2,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from EvolutionSimulation.src.Population import PopulationThread
+from EvolutionSimulation.src import PopulationThread
 
 
 class Dreamland:
-    """the playground of all populations, with X & Y coordinates"""
+    """
+    the playground of all populations, with X & Y coordinates.
+    The whole dreamland will be divided to different slots per 10 scale.
+    The slots are coded with codes like 1010/1020/2010 etc.
+    1010 means the rectangle area from [0,0] to (10,10) in the coordinate axis.
+    """
     # # dreamland size X
     # __sizeX__ = 1000
     # # dreamland size Y
@@ -25,3 +30,10 @@ class Dreamland:
     # remove population player from this dreamland
     def removePopulationPlayer(self, pt: PopulationThread):
         self.populationPlayers.remove(pt)
+
+    # return slot no. with input x and y coordinates
+    @staticmethod
+    def returnSlotNo(x, y):
+        codeX = (x//10 + 1) * 10
+        codeY = (y//10 + 1) * 10
+        return str(codeX) + "," + str(codeY)

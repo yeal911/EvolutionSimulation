@@ -5,7 +5,10 @@ from EvolutionSimulation.src.Gene import Gene
 import numpy as np
 import matplotlib.pyplot as plt
 
+from EvolutionSimulation.src.Wolf import WolfThread
+
 print(Dreamland.returnSlotNo(109, 54))
+c = WolfThread(Dreamland())
 
 # N = 10
 # x = np.random.rand(N)

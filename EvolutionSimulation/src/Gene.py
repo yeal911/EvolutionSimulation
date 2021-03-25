@@ -20,7 +20,7 @@ class Gene:
     __geneVariationMinValue = 0
 
     # gene variation max digits
-    __geneVariationMaxValue = 3
+    __geneVariationMaxValue = 2
 
     # initialize a new gene
     def __init__(self, first_generation=True):

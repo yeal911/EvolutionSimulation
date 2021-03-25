@@ -12,10 +12,6 @@ class Dreamland:
     The slots are coded with codes like 1010/1020/2010 etc.
     1010 means the rectangle area from [0,0] to (10,10) in the coordinate axis.
     """
-    # # dreamland size X
-    # __sizeX__ = 1000
-    # # dreamland size Y
-    # __sizeY__ = 1000
 
     def __init__(self, size_x=1000, size_y=1000):
         self.sizeX = size_x
@@ -36,4 +32,4 @@ class Dreamland:
     def returnSlotNo(x, y):
         codeX = (x//10 + 1) * 10
         codeY = (y//10 + 1) * 10
-        return str(codeX) + "," + str(codeY)
+        return str(codeX) + "A" + str(codeY)

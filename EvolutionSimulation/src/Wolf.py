@@ -2,6 +2,7 @@
 import math
 import random
 import threading
+from datetime import time
 
 from EvolutionSimulation.src.Dreamland import Dreamland
 from EvolutionSimulation.src.PopulationThread import PopulationThread
@@ -13,34 +14,6 @@ class Wolf(Population):
     """this class defines the properties and behaviours of wolf population"""
     # Gene count for wolf
     __geneCount = 10
-
-    #
-    # # lifespan
-    # lifespan = None
-    #
-    # # age
-    # age = None
-    #
-    # # gender
-    # gender = None
-    #
-    # # hungry level
-    # hungryLevel = None
-    #
-    # # attack possibility
-    # attackPossibility = None
-    #
-    # # defend possibility
-    # defendPossibility = None
-    #
-    # # fight capability
-    # fightCapability = None
-    #
-    # # gene set
-    # geneSet = []
-    #
-    # # breeding times for each individual
-    # remainingBreedingTimes = 2
 
     @classmethod  # static method of a class
     def populationName(cls):
@@ -103,7 +76,6 @@ class Wolf(Population):
 
         # lower limit of growth period
         self.lowerGrowthPeriod = math.ceil(self.lifespan / 3)
-
         # upper limit of growth period
         self.upperGrowthPeriod = 2 * self.lowerGrowthPeriod
 
@@ -184,14 +156,13 @@ class Wolf(Population):
 
 class WolfThread(threading.Thread, PopulationThread):
     """Thread for wolf population, to evolute all the individuals of wolf population"""
-    # initialization wolf count
-    __initWolfCount__ = 10
 
     # initialize wolf thread
-    def __init__(self, dreamland: Dreamland):
+    def __init__(self, wolf_count, dreamland: Dreamland):
         self.dreamland = dreamland
+        self.wolfCount = wolf_count
         self.wolves = []
-        for i in range(0, WolfThread.__initWolfCount__):
+        for i in range(0, wolf_count):
             # need to randomly initialize the coordinates of the wolf
             wolf = Wolf()
             wolf.coordinateX = random.randint(0, self.dreamland.sizeX)
@@ -199,11 +170,27 @@ class WolfThread(threading.Thread, PopulationThread):
             # set the slot code in the dreamland
             wolf.slotCode = Dreamland.returnSlotNo(wolf.coordinateX, wolf.coordinateY)
             self.wolves.append(wolf)
+        # add wolf thread to dreamland
+        dreamland.populationPlayers.append(self)
 
     # monitor all wolves, and execute for all their actions
-    def run(self): pass
+    def run(self):
+        # sleep for 1 day (1s)
+        time.sleep(1)
+        for wolf in self.wolves:
+            # add logic for forage, find for food if it is hungry
+            if wolf.hungryLevel > 5:
+                # find food in its own slot, if there is, then flight, if none, change position
+                print(wolf.name + " hungryLevel: " + wolf.hungryLevel)
+            else:
+                print(wolf.name + " hungryLevel: " + wolf.hungryLevel)
+            # add logic for grow
+
+            # add logic for flight
+
+            # add logic for breed
 
     # add logic for population run, handle all behaviours of each individual in this population
-
-    def getIndividualCount(self):
-        return WolfThread.__initWolfCount__
+    #
+    # def getIndividualCount(self):
+    #     return WolfThread.__initWolfCount__

@@ -170,6 +170,8 @@ class WolfThread(threading.Thread, PopulationThread):
             # set the slot code in the dreamland
             wolf.slotCode = Dreamland.returnSlotNo(wolf.coordinateX, wolf.coordinateY)
             self.wolves.append(wolf)
+            # update coordinate map
+            self.updateDreamLandMap(self, wolf, None, wolf.slotCode)
         # add wolf thread to dreamland
         dreamland.populationPlayers.append(self)
 
@@ -189,6 +191,14 @@ class WolfThread(threading.Thread, PopulationThread):
             # add logic for flight
 
             # add logic for breed
+
+    # update coordinate map after individual's location changing
+    def updateDreamLandMap(self, individual: Population, original, target):
+        if original is not None:
+            originalSlot = self.dreamland.coordinateMap[original]
+            originalSlot.remove(individual)
+            targetSlot = self.dreamland.coordinateMap[target]
+            targetSlot.append(individual)
 
     # add logic for population run, handle all behaviours of each individual in this population
     #

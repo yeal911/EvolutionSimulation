@@ -155,7 +155,18 @@ class Wolf(Population):
 
 
 class WolfThread(threading.Thread, PopulationThread):
-    """Thread for wolf population, to evolute all the individuals of wolf population"""
+    """
+    Thread for wolf population, to evolute all the individuals of wolf population
+
+    ***parameter explanation***
+    dreamland: where this thread runs
+    wolfCount: initiate the wolf count to be loaded to dream land
+    coordinateX: x coordinate in dream land
+    coordinateY: y coordinate in dream land
+    slotCode: slot code computed
+    wolves: all the individuals
+
+    """
 
     # initialize wolf thread
     def __init__(self, wolf_count, dreamland: Dreamland):
@@ -199,6 +210,33 @@ class WolfThread(threading.Thread, PopulationThread):
             originalSlot.remove(individual)
             targetSlot = self.dreamland.coordinateMap[target]
             targetSlot.append(individual)
+
+    # move individual location
+    def moveLocation(self, individual: Wolf):
+        moveDirection = random.randint(1, 4)
+        originalSlot = individual.slotCode
+        # move east
+        if moveDirection == 1:
+            individual.coordinateX += 5
+            if individual.coordinateX > self.dreamland.sizeX:
+                individual.coordinateX = self.dreamland.sizeX
+        # move south
+        elif moveDirection == 2:
+            individual.coordinateY -= 5
+            if individual.coordinateY < 0:
+                individual.coordinateY = 0
+        # move west
+        elif moveDirection == 3:
+            individual.coordinateX -= 5
+            if individual.coordinateX < 0:
+                individual.coordinateX = 0
+        # move north
+        else:
+            individual.coordinateY += 5
+            if individual.coordinateY > self.dreamland.sizeY:
+                individual.coordinateY = self.dreamland.sizeY
+        individual.slotCode = Dreamland.returnSlotNo(individual.coordinateX, individual.coordinateY)
+        self.updateDreamLandMap(individual, originalSlot, individual.slotCode)
 
     # add logic for population run, handle all behaviours of each individual in this population
     #

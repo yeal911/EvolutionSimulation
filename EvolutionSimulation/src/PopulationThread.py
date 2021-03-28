@@ -12,3 +12,6 @@ class PopulationThread(metaclass=ABCMeta):
     # run for population thread
     @abstractmethod
     def run(self): pass
+
+    @abstractmethod
+    def updateDreamLandMap(self): pass

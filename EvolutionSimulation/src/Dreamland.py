@@ -16,17 +16,17 @@ class Dreamland:
     populationThreadPlayers: stores all the Population Threads which should be added in Thread's own structure method
     coordinateMap: it is a dict, it has all the land slot no.s as the key, and the value is population individuals which are added/removed from Thread's logic
     """
+    SIZE_X = 1000
+    SIZE_Y = 1000
 
-    def __init__(self, size_x=1000, size_y=1000):
-        self.sizeX = size_x
-        self.sizeY = size_y
+    def __init__(self):
         # all population thread players
         self.populationThreadPlayers = []
         # coordinate map(dict) for searching, key is slot no., value is population individuals.
         self.coordinateMap = {}
         # initialize coordinate map
-        for i in range(10, self.sizeX, step=10):
-            for j in range(10, self.sizeY, step=10):
+        for i in range(10, Dreamland.SIZE_X, step=10):
+            for j in range(10, Dreamland.SIZE_Y, step=10):
                 mapKey = str(i) + "A" + str(j)
                 self.coordinateMap[mapKey] = []
 
@@ -45,3 +45,14 @@ class Dreamland:
         codeX = (x//10 + 1) * 10
         codeY = (y//10 + 1) * 10
         return str(codeX) + "A" + str(codeY)
+
+    # compute slot code after movement, check whether the target slot still inside the dreamland, if no then return None, otherwise return target slot code
+    @staticmethod
+    def computeSlot(slot_code, x_slot_shift, y_slot_shift):
+        slotNum = slot_code.split("A")
+        targetSlotX = slotNum[0] + x_slot_shift * 10
+        targetSlotY = slotNum[1] + y_slot_shift * 10
+        if targetSlotX  > Dreamland.SIZE_X or targetSlotY > Dreamland.SIZE_Y or targetSlotX < 0 or targetSlotY < 0:
+            return None
+        return str(targetSlotX) + "A" + str(targetSlotY)
+

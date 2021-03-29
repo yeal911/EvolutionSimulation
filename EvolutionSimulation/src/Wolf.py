@@ -38,6 +38,10 @@ class Wolf(Population):
         self.gender = genderGroup[random.randint(0, 1)]
         self.name = "wolf-" + str(id(self))  # name it with self's address in memory
         self.generation = generation
+        self.birthTime = time.time()
+        self.deathTime = None  # to be writen upon death
+        self.populationFeedingType = Population.CARNIVORE
+        self.populationType = Population.ANIMAL
 
         # dynamic properties initialization
         self.hungryLevel = 5
@@ -173,11 +177,12 @@ class WolfThread(threading.Thread, PopulationThread):
         self.dreamland = dreamland
         self.wolfCount = wolf_count
         self.wolves = []
+        self.deadWolves = []
         for i in range(0, wolf_count):
             # need to randomly initialize the coordinates of the wolf
             wolf = Wolf()
-            wolf.coordinateX = random.randint(0, self.dreamland.sizeX)
-            wolf.coordinateY = random.randint(0, self.dreamland.sizeY)
+            wolf.coordinateX = random.randint(0, Dreamland.SIZE_X)
+            wolf.coordinateY = random.randint(0, Dreamland.SIZE_Y)
             # set the slot code in the dreamland
             wolf.slotCode = Dreamland.returnSlotNo(wolf.coordinateX, wolf.coordinateY)
             self.wolves.append(wolf)
@@ -203,42 +208,41 @@ class WolfThread(threading.Thread, PopulationThread):
 
             # add logic for breed
 
-    # update coordinate map after individual's location changing
-    def updateDreamLandMap(self, individual: Population, original, target):
-        if original is not None:
-            originalSlot = self.dreamland.coordinateMap[original]
-            originalSlot.remove(individual)
-            targetSlot = self.dreamland.coordinateMap[target]
-            targetSlot.append(individual)
-
-    # move individual location
-    def moveLocation(self, individual: Wolf):
-        moveDirection = random.randint(1, 4)
-        originalSlot = individual.slotCode
-        # move east
-        if moveDirection == 1:
-            individual.coordinateX += 5
-            if individual.coordinateX > self.dreamland.sizeX:
-                individual.coordinateX = self.dreamland.sizeX
-        # move south
-        elif moveDirection == 2:
-            individual.coordinateY -= 5
-            if individual.coordinateY < 0:
-                individual.coordinateY = 0
-        # move west
-        elif moveDirection == 3:
-            individual.coordinateX -= 5
-            if individual.coordinateX < 0:
-                individual.coordinateX = 0
-        # move north
-        else:
-            individual.coordinateY += 5
-            if individual.coordinateY > self.dreamland.sizeY:
-                individual.coordinateY = self.dreamland.sizeY
-        individual.slotCode = Dreamland.returnSlotNo(individual.coordinateX, individual.coordinateY)
-        self.updateDreamLandMap(individual, originalSlot, individual.slotCode)
-
-    # add logic for population run, handle all behaviours of each individual in this population
+    # # update coordinate map after individual's location changing
+    # def updateDreamLandMap(self, individual: Population, original, target):
+    #     if original is not None:
+    #         originalSlot = self.dreamland.coordinateMap[original]
+    #         originalSlot.remove(individual)
+    #     targetSlot = self.dreamland.coordinateMap[target]
+    #     targetSlot.append(individual)
     #
-    # def getIndividualCount(self):
-    #     return WolfThread.__initWolfCount__
+    # # move individual location
+    # def moveLocation(self, individual: Wolf):
+    #     moveDirection = random.randint(1, 4)
+    #     originalSlot = individual.slotCode
+    #     # move east
+    #     if moveDirection == 1:
+    #         individual.coordinateX += 10
+    #         if individual.coordinateX > Dreamland.SIZE_X:
+    #             individual.coordinateX = Dreamland.SIZE_X
+    #     # move south
+    #     elif moveDirection == 2:
+    #         individual.coordinateY -= 10
+    #         if individual.coordinateY < 0:
+    #             individual.coordinateY = 0
+    #     # move west
+    #     elif moveDirection == 3:
+    #         individual.coordinateX -= 10
+    #         if individual.coordinateX < 0:
+    #             individual.coordinateX = 0
+    #     # move north
+    #     else:
+    #         individual.coordinateY += 10
+    #         if individual.coordinateY > Dreamland.SIZE_Y:
+    #             individual.coordinateY = Dreamland.SIZE_Y
+    #     individual.slotCode = Dreamland.returnSlotNo(individual.coordinateX, individual.coordinateY)
+    #     self.updateDreamLandMap(individual, originalSlot, individual.slotCode)
+    #
+    # # search food in near 2 slots from 4 directions
+    # def searchFood(self, individual: Wolf):
+    #     targetFood = None

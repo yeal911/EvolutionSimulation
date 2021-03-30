@@ -25,8 +25,8 @@ class Dreamland:
         # coordinate map(dict) for searching, key is slot no., value is population individuals.
         self.coordinateMap = {}
         # initialize coordinate map
-        for i in range(10, Dreamland.SIZE_X, step=10):
-            for j in range(10, Dreamland.SIZE_Y, step=10):
+        for i in range(10, Dreamland.SIZE_X, 10):
+            for j in range(10, Dreamland.SIZE_Y, 10):
                 mapKey = str(i) + "A" + str(j)
                 self.coordinateMap[mapKey] = []
 

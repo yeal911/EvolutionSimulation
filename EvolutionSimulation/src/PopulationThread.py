@@ -2,7 +2,7 @@
 from abc import ABCMeta, abstractmethod
 from random import random
 
-from EvolutionSimulation.src.Dreamland import Dreamland
+import Dreamland
 from EvolutionSimulation.src.Population import Population
 
 
@@ -14,12 +14,15 @@ class PopulationThread:
     # def getIndividualCount(self): pass
 
     # update coordinate map after individual's location changing
-    def updateDreamLandMap(self, individual: Population, original, target):
+    def updateDreamLandMap(self, dreamland: Dreamland, individual: Population, original, target):
+        targetSlotIndividuals = []
         if original is not None:
-            originalSlotIndividuals = self.dreamland.coordinateMap[original]
+            originalSlotIndividuals = dreamland.coordinateMap[original]
             originalSlotIndividuals.remove(individual)
-        targetSlotIndividuals = self.dreamland.coordinateMap[target]
+        # targetSlotIndividuals.append(dreamland.coordinateMap.get(target))
         targetSlotIndividuals.append(individual)
+        print("individual is " + str(individual))
+        print("targetSlotIndividuals is " + str(targetSlotIndividuals))
 
     # move individual location
     def moveLocation(self, individual: Population):

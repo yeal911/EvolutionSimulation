@@ -8,7 +8,7 @@ class Gene:
     """this class defines the properties and behaviours of generic gene"""
 
     # gene length
-    __geneLength = 10
+    GENE_LENGTH = 10
 
     # gene bit min value
     __geneBitMinValue = 0
@@ -23,14 +23,16 @@ class Gene:
     __geneVariationMaxValue = 2
 
     # initialize a new gene
-    def __init__(self, first_generation=True):
+    def __init__(self, gene_digits=None):
         # gene digits
         self.geneDigits = []
-        if first_generation:
+        if gene_digits is None:
             i = 0
-            while i < Gene.__geneLength:
+            while i < Gene.GENE_LENGTH:
                 self.geneDigits.append(random.randint(Gene.__geneBitMinValue, Gene.__geneBitMaxValue))
                 i += 1
+        else:
+            self.geneDigits = gene_digits
 
     # # return specific bit of a gene
     # def returnXBitOfGene(self, x):
@@ -55,8 +57,8 @@ class Gene:
         return variationCopy
 
     def recombine(self, spouse):
-        recombineGene = Gene(False)
-        for i in range(0, Gene.__geneLength):
+        recombineGene = Gene()
+        for i in range(0, Gene.GENE_LENGTH):
             randomNum = random.randint(0, 1)
             if randomNum == 0:
                 recombineGene.geneDigits.append(self.geneDigits[i])
@@ -72,6 +74,6 @@ class Gene:
     # return the summary of all digits in the gene
     def sumGeneDigits(self):
         summaryValue = 0
-        for i in range(0, Gene.__geneLength):
+        for i in range(0, Gene.GENE_LENGTH):
             summaryValue += self.geneDigits[i]
         return summaryValue

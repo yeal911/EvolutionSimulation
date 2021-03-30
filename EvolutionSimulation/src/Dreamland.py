@@ -33,11 +33,13 @@ class Dreamland:
     # add population player into this dreamland
     def addPopulationPlayer(self, pt: PopulationThread):
         self.populationThreadPlayers.append(pt)
-        pt.run(self)
+        pt.start()
 
     # remove population player from this dreamland
     def removePopulationPlayer(self, pt: PopulationThread):
         self.populationThreadPlayers.remove(pt)
+        # stop running thread
+        pt.join()
 
     # return slot no. with input x and y coordinates
     @staticmethod
@@ -52,7 +54,7 @@ class Dreamland:
         slotNum = slot_code.split("A")
         targetSlotX = slotNum[0] + x_slot_shift * 10
         targetSlotY = slotNum[1] + y_slot_shift * 10
-        if targetSlotX  > Dreamland.SIZE_X or targetSlotY > Dreamland.SIZE_Y or targetSlotX < 0 or targetSlotY < 0:
+        if targetSlotX > Dreamland.SIZE_X or targetSlotY > Dreamland.SIZE_Y or targetSlotX < 0 or targetSlotY < 0:
             return None
         return str(targetSlotX) + "A" + str(targetSlotY)
 

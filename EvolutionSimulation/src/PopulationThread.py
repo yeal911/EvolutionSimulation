@@ -6,16 +6,12 @@ from EvolutionSimulation.src.Dreamland import Dreamland
 from EvolutionSimulation.src.Population import Population
 
 
-class PopulationThread(metaclass=ABCMeta):
+class PopulationThread:
     """this abstract class defines the common actions of population thread"""
 
     # # return individual count of a population in the Thread
     # @abstractmethod
     # def getIndividualCount(self): pass
-
-    @abstractmethod
-    def updateDreamLandMap(self):
-        pass
 
     # update coordinate map after individual's location changing
     def updateDreamLandMap(self, individual: Population, original, target):

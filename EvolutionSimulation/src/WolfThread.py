@@ -39,7 +39,7 @@ class WolfThread(threading.Thread, PopulationThread):
             # update coordinate map
             self.updateDreamLandMap(wolf, None, wolf.slotCode)
         # add wolf thread to dreamland
-        # dreamland.populationPlayers.append(self)
+        self.dreamland.populationThreadPlayers.append(self)
 
     # monitor all wolves, and execute for all their actions
     def run(self):

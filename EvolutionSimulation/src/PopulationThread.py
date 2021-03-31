@@ -21,8 +21,9 @@ class PopulationThread:
             originalSlotIndividuals.remove(individual)
         targetSlotIndividuals = self.dreamland.coordinateMap[target]
         targetSlotIndividuals.append(individual)
-        print("target is " + str(target))
         print("self.dreamland.coordinateMap.get(target) is " + str(self.dreamland.coordinateMap.get(target)[0].name))
+        print("target is " + str(target))
+        print("dreamland is " + str(self.dreamland))
 
     # move individual location
     def moveLocation(self, individual: Population):

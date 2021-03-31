@@ -19,12 +19,10 @@ class PopulationThread:
         if original is not None:
             originalSlotIndividuals = self.dreamland.coordinateMap[original]
             originalSlotIndividuals.remove(individual)
-        # targetSlotIndividuals.append(dreamland.coordinateMap.get(target))
         targetSlotIndividuals = self.dreamland.coordinateMap[target]
         targetSlotIndividuals.append(individual)
-        print("individual is " + str(individual))
-        print(self.dreamland.coordinateMap[target])
-        print("targetSlotIndividuals is " + str(targetSlotIndividuals))
+        print("target is " + str(target))
+        print("self.dreamland.coordinateMap.get(target) is " + str(self.dreamland.coordinateMap.get(target)[0].name))
 
     # move individual location
     def moveLocation(self, individual: Population):

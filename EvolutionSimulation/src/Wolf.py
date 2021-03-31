@@ -2,7 +2,7 @@
 import math
 import random
 import threading
-from datetime import time
+import time
 
 from EvolutionSimulation.src.Dreamland import Dreamland
 from EvolutionSimulation.src.PopulationThread import PopulationThread
@@ -180,6 +180,7 @@ class WolfThread(threading.Thread, PopulationThread):
 
     # initialize wolf thread
     def __init__(self, wolf_count, dreamland: Dreamland):
+        threading.Thread.__init__(self)
         self.dreamland = dreamland
         self.wolfCount = wolf_count
         self.wolves = []
@@ -193,9 +194,9 @@ class WolfThread(threading.Thread, PopulationThread):
             wolf.slotCode = Dreamland.returnSlotNo(wolf.coordinateX, wolf.coordinateY)
             self.wolves.append(wolf)
             # update coordinate map
-            self.updateDreamLandMap(self, wolf, None, wolf.slotCode)
+            self.updateDreamLandMap(wolf, None, wolf.slotCode)
         # add wolf thread to dreamland
-        dreamland.populationPlayers.append(self)
+        # dreamland.populationPlayers.append(self)
 
     # monitor all wolves, and execute for all their actions
     def run(self):
@@ -205,9 +206,9 @@ class WolfThread(threading.Thread, PopulationThread):
             # add logic for forage, find for food if it is hungry
             if wolf.hungryLevel > 5:
                 # find food in its own slot, if there is, then flight, if none, change position
-                print(wolf.name + " hungryLevel: " + wolf.hungryLevel)
+                print(wolf.name + " hungryLevel: " + str(wolf.hungryLevel))
             else:
-                print(wolf.name + " hungryLevel: " + wolf.hungryLevel)
+                print(wolf.name + " hungryLevel: " + str(wolf.hungryLevel))
             # add logic for grow
 
             # add logic for flight

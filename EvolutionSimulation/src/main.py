@@ -1,10 +1,15 @@
 from EvolutionSimulation.src.Dreamland import Dreamland
 from EvolutionSimulation.src.SheepThread import SheepThread
+from EvolutionSimulation.src.Wolf import WolfThread
 
 dreamLand = Dreamland()
 sheepThread = SheepThread(2, dreamLand)
+wolfThread = WolfThread(2, dreamLand)
 
 
 dreamLand.addPopulationPlayer(sheepThread)
-# print("dreamLand.coordinateMap.get()" +  + dreamLand.coordinateMap.get("10A10"))
+dreamLand.addPopulationPlayer(wolfThread)
+
+
+
 

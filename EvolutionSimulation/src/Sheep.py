@@ -22,7 +22,7 @@ class Sheep(Population):
             self.gene = gene
 
         self.fightCapability = 5
-        self.name = "sheep"
+        self.name = "sheep-" + str(id(self))  # name it with self's address in memory
 
         self.generation = generation
         self.birthTime = time.time()

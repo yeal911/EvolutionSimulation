@@ -202,7 +202,7 @@ class WolfThread(threading.Thread, PopulationThread):
     def run(self):
         # sleep for 1 day (1s)
         time.sleep(1)
-        for wolf in self.wolves:
+        for wolf in self.group:
             # add logic for forage, find for food if it is hungry
             if wolf.hungryLevel > 5:
                 # find food in its own slot, if there is, then flight, if none, change position

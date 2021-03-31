@@ -57,10 +57,22 @@ class PopulationThread:
         # near areas to be searched, refer to searching logic
         targetSlotForSearching = [[1, 1], [1, 0], [2, 0], [1, -1], [0, -1], [0, -2], [-1, -1], [-1, 0], [-2, 0], [-1, 1], [0, 1], [0, 2]]
         for targetShift in targetSlotForSearching:
-            targetSlot = Dreamland.computeSlot(individual.slotCode, targetShift[0], targetShift[1])
+            targetSlot = Dreamland.Dreamland.computeSlot(individual.slotCode, targetShift[0], targetShift[1])
             if targetSlot is not None:
                 targetSlotIndividuals = self.dreamland.coordinateMap[targetSlot]
                 for food in targetSlotIndividuals:
                     if (individual.populationFeedingType == Population.CARNIVORE and food.populationType == Population.ANIMAL) or (individual.populationFeedingType == Population.HERBIVORE and food.populationType == Population.PLANT):
                         return food
+        return None
+
+    def searchSpouse(self, individual: Population):
+        # near areas to be searched, refer to searching logic
+        targetSlotForSearching = [[1, 1], [1, 0], [2, 0], [1, -1], [0, -1], [0, -2], [-1, -1], [-1, 0], [-2, 0], [-1, 1], [0, 1], [0, 2]]
+        for targetShift in targetSlotForSearching:
+            targetSlot = Dreamland.Dreamland.computeSlot(individual.slotCode, targetShift[0], targetShift[1])
+            if targetSlot is not None:
+                targetSlotIndividuals = self.dreamland.coordinateMap[targetSlot]
+                for spouse in targetSlotIndividuals:
+                    if spouse.populationType == Population.ANIMAL and individual.name.split("-")[0] == spouse.name.split("-")[0] and individual.gender != spouse.gender:
+                        return spouse
         return None

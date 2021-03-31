@@ -27,7 +27,7 @@ class Sheep(Population):
         self.generation = generation
         self.birthTime = time.time()
         self.deathTime = None  # to be writen upon death
-        self.populationFeedingType = Population.CARNIVORE
+        self.populationFeedingType = Population.HERBIVORE
         self.populationType = Population.ANIMAL
 
         # dynamic properties initialization

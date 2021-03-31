@@ -51,3 +51,6 @@ class SheepThread(threading.Thread, PopulationThread):
                 print(sheep.name + " hungryLevel: " + str(sheep.hungryLevel))
             else:
                 print(sheep.name + " hungryLevel: " + str(sheep.hungryLevel))
+
+            # add logic for breed
+

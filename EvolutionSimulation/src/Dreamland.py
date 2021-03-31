@@ -52,9 +52,9 @@ class Dreamland:
     @staticmethod
     def computeSlot(slot_code, x_slot_shift, y_slot_shift):
         slotNum = slot_code.split("A")
-        targetSlotX = slotNum[0] + x_slot_shift * 10
-        targetSlotY = slotNum[1] + y_slot_shift * 10
-        if targetSlotX > Dreamland.SIZE_X or targetSlotY > Dreamland.SIZE_Y or targetSlotX < 0 or targetSlotY < 0:
+        targetSlotX = int(slotNum[0]) + x_slot_shift * 10
+        targetSlotY = int(slotNum[1]) + y_slot_shift * 10
+        if targetSlotX > Dreamland.SIZE_X or targetSlotY > Dreamland.SIZE_Y or targetSlotX < 10 or targetSlotY < 10:
             return None
         return str(targetSlotX) + "A" + str(targetSlotY)
 

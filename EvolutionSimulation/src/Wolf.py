@@ -182,9 +182,9 @@ class WolfThread(threading.Thread, PopulationThread):
     def __init__(self, wolf_count, dreamland: Dreamland):
         threading.Thread.__init__(self)
         self.dreamland = dreamland
-        self.wolfCount = wolf_count
-        self.wolves = []
-        self.deadWolves = []
+        self.initCount = wolf_count
+        self.group = []
+        self.dead = []
         for i in range(0, wolf_count):
             # need to randomly initialize the coordinates of the wolf
             wolf = Wolf()
@@ -192,11 +192,11 @@ class WolfThread(threading.Thread, PopulationThread):
             wolf.coordinateY = random.randint(0, Dreamland.SIZE_Y)
             # set the slot code in the dreamland
             wolf.slotCode = Dreamland.returnSlotNo(wolf.coordinateX, wolf.coordinateY)
-            self.wolves.append(wolf)
+            self.group.append(wolf)
             # update coordinate map
             self.updateDreamLandMap(wolf, None, wolf.slotCode)
         # add wolf thread to dreamland
-        # dreamland.populationPlayers.append(self)
+        dreamland.populationThreadPlayers.append(self)
 
     # monitor all wolves, and execute for all their actions
     def run(self):

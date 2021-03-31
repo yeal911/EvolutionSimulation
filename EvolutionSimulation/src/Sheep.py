@@ -47,7 +47,6 @@ class Sheep(Population):
 
         # lifespan in 2 times first 2 digits of gene
         self.lifespan += math.ceil(self.gene.geneDigits[0] / 20)
-        print("life span is " + str(self.lifespan))
         # gender
         if self.gene.geneDigits[2] % 2 == 0:
             self.gender = "M"

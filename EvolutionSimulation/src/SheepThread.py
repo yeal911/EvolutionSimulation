@@ -40,7 +40,7 @@ class SheepThread(threading.Thread, PopulationThread):
             # update coordinate map
             self.updateDreamLandMap(sheep, None, sheep.slotCode)
         # add sheep thread to dreamland
-        # self.dreamland.populationPlayers.append()
+        self.dreamland.populationThreadPlayers.append(self)
 
     def run(self):
         time.sleep(1)

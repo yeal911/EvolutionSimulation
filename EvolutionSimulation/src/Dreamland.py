@@ -16,8 +16,8 @@ class Dreamland:
     populationThreadPlayers: stores all the Population Threads which should be added in Thread's own structure method
     coordinateMap: it is a dict, it has all the land slot no.s as the key, and the value is population individuals which are added/removed from Thread's logic
     """
-    SIZE_X = 1000
-    SIZE_Y = 1000
+    SIZE_X = 100
+    SIZE_Y = 100
 
     def __init__(self):
         # all population thread players
@@ -25,8 +25,8 @@ class Dreamland:
         # coordinate map(dict) for searching, key is slot no., value is population individuals.
         self.coordinateMap = {}
         # initialize coordinate map
-        for i in range(10, Dreamland.SIZE_X, 10):
-            for j in range(10, Dreamland.SIZE_Y, 10):
+        for i in range(10, Dreamland.SIZE_X + 1, 10):
+            for j in range(10, Dreamland.SIZE_Y + 1, 10):
                 mapKey = str(i) + "A" + str(j)
                 self.coordinateMap[mapKey] = []
 

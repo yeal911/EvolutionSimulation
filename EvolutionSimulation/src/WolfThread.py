@@ -25,9 +25,9 @@ class WolfThread(threading.Thread, PopulationThread):
     def __init__(self, wolf_count, dreamland: Dreamland):
         threading.Thread.__init__(self)
         self.dreamland = dreamland
-        self.wolfCount = wolf_count
-        self.wolves = []
-        self.deadWolves = []
+        self.initCount = wolf_count
+        self.group = []
+        self.dead = []
         for i in range(0, wolf_count):
             # need to randomly initialize the coordinates of the wolf
             wolf = Wolf()

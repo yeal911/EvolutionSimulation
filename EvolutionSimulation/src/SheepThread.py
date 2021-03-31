@@ -38,7 +38,7 @@ class SheepThread(threading.Thread, PopulationThread):
             print("sheep.SlotCode is " + str(sheep.slotCode))
             self.group.append(sheep)
             # update coordinate map
-            self.updateDreamLandMap(dreamland, sheep, None, sheep.slotCode)
+            self.updateDreamLandMap(sheep, None, sheep.slotCode)
         # add sheep thread to dreamland
         # self.dreamland.populationPlayers.append()
 

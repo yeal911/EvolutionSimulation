@@ -14,14 +14,16 @@ class PopulationThread:
     # def getIndividualCount(self): pass
 
     # update coordinate map after individual's location changing
-    def updateDreamLandMap(self, dreamland: Dreamland, individual: Population, original, target):
+    def updateDreamLandMap(self, individual: Population, original, target):
         targetSlotIndividuals = []
         if original is not None:
-            originalSlotIndividuals = dreamland.coordinateMap[original]
+            originalSlotIndividuals = self.dreamland.coordinateMap[original]
             originalSlotIndividuals.remove(individual)
         # targetSlotIndividuals.append(dreamland.coordinateMap.get(target))
+        targetSlotIndividuals = self.dreamland.coordinateMap[target]
         targetSlotIndividuals.append(individual)
         print("individual is " + str(individual))
+        print(self.dreamland.coordinateMap[target])
         print("targetSlotIndividuals is " + str(targetSlotIndividuals))
 
     # move individual location

@@ -22,8 +22,6 @@ class PopulationThread:
         targetSlotIndividuals = self.dreamland.coordinateMap[target]
         targetSlotIndividuals.append(individual)
         print("self.dreamland.coordinateMap.get(target) is " + str(self.dreamland.coordinateMap.get(target)[0].name))
-        print("target is " + str(target))
-        print("dreamland is " + str(self.dreamland))
 
     # move individual location
     def moveLocation(self, individual: Population):
@@ -62,6 +60,7 @@ class PopulationThread:
                 targetSlotIndividuals = self.dreamland.coordinateMap[targetSlot]
                 for food in targetSlotIndividuals:
                     if (individual.populationFeedingType == Population.CARNIVORE and food.populationType == Population.ANIMAL) or (individual.populationFeedingType == Population.HERBIVORE and food.populationType == Population.PLANT):
+                        self.dreamland.coordinateMap[targetSlot].remove(food)
                         return food
         return None
 

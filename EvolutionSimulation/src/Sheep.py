@@ -3,6 +3,7 @@ import math
 import random
 import time
 
+from EvolutionSimulation.src.PlantSet import PlantSet
 from Population import Population
 from Gene import Gene
 
@@ -31,8 +32,8 @@ class Sheep(Population):
         self.populationType = Population.ANIMAL
 
         # dynamic properties initialization
-        self.hungryLevel = 5
-        self.age = 0
+        self.hungryLevel = 6
+        self.age = 8
         self.lifeStatus = "Alive"
         self.coordinateX = 0
         self.coordinateY = 0
@@ -65,7 +66,7 @@ class Sheep(Population):
 
         # hungryLevel
         # self.hungryLevel = (self.gene.geneDigits[5] + self.gene.geneDigits[6]) / 2
-        self.hungryLevel = 5
+        self.hungryLevel = 8
         # lower limit of growth period
         # self.lowerGrowthPeriod = self.lifespan / 3
         self.lowerGrowthPeriod = self.lifespan / 3
@@ -74,7 +75,8 @@ class Sheep(Population):
         self.upperGrowthPeriod = 2 * self.lowerGrowthPeriod
 
     # # forage behaviour of sheep
-    def forage(self):
+    def forage(self, foodSet: PlantSet):
+        foodSet.group.remove()
         if self.hungryLevel == 0:
             return False
         else:

@@ -41,6 +41,10 @@ class Dreamland:
         # stop running thread
         pt.join()
 
+    # start population threar
+    def startPopulationThread(self, pt: PopulationThread):
+        pt.start()
+
     # return slot no. with input x and y coordinates
     @staticmethod
     def returnSlotNo(x, y):

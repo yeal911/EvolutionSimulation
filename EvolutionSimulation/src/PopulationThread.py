@@ -25,37 +25,47 @@ class PopulationThread:
 
     # move individual location
     def moveLocation(self, individual: Population):
-        moveDirection = random.randint(1, 4)
-        originalSlot = individual.slotCode
-        # move east
-        if moveDirection == 1:
-            individual.coordinateX += 10
-            if individual.coordinateX > Dreamland.SIZE_X:
-                individual.coordinateX = Dreamland.SIZE_X
-        # move south
-        elif moveDirection == 2:
-            individual.coordinateY -= 10
-            if individual.coordinateY < 0:
-                individual.coordinateY = 0
-        # move west
-        elif moveDirection == 3:
-            individual.coordinateX -= 10
-            if individual.coordinateX < 0:
-                individual.coordinateX = 0
-        # move north
-        else:
-            individual.coordinateY += 10
-            if individual.coordinateY > Dreamland.SIZE_Y:
-                individual.coordinateY = Dreamland.SIZE_Y
-        individual.slotCode = Dreamland.returnSlotCode(individual.coordinateX, individual.coordinateY)
-        self.updateDreamLandMap(individual, originalSlot, individual.slotCode)
+        # possible slots to move to
+        targetSlotForSearching = [[1, 0], [2, 0], [0, -1], [0, -2], [-1, 0], [-2, 0], [0, 1], [0, 2]]
+        # check if the current slot is near the border of dreamland
+        slotNum = individual.slotCode.split("A")
+        slotX = int(slotNum[0])
+        slotY = int(slotNum[1])
+        if Dreamland.SIZE_X - slotX == 0:
+            targetSlotForSearching.remove([1, 0])
+            targetSlotForSearching.remove([2, 0])
+        elif Dreamland.SIZE_X - slotX == 10:
+            targetSlotForSearching.remove([2, 0])
+        if Dreamland.SIZE_Y - slotY == 0:
+            targetSlotForSearching.remove([0, 1])
+            targetSlotForSearching.remove([0, 2])
+        elif Dreamland.SIZE_Y - slotY == 10:
+            targetSlotForSearching.remove([0, 2])
+        if slotX == 0:
+            targetSlotForSearching.remove([-1, 0])
+            targetSlotForSearching.remove([-2, 0])
+        elif slotX == 10:
+            targetSlotForSearching.remove([-2, 0])
+        if slotY == 0:
+            targetSlotForSearching.remove([0, -1])
+            targetSlotForSearching.remove([0, -2])
+        elif slotY == 10:
+            targetSlotForSearching.remove([0, -2])
+        randDirection = random.randint(0, len(targetSlotForSearching) - 1)
+        targetShift = targetSlotForSearching[randDirection]
+        targetSlot = Dreamland.computeSlot(individual.slotCode, targetShift[0], targetShift[1])
+        if targetSlot is not None:
+            individual.coordinateX += targetShift[0] * 10
+            individual.coordinateY += targetShift[1] * 10
+            self.updateDreamLandMap(individual, individual.slotCode, targetSlot)
+            individual.slotCode = targetSlot
 
     # search food in near 2 slots from 4 directions
     def searchFood(self, individual: Population):
         # near areas to be searched, refer to searching logic
         targetSlotForSearching = [[1, 1], [1, 0], [2, 0], [1, -1], [0, -1], [0, -2], [-1, -1], [-1, 0], [-2, 0], [-1, 1], [0, 1], [0, 2]]
         for targetShift in targetSlotForSearching:
-            targetSlot = Dreamland.Dreamland.computeSlot(individual.slotCode, targetShift[0], targetShift[1])
+            targetSlot = Dreamland.computeSlot(individual.slotCode, targetShift[0], targetShift[1])
             if targetSlot is not None:
                 targetSlotIndividuals = self.dreamland.coordinateMap[targetSlot]
                 for food in targetSlotIndividuals:
@@ -68,7 +78,7 @@ class PopulationThread:
         # near areas to be searched, refer to searching logic
         targetSlotForSearching = [[1, 1], [1, 0], [2, 0], [1, -1], [0, -1], [0, -2], [-1, -1], [-1, 0], [-2, 0], [-1, 1], [0, 1], [0, 2]]
         for targetShift in targetSlotForSearching:
-            targetSlot = Dreamland.Dreamland.computeSlot(individual.slotCode, targetShift[0], targetShift[1])
+            targetSlot = Dreamland.computeSlot(individual.slotCode, targetShift[0], targetShift[1])
             if targetSlot is not None:
                 targetSlotIndividuals = self.dreamland.coordinateMap[targetSlot]
                 for spouse in targetSlotIndividuals:

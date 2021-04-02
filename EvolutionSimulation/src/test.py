@@ -7,11 +7,16 @@ import matplotlib.pyplot as plt
 
 from WolfThread import WolfThread
 
-print(Dreamland.returnSlotCode(99, 54))
-print(Dreamland.returnSlotCode(100, 100))
-print(Dreamland.returnSlotCode(0, 4))
-
-c = WolfThread(10, Dreamland())
+testlist = [[1, 1], [1, 2]]
+testlist.remove([1, 1])
+testlist.remove([1, 1])
+print(testlist)
+#
+# print(Dreamland.returnSlotCode(99, 54))
+# print(Dreamland.returnSlotCode(100, 100))
+# print(Dreamland.returnSlotCode(0, 4))
+#
+# c = WolfThread(10, Dreamland())
 
 # N = 10
 # x = np.random.rand(N)

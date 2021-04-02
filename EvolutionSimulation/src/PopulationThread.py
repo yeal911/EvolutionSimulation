@@ -2,7 +2,7 @@
 from abc import ABCMeta, abstractmethod
 from random import random
 
-import Dreamland
+from Dreamland import Dreamland
 from EvolutionSimulation.src.Population import Population
 
 
@@ -47,7 +47,7 @@ class PopulationThread:
             individual.coordinateY += 10
             if individual.coordinateY > Dreamland.SIZE_Y:
                 individual.coordinateY = Dreamland.SIZE_Y
-        individual.slotCode = Dreamland.returnSlotNo(individual.coordinateX, individual.coordinateY)
+        individual.slotCode = Dreamland.returnSlotCode(individual.coordinateX, individual.coordinateY)
         self.updateDreamLandMap(individual, originalSlot, individual.slotCode)
 
     # search food in near 2 slots from 4 directions

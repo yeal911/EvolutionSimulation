@@ -2,9 +2,9 @@ import random
 import threading
 import time
 
-import PopulationThread
-import Dreamland
-import Wolf
+from PopulationThread import PopulationThread
+from Dreamland import Dreamland
+from Wolf import Wolf
 
 
 class WolfThread(threading.Thread, PopulationThread):
@@ -34,8 +34,8 @@ class WolfThread(threading.Thread, PopulationThread):
             wolf.coordinateX = random.randint(0, Dreamland.SIZE_X)
             wolf.coordinateY = random.randint(0, Dreamland.SIZE_Y)
             # set the slot code in the dreamland
-            wolf.slotCode = Dreamland.returnSlotNo(wolf.coordinateX, wolf.coordinateY)
-            self.wolves.append(wolf)
+            wolf.slotCode = Dreamland.returnSlotCode(wolf.coordinateX, wolf.coordinateY)
+            self.group.append(wolf)
             # update coordinate map
             self.updateDreamLandMap(wolf, None, wolf.slotCode)
         # add wolf thread to dreamland

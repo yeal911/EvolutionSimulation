@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+import math
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -41,15 +43,15 @@ class Dreamland:
         # stop running thread
         pt.join()
 
-    # start population threar
+    # start population thread
     def startPopulationThread(self, pt: PopulationThread):
         pt.start()
 
     # return slot no. with input x and y coordinates
     @staticmethod
-    def returnSlotNo(x, y):
-        codeX = (x//10 + 1) * 10
-        codeY = (y//10 + 1) * 10
+    def returnSlotCode(x, y):
+        codeX = math.ceil(x/10) * 10
+        codeY = math.ceil(y/10) * 10
         return str(codeX) + "A" + str(codeY)
 
     # compute slot code after movement, check whether the target slot still inside the dreamland, if no then return None, otherwise return target slot code

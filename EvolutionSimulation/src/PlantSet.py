@@ -20,7 +20,7 @@ class PlantSet(PopulationThread):
             plant.coordinateX = random.randint(0, Dreamland.Dreamland.SIZE_X - 1)
             plant.coordinateY = random.randint(0, Dreamland.Dreamland.SIZE_Y - 1)
             # set the slot code in the dreamland
-            plant.slotCode = Dreamland.Dreamland.returnSlotNo(plant.coordinateX, plant.coordinateY)
+            plant.slotCode = Dreamland.Dreamland.returnSlotCode(plant.coordinateX, plant.coordinateY)
             print("plant.SlotCode is " + str(plant.slotCode))
             self.group.append(plant)
             # update coordinate map

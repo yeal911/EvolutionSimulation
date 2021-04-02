@@ -37,7 +37,7 @@ class SheepThread(threading.Thread, PopulationThread):
             sheep.coordinateX = random.randint(0, Dreamland.SIZE_X - 1)
             sheep.coordinateY = random.randint(0, Dreamland.SIZE_Y - 1)
             # set the slot code in the dreamland
-            sheep.slotCode = Dreamland.returnSlotNo(sheep.coordinateX, sheep.coordinateY)
+            sheep.slotCode = Dreamland.returnSlotCode(sheep.coordinateX, sheep.coordinateY)
             print("sheep.SlotCode is " + str(sheep.slotCode))
             self.group.append(sheep)
             # update coordinate map
@@ -72,7 +72,7 @@ class SheepThread(threading.Thread, PopulationThread):
                     newSheep.coordinateX = random.randint(0, Dreamland.SIZE_X - 1)
                     newSheep.coordinateY = random.randint(0, Dreamland.SIZE_Y - 1)
                     # set the slot code in the dreamland
-                    newSheep.slotCode = Dreamland.returnSlotNo(newSheep.coordinateX, newSheep.coordinateY)
+                    newSheep.slotCode = Dreamland.returnSlotCode(newSheep.coordinateX, newSheep.coordinateY)
                     print("newSheep.SlotCode is " + str(sheep.slotCode))
                     self.group.append(newSheep)
                     # update coordinate map

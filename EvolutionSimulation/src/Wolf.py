@@ -191,7 +191,7 @@ class Wolf(Population):
 #             wolf.coordinateX = random.randint(0, Dreamland.SIZE_X)
 #             wolf.coordinateY = random.randint(0, Dreamland.SIZE_Y)
 #             # set the slot code in the dreamland
-#             wolf.slotCode = Dreamland.returnSlotNo(wolf.coordinateX, wolf.coordinateY)
+#             wolf.slotCode = Dreamland.returnSlotCode(wolf.coordinateX, wolf.coordinateY)
 #             self.group.append(wolf)
 #             # update coordinate map
 #             self.updateDreamLandMap(wolf, None, wolf.slotCode)
@@ -247,7 +247,7 @@ class Wolf(Population):
     #         individual.coordinateY += 10
     #         if individual.coordinateY > Dreamland.SIZE_Y:
     #             individual.coordinateY = Dreamland.SIZE_Y
-    #     individual.slotCode = Dreamland.returnSlotNo(individual.coordinateX, individual.coordinateY)
+    #     individual.slotCode = Dreamland.returnSlotCode(individual.coordinateX, individual.coordinateY)
     #     self.updateDreamLandMap(individual, originalSlot, individual.slotCode)
     #
     # # search food in near 2 slots from 4 directions

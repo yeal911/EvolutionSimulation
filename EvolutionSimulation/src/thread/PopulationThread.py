@@ -30,26 +30,23 @@ class PopulationThread:
         slotNum = individual.slotCode.split("A")
         slotX = int(slotNum[0])
         slotY = int(slotNum[1])
-        if Dreamland.SIZE_X - slotX == 0:
-            targetSlotForSearching.remove([1, 0])
-            targetSlotForSearching.remove([2, 0])
-        elif Dreamland.SIZE_X - slotX == 10:
-            targetSlotForSearching.remove([2, 0])
-        if Dreamland.SIZE_Y - slotY == 0:
-            targetSlotForSearching.remove([0, 1])
-            targetSlotForSearching.remove([0, 2])
-        elif Dreamland.SIZE_Y - slotY == 10:
-            targetSlotForSearching.remove([0, 2])
-        if slotX == 0:
-            targetSlotForSearching.remove([-1, 0])
-            targetSlotForSearching.remove([-2, 0])
-        elif slotX == 10:
-            targetSlotForSearching.remove([-2, 0])
-        if slotY == 0:
-            targetSlotForSearching.remove([0, -1])
-            targetSlotForSearching.remove([0, -2])
-        elif slotY == 10:
-            targetSlotForSearching.remove([0, -2])
+        tmpXGap = 2 - (Dreamland.SIZE_X - slotX) / 10
+        tmpYGap = 2 - (Dreamland.SIZE_Y - slotY) / 10
+        while 0 < tmpXGap <= 2:
+            targetSlotForSearching.remove([tmpXGap, 0])
+            tmpXGap -= 1
+        while 0 < tmpYGap <= 2:
+            targetSlotForSearching.remove([0, tmpYGap])
+            tmpYGap -= 1
+        tmpXGap = slotX / 10
+        tmpYGap = slotY / 10
+        while 0 <= tmpXGap < 2:
+            targetSlotForSearching.remove([tmpXGap - 2, 0])
+            tmpXGap += 1
+        while 0 <= tmpYGap < 2:
+            targetSlotForSearching.remove([tmpYGap - 2, 0])
+            tmpYGap += 1
+
         randDirection = random.randint(0, len(targetSlotForSearching) - 1)
         targetShift = targetSlotForSearching[randDirection]
         targetSlot = Dreamland.computeSlot(individual.slotCode, targetShift[0], targetShift[1])

@@ -11,9 +11,7 @@ from EvolutionSimulation.src.gene.Gene import Gene
 class Sheep(Population):
     """this class defines the properties and behaviours of sheep population"""
 
-    @classmethod  # static method of a class
-    def populationName(cls):
-        return "Sheep"
+    populationName = "Sheep"
 
     def __init__(self, gene=None, generation=1):
         # initialize gene set
@@ -30,6 +28,7 @@ class Sheep(Population):
         self.deathTime = None  # to be writen upon death
         self.populationFeedingType = Population.HERBIVORE
         self.populationType = Population.ANIMAL
+        self.populationThreat = 2
 
         # dynamic properties initialization
         self.hungryLevel = 6
@@ -38,6 +37,9 @@ class Sheep(Population):
         self.coordinateX = 0
         self.coordinateY = 0
         self.slotCode = ""
+        self.isBusy = False
+        self.fightTimes = 0
+        self.breedTimes = 0
 
         # gene related properties initialization
         self.lifespan = 13  # initialize life with 10, maximum 15 after computation based on gene_set
@@ -166,7 +168,7 @@ class Sheep(Population):
                 self.remainingBreedingTimes -= 1
                 gene = self.gene.recombine(spouse.gene)
                 print("Father is " + str(self.gene.geneDigits) + " Mother is " + str(spouse.gene.geneDigits))
-                new_sheep = Sheep(gene)
+                new_sheep = Sheep(gene, round((self.generation + spouse.generation) / 2))
                 return new_sheep
 
     # set gene

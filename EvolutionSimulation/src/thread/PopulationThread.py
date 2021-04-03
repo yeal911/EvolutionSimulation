@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 import random
-
 from EvolutionSimulation.src.dreamland.Dreamland import Dreamland
 from EvolutionSimulation.src.population.Population import Population
 
@@ -13,13 +12,13 @@ class PopulationThread:
     # def getIndividualCount(self): pass
 
     # update coordinate map after individual's location changing
-    def updateDreamLandMap(self, individual: Population, original, target):
-        if original is not None:
-            originalSlotIndividuals = self.dreamland.coordinateMap[original]
+    def updateDreamLandMap(self, individual: Population, original_slot_code, target_slot_code):
+        if original_slot_code is not None:
+            originalSlotIndividuals = self.dreamland.coordinateMap[original_slot_code]
             originalSlotIndividuals.remove(individual)
-        targetSlotIndividuals = self.dreamland.coordinateMap[target]
+        targetSlotIndividuals = self.dreamland.coordinateMap[target_slot_code]
         targetSlotIndividuals.append(individual)
-        print("self.dreamland.coordinateMap.get(target) is " + str(self.dreamland.coordinateMap.get(target)[0].name))
+        # print("self.dreamland.coordinateMap.get(target) is " + str(self.dreamland.coordinateMap.get(target_slot_code)[0].name))
 
     # move individual location
     def moveLocation(self, individual: Population):
@@ -58,25 +57,28 @@ class PopulationThread:
     # search food in near 2 slots from 4 directions
     def searchFood(self, individual: Population):
         # near areas to be searched, refer to searching logic
-        targetSlotForSearching = [[1, 1], [1, 0], [2, 0], [1, -1], [0, -1], [0, -2], [-1, -1], [-1, 0], [-2, 0], [-1, 1], [0, 1], [0, 2]]
+        targetSlotForSearching = [[0, 0], [1, 1], [1, 0], [2, 0], [1, -1], [0, -1], [0, -2], [-1, -1], [-1, 0], [-2, 0], [-1, 1], [0, 1], [0, 2]]
         for targetShift in targetSlotForSearching:
             targetSlot = Dreamland.computeSlot(individual.slotCode, targetShift[0], targetShift[1])
             if targetSlot is not None:
                 targetSlotIndividuals = self.dreamland.coordinateMap[targetSlot]
                 for food in targetSlotIndividuals:
-                    if (individual.populationFeedingType == Population.CARNIVORE and food.populationType == Population.ANIMAL) or (individual.populationFeedingType == Population.HERBIVORE and food.populationType == Population.PLANT):
-                        self.dreamland.coordinateMap[targetSlot].remove(food)
-                        return food
+                    if (individual.populationFeedingType == Population.CARNIVORE and food.populationType == Population.ANIMAL and individual.populationName != food.populationName) or (individual.populationFeedingType == Population.HERBIVORE and food.populationType == Population.PLANT):
+                        # self.dreamland.coordinateMap[targetSlot].remove(food)
+                        # check target's threat (e.g. wolf won't attach tiger)
+                        if individual.populationThreat >= food.populationThreat:
+                            return food
         return None
 
+    # search spouse in near 2 slots from 4 directions
     def searchSpouse(self, individual: Population):
         # near areas to be searched, refer to searching logic
-        targetSlotForSearching = [[1, 1], [1, 0], [2, 0], [1, -1], [0, -1], [0, -2], [-1, -1], [-1, 0], [-2, 0], [-1, 1], [0, 1], [0, 2]]
+        targetSlotForSearching = [[0, 0], [1, 1], [1, 0], [2, 0], [1, -1], [0, -1], [0, -2], [-1, -1], [-1, 0], [-2, 0], [-1, 1], [0, 1], [0, 2]]
         for targetShift in targetSlotForSearching:
             targetSlot = Dreamland.computeSlot(individual.slotCode, targetShift[0], targetShift[1])
             if targetSlot is not None:
                 targetSlotIndividuals = self.dreamland.coordinateMap[targetSlot]
                 for spouse in targetSlotIndividuals:
-                    if spouse.populationType == Population.ANIMAL and individual.name.split("-")[0] == spouse.name.split("-")[0] and individual.gender != spouse.gender:
+                    if spouse.populationType == Population.ANIMAL and individual.populationName == spouse.populationName and individual.gender != spouse.gender:
                         return spouse
         return None

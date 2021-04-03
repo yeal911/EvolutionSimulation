@@ -45,17 +45,50 @@ class WolfThread(threading.Thread, PopulationThread):
     def run(self):
         while True:
             for wolf in self.group:
-                # add logic for forage, find for food if it is hungry
-                if wolf.hungryLevel > 5:
-                    # find food in its own slot, if there is, then flight, if none, change position
-                    print(wolf.name + " hungryLevel: " + str(wolf.hungryLevel))
-                else:
-                    print(wolf.name + " hungryLevel: " + str(wolf.hungryLevel))
-                # add logic for grow
-
-                # add logic for flight
-
-                # add logic for breed
-
+                # check if wolf should die naturally
+                if wolf.hungryLevel > 10 or wolf.age >= wolf.lifespan:
+                    wolf.lifeStatus = "Dead"
+                    wolf.deathTime = time.time()
+                # check wolf life status first, move to different category if dead (starve to death/natural death/fight to death)
+                if wolf.lifeStatus == "Dead":
+                    self.group.remove(wolf)
+                    self.dead.append(wolf)
+                    continue
+                if not wolf.isBusy:
+                    wolf.isBusy = True
+                    # add logic for searching food and fight
+                    if wolf.hungryLevel > 4:
+                        # find food in its own slot, if there is, then flight, if none, change position
+                        food = PopulationThread.searchFood(wolf)
+                        if food is not None:
+                            fightResult = wolf.fight(food)
+                            # if wins, update location to food's location, and remove food from map
+                            if fightResult == "Success":
+                                self.updateDreamLandMap(wolf, wolf.slotCode, food.slotCode)
+                                self.dreamland.coordinateMap[food.slotCode].remove(food)
+                            # if fails, remove wolf from map
+                            elif fightResult == "Failure":
+                                self.dreamland.coordinateMap[wolf.slotCode].remove(wolf)
+                        # if no food found, move location and become more hungry
+                        else:
+                            PopulationThread.moveLocation(wolf)
+                            wolf.hungryLevel += 1
+                    # if not hungry enough, prepare for breeding
+                    else:
+                        # breed logic
+                        spouse = PopulationThread.searchSpouse(wolf)
+                        if spouse is not None:
+                            child = wolf.breed(spouse)
+                            if child is not None:
+                                child.coordinateX = random.randint(0, Dreamland.SIZE_X)
+                                child.coordinateY = random.randint(0, Dreamland.SIZE_Y)
+                                # set the slot code in the dreamland
+                                child.slotCode = Dreamland.returnSlotCode(child.coordinateX, child.coordinateY)
+                                self.group.append(child)
+                                # update coordinate map
+                                self.updateDreamLandMap(child, None, child.slotCode)
+                        else:
+                            wolf.hungryLevel += 1
+                wolf.isBusy = False
             # sleep for 1 day (1s)
             time.sleep(1)

@@ -10,9 +10,7 @@ from EvolutionSimulation.src.population.Population import Population
 class Wolf(Population):
     """this class defines the properties and behaviours of wolf population"""
 
-    @classmethod  # static method of a class
-    def populationName(cls):
-        return "Wolf"
+    populationName = "Wolf"
 
     def __init__(self, gene=None, generation=1):
         # initialize gene_set, if no input parameter gene_set or input gene_set is incorrect, randomly generate genes
@@ -29,14 +27,18 @@ class Wolf(Population):
         self.deathTime = None  # to be writen upon death
         self.populationFeedingType = Population.CARNIVORE
         self.populationType = Population.ANIMAL
+        self.populationThreat = 6   # this property is visible to other population, if own value is bigger than other population, then attack; otherwise, don't attack
 
         # dynamic properties initialization
-        self.hungryLevel = 5
+        self.hungryLevel = 1  # maximum hungry level is 10, population will die if beyond 10
         self.age = 0
         self.lifeStatus = "Alive"
         self.coordinateX = 0
         self.coordinateY = 0
         self.slotCode = ""
+        self.isBusy = False
+        self.fightTimes = 0
+        self.breedTimes = 0
 
         # gene related properties initialization
         self.lifespan = 10  # initialize life with 10, maximum 15 after computation based on gene_set
@@ -117,30 +119,41 @@ class Wolf(Population):
                 self.hungryLevel -= 1
 
     # fight behaviour of a wolf
-    def fight(self, population: Population):
-        if self.fightCapability > population.fightCapability:
+    def fight(self, competitor: Population):
+        if self.fightCapability > competitor.fightCapability:
             if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-                self.fightCapability += 1
+                # win fight, reset properties
+                self.hungryLevel = 0
+                self.fightTimes += 1
+                competitor.fightTimes += 1
+                competitor.lifeStatus = "Dead"
+                competitor.deathTime = time.time()
             return "Success"
-        elif self.fightCapability == population.fightCapability:
+        elif self.fightCapability == competitor.fightCapability:
+            self.hungryLevel += 1
+            competitor.hungryLevel += 1
             return "Peace"
         else:
+            competitor.hungryLevel = 0
+            competitor.fightTimes += 1
+            self.fightTimes += 1
             self.lifeStatus = "Dead"
+            self.deathTime = time.time()
             return "Failure"
 
-    # # defend behaviour of a wolf
-    # def defend(self, population: Population):
-    #     print("self.fightCapability " + str(self.fightCapability) + "competitor.fightCapability " + str(population.fightCapability))
-    #     # fightCapability increase in the growth period
-    #     # if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-    #     #     self.fightCapability += 1
-    #     # escape successfully
-    #     if self.fightCapability >= population.fightCapability:
-    #         print(self.name + " defended successfully!")
-    #         return True
-    #     # defend unsuccessfully
-    #     else:
-    #         return False
+    # defend behaviour of a wolf
+    def defend(self, population: Population):
+        print("self.fightCapability " + str(self.fightCapability) + "competitor.fightCapability " + str(population.fightCapability))
+        # fightCapability increase in the growth period
+        # if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
+        #     self.fightCapability += 1
+        # escape successfully
+        if self.fightCapability >= population.fightCapability:
+            print(self.name + " defended successfully!")
+            return True
+        # defend unsuccessfully
+        else:
+            return False
 
     # breed behaviour of a wolf
     def breed(self, spouse):
@@ -149,6 +162,9 @@ class Wolf(Population):
             return None
         if self.remainingBreedingTimes > 0 and self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
             self.remainingBreedingTimes -= 1
+            self.breedTimes += 1
+            self.hungryLevel += 1
+            spouse.hungryLevel += 1
             # rebuild gene_set for new baby wolf, get first half gene set from self, another half from spouse
             childGeneDigits = []
             # get first half gene set from self after variation

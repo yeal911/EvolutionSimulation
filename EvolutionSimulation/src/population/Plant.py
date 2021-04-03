@@ -3,6 +3,8 @@ from EvolutionSimulation.src.population.Population import Population
 
 class Plant:
 
+    populationName = "Plant"
+
     # initialize plant thread
     def __init__(self):
         self.coordinateX = 0

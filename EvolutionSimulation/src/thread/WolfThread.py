@@ -90,5 +90,6 @@ class WolfThread(threading.Thread, PopulationThread):
                         else:
                             wolf.hungryLevel += 1
                 wolf.isBusy = False
+                wolf.age += 1
             # sleep for 1 day (1s)
             time.sleep(1)

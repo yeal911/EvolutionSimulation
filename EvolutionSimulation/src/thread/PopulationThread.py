@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from random import random
+import random
 
 from EvolutionSimulation.src.dreamland.Dreamland import Dreamland
 from EvolutionSimulation.src.population.Population import Population
@@ -14,7 +14,6 @@ class PopulationThread:
 
     # update coordinate map after individual's location changing
     def updateDreamLandMap(self, individual: Population, original, target):
-        targetSlotIndividuals = []
         if original is not None:
             originalSlotIndividuals = self.dreamland.coordinateMap[original]
             originalSlotIndividuals.remove(individual)
@@ -26,7 +25,7 @@ class PopulationThread:
     def moveLocation(self, individual: Population):
         # possible slots to move to
         targetSlotForSearching = [[1, 0], [2, 0], [0, -1], [0, -2], [-1, 0], [-2, 0], [0, 1], [0, 2]]
-        # check if the current slot is near the border of dreamland
+        # check if the current slot is near the border of dreamland, remove slots beyond dreamland
         slotNum = individual.slotCode.split("A")
         slotX = int(slotNum[0])
         slotY = int(slotNum[1])
@@ -46,7 +45,7 @@ class PopulationThread:
         while 0 <= tmpYGap < 2:
             targetSlotForSearching.remove([tmpYGap - 2, 0])
             tmpYGap += 1
-
+        # move location randomly
         randDirection = random.randint(0, len(targetSlotForSearching) - 1)
         targetShift = targetSlotForSearching[randDirection]
         targetSlot = Dreamland.computeSlot(individual.slotCode, targetShift[0], targetShift[1])

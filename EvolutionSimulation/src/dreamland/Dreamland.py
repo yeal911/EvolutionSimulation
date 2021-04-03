@@ -58,4 +58,3 @@ class Dreamland:
         if targetSlotX > Dreamland.SIZE_X or targetSlotY > Dreamland.SIZE_Y or targetSlotX < 10 or targetSlotY < 10:
             return None
         return str(targetSlotX) + "A" + str(targetSlotY)
-

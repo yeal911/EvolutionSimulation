@@ -1,7 +1,21 @@
-testlist = [[1, 1], [1, 2]]
-testlist.remove([1, 1])
-testlist.remove([1, 1])
-print(testlist)
+class A:
+    a = None
+    b = None
+
+    def __init__(self):
+        self.a = "A-a"
+        self.b = "A-b"
+
+
+class B(A):
+    def __init__(self):
+        self.c = "B-c"
+        self.a = "B-a"
+
+
+a = A()
+b = B()
+print(b.a)
 #
 # print(Dreamland.returnSlotCode(99, 54))
 # print(Dreamland.returnSlotCode(100, 100))
@@ -38,18 +52,6 @@ print(testlist)
 # plt.xticks(())
 # plt.yticks(())
 # plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # print(sys.path)

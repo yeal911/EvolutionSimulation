@@ -1,11 +1,6 @@
 #!/usr/bin/python3
 import math
 
-import numpy as np
-import matplotlib.pyplot as plt
-
-from EvolutionSimulation.src import PopulationThread
-
 
 class Dreamland:
     """
@@ -33,18 +28,18 @@ class Dreamland:
                 self.coordinateMap[mapKey] = []
 
     # add population player into this dreamland
-    def addPopulationPlayer(self, pt: PopulationThread):
+    def addPopulationPlayer(self, pt):
         self.populationThreadPlayers.append(pt)
         pt.start()
 
     # remove population player from this dreamland
-    def removePopulationPlayer(self, pt: PopulationThread):
+    def removePopulationPlayer(self, pt):
         self.populationThreadPlayers.remove(pt)
         # stop running thread
         pt.join()
 
     # start population thread
-    def startPopulationThread(self, pt: PopulationThread):
+    def startPopulationThread(self, pt):
         pt.start()
 
     # return slot no. with input x and y coordinates

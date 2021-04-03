@@ -2,11 +2,11 @@ import threading
 import time
 import random
 
-from EvolutionSimulation.src.Dreamland import Dreamland
-from EvolutionSimulation.src.PlantSet import PlantSet
-from EvolutionSimulation.src.Population import Population
-from EvolutionSimulation.src.PopulationThread import PopulationThread
-from EvolutionSimulation.src.Sheep import Sheep
+from EvolutionSimulation.src.dreamland.Dreamland import Dreamland
+from EvolutionSimulation.src.thread.PlantSet import PlantSet
+from EvolutionSimulation.src.population.Population import Population
+from EvolutionSimulation.src.thread.PopulationThread import PopulationThread
+from EvolutionSimulation.src.population.Sheep import Sheep
 
 
 class SheepThread(threading.Thread, PopulationThread):

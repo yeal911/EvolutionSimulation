@@ -1,13 +1,10 @@
 #!/usr/bin/python3
 import math
 import random
-import threading
 import time
 
-from EvolutionSimulation.src.Dreamland import Dreamland
-from EvolutionSimulation.src.PopulationThread import PopulationThread
-from Population import Population
-from Gene import Gene
+from EvolutionSimulation.src.gene.Gene import Gene
+from EvolutionSimulation.src.population.Population import Population
 
 
 class Wolf(Population):

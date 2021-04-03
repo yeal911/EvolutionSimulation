@@ -1,4 +1,4 @@
-from EvolutionSimulation.src.Population import Population
+from EvolutionSimulation.src.population.Population import Population
 
 
 class Plant:

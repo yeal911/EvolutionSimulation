@@ -3,9 +3,9 @@ import math
 import random
 import time
 
-from EvolutionSimulation.src.PlantSet import PlantSet
-from Population import Population
-from Gene import Gene
+from EvolutionSimulation.src.thread.PlantSet import PlantSet
+from EvolutionSimulation.src.population.Population import Population
+from EvolutionSimulation.src.gene.Gene import Gene
 
 
 class Sheep(Population):

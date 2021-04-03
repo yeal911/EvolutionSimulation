@@ -3,8 +3,8 @@ import threading
 import time
 
 from PopulationThread import PopulationThread
-from Dreamland import Dreamland
-from Wolf import Wolf
+from EvolutionSimulation.src.dreamland.Dreamland import Dreamland
+from EvolutionSimulation.src.population.Wolf import Wolf
 
 
 class WolfThread(threading.Thread, PopulationThread):

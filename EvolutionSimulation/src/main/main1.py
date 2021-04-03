@@ -1,12 +1,10 @@
 import time
 
-from EvolutionSimulation.src.Sheep import Sheep
-from EvolutionSimulation.src.Wolf import Wolf
+from EvolutionSimulation.src.population.Sheep import Sheep
+from EvolutionSimulation.src.population.Wolf import Wolf
 from random import choice, random
 import matplotlib.pyplot as plt
-import Population
-from numpy import *
-import numpy as np
+from EvolutionSimulation.src.population import Population
 
 sheep = []
 wolf = []

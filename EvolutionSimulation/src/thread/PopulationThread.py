@@ -1,9 +1,8 @@
 #!/usr/bin/python3
-from abc import ABCMeta, abstractmethod
 from random import random
 
-from Dreamland import Dreamland
-from EvolutionSimulation.src.Population import Population
+from EvolutionSimulation.src.dreamland.Dreamland import Dreamland
+from EvolutionSimulation.src.population.Population import Population
 
 
 class PopulationThread:

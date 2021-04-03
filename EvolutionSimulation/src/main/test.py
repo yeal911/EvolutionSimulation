@@ -1,12 +1,3 @@
-import sys
-
-from EvolutionSimulation.src.Dreamland import Dreamland
-from EvolutionSimulation.src.Gene import Gene
-import numpy as np
-import matplotlib.pyplot as plt
-
-from WolfThread import WolfThread
-
 testlist = [[1, 1], [1, 2]]
 testlist.remove([1, 1])
 testlist.remove([1, 1])

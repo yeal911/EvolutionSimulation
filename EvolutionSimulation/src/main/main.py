@@ -1,7 +1,6 @@
-from EvolutionSimulation.src.Dreamland import Dreamland
-from EvolutionSimulation.src.PlantSet import PlantSet
-from EvolutionSimulation.src.SheepThread import SheepThread
-from WolfThread import WolfThread
+from EvolutionSimulation.src.dreamland.Dreamland import Dreamland
+from EvolutionSimulation.src.thread.PlantSet import PlantSet
+from EvolutionSimulation.src.thread.SheepThread import SheepThread
 
 dreamLand = Dreamland()
 # dreamLand1 = Dreamland()

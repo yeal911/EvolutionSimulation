@@ -2,9 +2,9 @@ import random
 import threading
 import time
 
+from EvolutionSimulation.src.thread.PopulationThread import PopulationThread
 from EvolutionSimulation.src.tool.CycleInfo import CycleInfo
 from EvolutionSimulation.src.tool.Recorder import Recorder
-from PopulationThread import PopulationThread
 from EvolutionSimulation.src.dreamland.Dreamland import Dreamland
 from EvolutionSimulation.src.population.Tiger import Tiger
 
@@ -72,7 +72,7 @@ class TigerThread(threading.Thread, PopulationThread):
                     # add logic for searching food and fight
                     if tiger.hungryLevel > 4:
                         # find food in its own slot, if there is, then flight, if none, change position
-                        food = PopulationThread.searchFood(tiger)
+                        food = self.searchFood(tiger)
                         if food is not None:
                             cycleInfo.fightTimes += 1
                             fightResult = tiger.fight(food)
@@ -90,12 +90,12 @@ class TigerThread(threading.Thread, PopulationThread):
                                 cycleInfo.fightPeaceTimes += 1
                         # if no food found, move location and become more hungry
                         else:
-                            PopulationThread.moveLocation(tiger)
+                            self.moveLocation(tiger)
                             tiger.hungryLevel += 1
                     # if not hungry enough, prepare for breeding
                     else:
                         # breed logic
-                        spouse = PopulationThread.searchSpouse(tiger)
+                        spouse = self.searchSpouse(tiger)
                         if spouse is not None:
                             cycleInfo.breedTimes += 1
                             child = tiger.breed(spouse)

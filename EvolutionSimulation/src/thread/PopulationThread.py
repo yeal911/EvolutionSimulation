@@ -18,6 +18,7 @@ class PopulationThread:
             originalSlotIndividuals.remove(individual)
         targetSlotIndividuals = self.dreamland.coordinateMap[target_slot_code]
         targetSlotIndividuals.append(individual)
+        individual.slotCode = target_slot_code
         # print("self.dreamland.coordinateMap.get(target) is " + str(self.dreamland.coordinateMap.get(target_slot_code)[0].name))
 
     # move individual location
@@ -52,7 +53,6 @@ class PopulationThread:
             individual.coordinateX += targetShift[0] * 10
             individual.coordinateY += targetShift[1] * 10
             self.updateDreamLandMap(individual, individual.slotCode, targetSlot)
-            individual.slotCode = targetSlot
 
     # search food in near 2 slots from 4 directions
     def searchFood(self, individual: Population):

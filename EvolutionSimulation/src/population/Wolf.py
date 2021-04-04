@@ -124,7 +124,7 @@ class Wolf(Population):
             parentX = self.gene.variate()
             parentY = spouse.gene.variate()
             for i in range(0, Gene.GENE_LENGTH, 2):
-                childGeneDigits.append(parentX.gene.geneDigits[i])
-                childGeneDigits.append(parentY.gene.geneDigits[i+1])
+                childGeneDigits.append(parentX.geneDigits[i])
+                childGeneDigits.append(parentY.geneDigits[i+1])
             return Wolf(Gene(childGeneDigits), round((self.generation + spouse.generation) / 2))
         return None

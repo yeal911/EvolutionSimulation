@@ -46,7 +46,7 @@ class Tiger(Population):
         self.fightCapability = 70  # initialize fight capability with 50, maximum 100 after computation based on gene_set
         self.attackPossibility = 70  # initialize attack possibility with 50, maximum 100 after computation based on gene_set
         self.defendPossibility = 70  # initialize defend possibility with 50, maximum 100 after computation based on gene_set
-        self.remainingBreedingTimes = 1  # initialize remaining breeding times with 1, maximum 2 after computation based on gene_set
+        self.TotalBreedingTimes = 1  # initialize remaining breeding times with 1, maximum 2 after computation based on gene_set
 
         # the 1st bit of Gene controls lifespan
         # then compute the addition to be added to initial value of lifespan
@@ -60,9 +60,9 @@ class Tiger(Population):
         # the 4th bit of Gene controls defendPossibility
         # then compute the addition to be added to initial value of defendPossibility
         self.defendPossibility += math.ceil(self.gene.geneDigits[3] / 3.3)
-        # the 5th bit of Gene controls remainingBreedingTimes
-        # then compute the addition to be added to initial value of remainingBreedingTimes
-        self.remainingBreedingTimes += round(self.gene.geneDigits[4] / 50)
+        # the 5th bit of Gene controls TotalBreedingTimes
+        # then compute the addition to be added to initial value of TotalBreedingTimes
+        self.TotalBreedingTimes += round(self.gene.geneDigits[4] / 50)
 
         # lower limit of growth period
         self.lowerGrowthPeriod = math.ceil(self.lifespan / 3)
@@ -99,9 +99,9 @@ class Tiger(Population):
         if spouse.__class__.__name__ != "Tiger" or self.gender == spouse.gender:
             print("Different population or same gender, no breed")
             return None
-        if self.remainingBreedingTimes > 0 and self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-            self.remainingBreedingTimes -= 1
+        if (self.breedTimes < self.TotalBreedingTimes and self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod) and (spouse.breedTimes < spouse.TotalBreedingTimes and spouse.lowerGrowthPeriod < spouse.age < spouse.upperGrowthPeriod):
             self.breedTimes += 1
+            spouse.breedTimes += 1
             self.hungryLevel += 1
             spouse.hungryLevel += 1
             # rebuild gene_set for new baby tiger, get first half gene set from self, another half from spouse
@@ -110,7 +110,7 @@ class Tiger(Population):
             parentX = self.gene.variate()
             parentY = spouse.gene.variate()
             for i in range(0, Gene.GENE_LENGTH, 2):
-                childGeneDigits.append(parentX.gene.geneDigits[i])
-                childGeneDigits.append(parentY.gene.geneDigits[i+1])
+                childGeneDigits.append(parentX.geneDigits[i])
+                childGeneDigits.append(parentY.geneDigits[i+1])
             return Tiger(Gene(childGeneDigits), round((self.generation + spouse.generation) / 2))
         return None

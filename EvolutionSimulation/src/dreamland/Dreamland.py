@@ -27,10 +27,10 @@ class Dreamland:
                 mapKey = str(i) + "A" + str(j)
                 self.coordinateMap[mapKey] = []
 
-    # add population player into this dreamland
-    def addPopulationPlayer(self, pt):
-        self.populationThreadPlayers.append(pt)
-        pt.start()
+    # # add population player into this dreamland
+    # def addPopulationPlayer(self, pt):
+    #     self.populationThreadPlayers.append(pt)
+    #     pt.start()
 
     # remove population player from this dreamland
     def removePopulationPlayer(self, pt):
@@ -39,14 +39,26 @@ class Dreamland:
         pt.join()
 
     # start population thread
-    def startPopulationThread(self, pt):
+    @staticmethod
+    def startPopulationThread(pt):
         pt.start()
+
+    # stop population thread
+    @staticmethod
+    def stopPopulationThread(pt):
+        pt.join()
 
     # return slot code with input x and y coordinates
     @staticmethod
     def returnSlotCode(x, y):
-        codeX = math.ceil(x/10) * 10
-        codeY = math.ceil(y/10) * 10
+        if x == 0:
+            codeX = 10
+        else:
+            codeX = math.ceil(x/10) * 10
+        if y == 0:
+            codeY = 10
+        else:
+            codeY = math.ceil(y/10) * 10
         return str(codeX) + "A" + str(codeY)
 
     # compute slot code after movement, check whether the target slot still inside the dreamland, if no then return None, otherwise return target slot code

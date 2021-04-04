@@ -46,11 +46,11 @@ class Gene:
     def variate(self):
         variationCopy = copy.deepcopy(self)
         variationDigitCount = random.randint(Gene.__geneVariationMinValue, Gene.__geneVariationMaxValue)
-        print("variationDigitCount " + str(variationDigitCount))
+        # print("variationDigitCount " + str(variationDigitCount))
         exclude = []
         while variationDigitCount > 0:
             variationBit = random.choice([i for i in range(0, 9) if i not in exclude])
-            print("variationBit " + str(variationBit))
+            # print("variationBit " + str(variationBit))
             exclude.append(variationBit)
             variationCopy.geneDigits[variationBit] = random.randint(Gene.__geneBitMinValue, Gene.__geneBitMaxValue)
             variationDigitCount -= 1

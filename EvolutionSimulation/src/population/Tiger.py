@@ -25,6 +25,7 @@ class Tiger(Population):
         self.generation = generation
         self.birthTime = time.time()
         self.deathTime = None  # to be writen upon death
+        self.deathCause = None # to be write upon death
         self.populationFeedingType = Population.CARNIVORE
         self.populationType = Population.ANIMAL
         self.populationThreat = 8   # this property is visible to other population, if own value is bigger than other population, then attack; otherwise, don't attack
@@ -77,6 +78,7 @@ class Tiger(Population):
                 self.fightTimes += 1
                 competitor.fightTimes += 1
                 competitor.lifeStatus = "Dead"
+                competitor.deathCause = "Fight to death"
                 competitor.deathTime = time.time()
             return "Success"
         elif self.fightCapability == competitor.fightCapability:
@@ -88,6 +90,7 @@ class Tiger(Population):
             competitor.fightTimes += 1
             self.fightTimes += 1
             self.lifeStatus = "Dead"
+            self.deathCause = "Fight to death"
             self.deathTime = time.time()
             return "Failure"
 

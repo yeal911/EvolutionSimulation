@@ -25,6 +25,7 @@ class Wolf(Population):
         self.generation = generation
         self.birthTime = time.time()
         self.deathTime = None  # to be writen upon death
+        self.deathCause = None # to be write upon death
         self.populationFeedingType = Population.CARNIVORE
         self.populationType = Population.ANIMAL
         self.populationThreat = 6   # this property is visible to other population, if own value is bigger than other population, then attack; otherwise, don't attack
@@ -45,27 +46,7 @@ class Wolf(Population):
         self.fightCapability = 50  # initialize fight capability with 50, maximum 100 after computation based on gene_set
         self.attackPossibility = 50  # initialize attack possibility with 50, maximum 100 after computation based on gene_set
         self.defendPossibility = 50  # initialize defend possibility with 50, maximum 100 after computation based on gene_set
-        self.remainingBreedingTimes = 1  # initialize remaining breeding times with 1, maximum 3 after computation based on gene_set
-
-        # add computation for properties based on gene set
-        # # the 1st & 2nd Gene control lifespan, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980],
-        # # then compute the addition to be added to initial value of lifespan
-        # self.lifespan += math.ceil((self.gene_set[0].sumGeneDigits() + self.gene_set[1].sumGeneDigits()) / 396)
-        # # the 3rd & 4th Gene control fightCapability, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980],
-        # # then compute the addition to be added to initial value of fightCapability
-        # self.fightCapability += math.ceil((self.gene_set[2].sumGeneDigits() + self.gene_set[3].sumGeneDigits()) / 39.6)
-        # # the 5th & 6th Gene control attackPossibility, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980],
-        # # then compute the addition to be added to initial value of attackPossibility
-        # self.attackPossibility += math.ceil(
-        #     (self.gene_set[4].sumGeneDigits() + self.gene_set[5].sumGeneDigits()) / 39.6)
-        # # the 7th & 8th Gene control defendPossibility, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980],
-        # # then compute the addition to be added to initial value of defendPossibility
-        # self.defendPossibility += math.ceil(
-        #     (self.gene_set[6].sumGeneDigits() + self.gene_set[7].sumGeneDigits()) / 39.6)
-        # # the 9th & 10th Gene control remainingBreedingTimes, add up all digits from gene (total 2*Gene.__geneLength) with value range [0,1980],
-        # # then compute the addition to be added to initial value of remainingBreedingTimes
-        # self.remainingBreedingTimes += round(
-        #     (self.gene_set[8].sumGeneDigits() + self.gene_set[9].sumGeneDigits()) / 990)
+        self.TotalBreedingTimes = 1  # initialize Total breeding times with 1, maximum 3 after computation based on gene_set
 
         # the 1st bit of Gene controls lifespan
         # then compute the addition to be added to initial value of lifespan
@@ -79,44 +60,14 @@ class Wolf(Population):
         # the 4th bit of Gene controls defendPossibility
         # then compute the addition to be added to initial value of defendPossibility
         self.defendPossibility += math.ceil(self.gene.geneDigits[3] / 2)
-        # the 5th bit of Gene controls remainingBreedingTimes
-        # then compute the addition to be added to initial value of remainingBreedingTimes
-        self.remainingBreedingTimes += round(math.ceil(self.gene.geneDigits[4] / 50))
+        # the 5th bit of Gene controls TotalBreedingTimes
+        # then compute the addition to be added to initial value of TotalBreedingTimes
+        self.TotalBreedingTimes += round(math.ceil(self.gene.geneDigits[4] / 50))
 
         # lower limit of growth period
         self.lowerGrowthPeriod = math.ceil(self.lifespan / 3)
         # upper limit of growth period
         self.upperGrowthPeriod = 2 * self.lowerGrowthPeriod
-
-    # forage behaviour of wolf
-    def forage(self):
-        if self.hungryLevel == 0:
-            return False
-        else:
-            self.hungryLevel -= 1
-            return True
-
-    # grow behaviour of a wolf
-    def grow(self):
-        # If age is over lifespan, it should die
-        if self.age >= self.lifespan:
-            print(self.name + "lifespan is " + str(self.lifespan) + "," + "Now should die :(")
-            self.lifeStatus = "Dead"
-            return False
-        # Otherwise it will increase
-        self.age += 1
-        if self.hungryLevel < 10:
-            self.hungryLevel += 1
-        if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-            # self.defendPossibility += 1
-            # self.attackPossibility += 1
-            self.fightCapability += 1
-        elif self.age >= self.upperGrowthPeriod:
-            # self.defendPossibility -= 1
-            # self.attackPossibility -= 1
-            self.fightCapability -= 1
-            if self.hungryLevel > 1:
-                self.hungryLevel -= 1
 
     # fight behaviour of a wolf
     def fight(self, competitor: Population):
@@ -127,6 +78,7 @@ class Wolf(Population):
                 self.fightTimes += 1
                 competitor.fightTimes += 1
                 competitor.lifeStatus = "Dead"
+                competitor.deathCause = "Fight to death"
                 competitor.deathTime = time.time()
             return "Success"
         elif self.fightCapability == competitor.fightCapability:
@@ -138,31 +90,32 @@ class Wolf(Population):
             competitor.fightTimes += 1
             self.fightTimes += 1
             self.lifeStatus = "Dead"
+            self.deathCause = "Fight to death"
             self.deathTime = time.time()
             return "Failure"
 
-    # defend behaviour of a wolf
-    def defend(self, population: Population):
-        print("self.fightCapability " + str(self.fightCapability) + "competitor.fightCapability " + str(population.fightCapability))
-        # fightCapability increase in the growth period
-        # if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-        #     self.fightCapability += 1
-        # escape successfully
-        if self.fightCapability >= population.fightCapability:
-            print(self.name + " defended successfully!")
-            return True
-        # defend unsuccessfully
-        else:
-            return False
+    # # defend behaviour of a wolf
+    # def defend(self, population: Population):
+    #     print("self.fightCapability " + str(self.fightCapability) + "competitor.fightCapability " + str(population.fightCapability))
+    #     # fightCapability increase in the growth period
+    #     # if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
+    #     #     self.fightCapability += 1
+    #     # escape successfully
+    #     if self.fightCapability >= population.fightCapability:
+    #         print(self.name + " defended successfully!")
+    #         return True
+    #     # defend unsuccessfully
+    #     else:
+    #         return False
 
     # breed behaviour of a wolf
     def breed(self, spouse):
         if spouse.__class__.__name__ != "Wolf" or self.gender == spouse.gender:
             print("Different population or same gender, no breed")
             return None
-        if self.remainingBreedingTimes > 0 and self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-            self.remainingBreedingTimes -= 1
+        if (self.breedTimes < self.TotalBreedingTimes and self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod) and (spouse.breedTimes < spouse.TotalBreedingTimes and spouse.lowerGrowthPeriod < spouse.age < spouse.upperGrowthPeriod):
             self.breedTimes += 1
+            spouse.breedTimes += 1
             self.hungryLevel += 1
             spouse.hungryLevel += 1
             # rebuild gene_set for new baby wolf, get first half gene set from self, another half from spouse
@@ -175,94 +128,3 @@ class Wolf(Population):
                 childGeneDigits.append(parentY.gene.geneDigits[i+1])
             return Wolf(Gene(childGeneDigits), round((self.generation + spouse.generation) / 2))
         return None
-
-#
-# class WolfThread(threading.Thread, PopulationThread):
-#     """
-#     Thread for wolf population, to evolute all the individuals of wolf population
-#
-#     ***parameter explanation***
-#     dreamland: where this thread runs
-#     wolfCount: initiate the wolf count to be loaded to dream land
-#     coordinateX: x coordinate in dream land
-#     coordinateY: y coordinate in dream land
-#     slotCode: slot code computed
-#     wolves: all the individuals
-#
-#     """
-#
-#     # initialize wolf thread
-#     def __init__(self, wolf_count, dreamland: Dreamland):
-#         threading.Thread.__init__(self)
-#         self.dreamland = dreamland
-#         self.initCount = wolf_count
-#         self.group = []
-#         self.dead = []
-#         for i in range(0, wolf_count):
-#             # need to randomly initialize the coordinates of the wolf
-#             wolf = Wolf()
-#             wolf.coordinateX = random.randint(0, Dreamland.SIZE_X)
-#             wolf.coordinateY = random.randint(0, Dreamland.SIZE_Y)
-#             # set the slot code in the dreamland
-#             wolf.slotCode = Dreamland.returnSlotCode(wolf.coordinateX, wolf.coordinateY)
-#             self.group.append(wolf)
-#             # update coordinate map
-#             self.updateDreamLandMap(wolf, None, wolf.slotCode)
-#         # add wolf thread to dreamland
-#         dreamland.populationThreadPlayers.append(self)
-#
-#     # monitor all wolves, and execute for all their actions
-#     def run(self):
-#         # sleep for 1 day (1s)
-#         time.sleep(1)
-#         for wolf in self.group:
-#             # add logic for forage, find for food if it is hungry
-#             if wolf.hungryLevel > 5:
-#                 # find food in its own slot, if there is, then flight, if none, change position
-#                 print(wolf.name + " hungryLevel: " + str(wolf.hungryLevel))
-#             else:
-#                 print(wolf.name + " hungryLevel: " + str(wolf.hungryLevel))
-#             # add logic for grow
-#
-#             # add logic for flight
-#
-#             # add logic for breed
-
-    # # update coordinate map after individual's location changing
-    # def updateDreamLandMap(self, individual: Population, original, target):
-    #     if original is not None:
-    #         originalSlot = self.dreamland.coordinateMap[original]
-    #         originalSlot.remove(individual)
-    #     targetSlot = self.dreamland.coordinateMap[target]
-    #     targetSlot.append(individual)
-    #
-    # # move individual location
-    # def moveLocation(self, individual: Wolf):
-    #     moveDirection = random.randint(1, 4)
-    #     originalSlot = individual.slotCode
-    #     # move east
-    #     if moveDirection == 1:
-    #         individual.coordinateX += 10
-    #         if individual.coordinateX > Dreamland.SIZE_X:
-    #             individual.coordinateX = Dreamland.SIZE_X
-    #     # move south
-    #     elif moveDirection == 2:
-    #         individual.coordinateY -= 10
-    #         if individual.coordinateY < 0:
-    #             individual.coordinateY = 0
-    #     # move west
-    #     elif moveDirection == 3:
-    #         individual.coordinateX -= 10
-    #         if individual.coordinateX < 0:
-    #             individual.coordinateX = 0
-    #     # move north
-    #     else:
-    #         individual.coordinateY += 10
-    #         if individual.coordinateY > Dreamland.SIZE_Y:
-    #             individual.coordinateY = Dreamland.SIZE_Y
-    #     individual.slotCode = Dreamland.returnSlotCode(individual.coordinateX, individual.coordinateY)
-    #     self.updateDreamLandMap(individual, originalSlot, individual.slotCode)
-    #
-    # # search food in near 2 slots from 4 directions
-    # def searchFood(self, individual: Wolf):
-    #     targetFood = None

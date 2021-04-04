@@ -2,6 +2,8 @@ import random
 import threading
 import time
 
+from EvolutionSimulation.src.tool.CycleInfo import CycleInfo
+from EvolutionSimulation.src.tool.Recorder import Recorder
 from PopulationThread import PopulationThread
 from EvolutionSimulation.src.dreamland.Dreamland import Dreamland
 from EvolutionSimulation.src.population.Tiger import Tiger
@@ -20,14 +22,17 @@ class TigerThread(threading.Thread, PopulationThread):
     group: all the individuals
     dead: all dead individuals
     """
+    THREAD_NAME = "TigerThread"
 
     # initialize tiger thread
-    def __init__(self, tiger_count, dreamland: Dreamland):
+    def __init__(self, tiger_count, dreamland: Dreamland, recorder: Recorder):
         threading.Thread.__init__(self)
         self.dreamland = dreamland
+        self.recorder = recorder
         self.initCount = tiger_count
         self.group = []
         self.dead = []
+        self.cycleNumber = 0
         for i in range(0, tiger_count):
             # need to randomly initialize the coordinates of the tiger
             tiger = Tiger()
@@ -40,17 +45,25 @@ class TigerThread(threading.Thread, PopulationThread):
             self.updateDreamLandMap(tiger, None, tiger.slotCode)
         # add tiger thread to dreamland
         self.dreamland.populationThreadPlayers.append(self)
+        # initialize recorder to record every cycle info
+        self.recorder.cycleInfo[TigerThread.THREAD_NAME] = {}
 
     # monitor all wolves, and execute for all their actions
     def run(self):
         while True:
+            self.cycleNumber += 1
+            cycleInfo = CycleInfo("Tiger")
             for tiger in self.group:
                 # check if tiger should die naturally
-                if tiger.hungryLevel > 10 or tiger.age >= tiger.lifespan:
+                if tiger.hungryLevel > 10:
                     tiger.lifeStatus = "Dead"
-                    tiger.deathTime = time.time()
+                    tiger.deathCause = "Starve to death"
+                elif tiger.age >= tiger.lifespan:
+                    tiger.lifeStatus = "Dead"
+                    tiger.deathCause = "Natural death"
                 # check tiger life status first, move to different category if dead (starve to death/natural death/fight to death)
                 if tiger.lifeStatus == "Dead":
+                    tiger.deathTime = time.time()
                     self.group.remove(tiger)
                     self.dead.append(tiger)
                     continue
@@ -61,14 +74,20 @@ class TigerThread(threading.Thread, PopulationThread):
                         # find food in its own slot, if there is, then flight, if none, change position
                         food = PopulationThread.searchFood(tiger)
                         if food is not None:
+                            cycleInfo.fightTimes += 1
                             fightResult = tiger.fight(food)
                             # if wins, update location to food's location, and remove food from map
                             if fightResult == "Success":
                                 self.updateDreamLandMap(tiger, tiger.slotCode, food.slotCode)
                                 self.dreamland.coordinateMap[food.slotCode].remove(food)
+                                cycleInfo.fightSuccessTimes += 1
                             # if fails, remove tiger from map
                             elif fightResult == "Failure":
                                 self.dreamland.coordinateMap[tiger.slotCode].remove(tiger)
+                                cycleInfo.newDeath += 1
+                                cycleInfo.fightFailureTimes += 1
+                            else:
+                                cycleInfo.fightPeaceTimes += 1
                         # if no food found, move location and become more hungry
                         else:
                             PopulationThread.moveLocation(tiger)
@@ -78,6 +97,7 @@ class TigerThread(threading.Thread, PopulationThread):
                         # breed logic
                         spouse = PopulationThread.searchSpouse(tiger)
                         if spouse is not None:
+                            cycleInfo.breedTimes += 1
                             child = tiger.breed(spouse)
                             if child is not None:
                                 child.coordinateX = random.randint(0, Dreamland.SIZE_X)
@@ -87,9 +107,27 @@ class TigerThread(threading.Thread, PopulationThread):
                                 self.group.append(child)
                                 # update coordinate map
                                 self.updateDreamLandMap(child, None, child.slotCode)
+                                cycleInfo.newBorn += 1
                         else:
                             tiger.hungryLevel += 1
                 tiger.isBusy = False
                 tiger.age += 1
+                cycleInfo.popAvgHungryLevel += tiger.hungryLevel
+                cycleInfo.popAvgAge += tiger.age
+                cycleInfo.popAvgLifespan += tiger.lifespan
+                cycleInfo.popAvgFightCapability += tiger.fightCapability
+                cycleInfo.popAvgAttackPossibility += tiger.attackPossibility
+                cycleInfo.popAvgDefendPossibility += tiger.defendPossibility
+                cycleInfo.popAvgTotalBreedingTimes += tiger.TotalBreedingTimes
+            cycleInfo.liveIndividuals = len(self.group)
+            cycleInfo.deadIndividuals = len(self.dead)
+            cycleInfo.popAvgHungryLevel = cycleInfo.popAvgHungryLevel / len(self.group)
+            cycleInfo.popAvgAge = cycleInfo.popAvgAge / len(self.group)
+            cycleInfo.popAvgLifespan = cycleInfo.popAvgLifespan / len(self.group)
+            cycleInfo.popAvgFightCapability = cycleInfo.popAvgFightCapability / len(self.group)
+            cycleInfo.popAvgAttackPossibility = cycleInfo.popAvgAttackPossibility / len(self.group)
+            cycleInfo.popAvgDefendPossibility = cycleInfo.popAvgDefendPossibility / len(self.group)
+            cycleInfo.popAvgTotalBreedingTimes = cycleInfo.popAvgTotalBreedingTimes / len(self.group)
+            self.recorder.saveCycleInfo(self.cycleNumber, self, cycleInfo)
             # sleep for 1 day (1s)
             time.sleep(1)

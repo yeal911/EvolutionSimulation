@@ -13,13 +13,13 @@ class Population(metaclass=ABCMeta):
     ANIMAL = 1
     PLANT = 2
 
-    # forage behaviour of a population
-    @abstractmethod
-    def forage(self): pass
-
-    # grow behaviour of a population
-    @abstractmethod
-    def grow(self): pass
+    # # forage behaviour of a population
+    # @abstractmethod
+    # def forage(self): pass
+    #
+    # # grow behaviour of a population
+    # @abstractmethod
+    # def grow(self): pass
 
     # attack behaviour of a population
     @abstractmethod

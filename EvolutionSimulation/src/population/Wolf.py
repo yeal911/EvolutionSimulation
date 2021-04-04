@@ -170,7 +170,7 @@ class Wolf(Population):
             # get first half gene set from self after variation
             parentX = self.gene.variate()
             parentY = spouse.gene.variate()
-            for i in range(0, Gene.GENE_LENGTH / 2):
+            for i in range(0, Gene.GENE_LENGTH, 2):
                 childGeneDigits.append(parentX.gene.geneDigits[i])
                 childGeneDigits.append(parentY.gene.geneDigits[i+1])
             return Wolf(Gene(childGeneDigits), round((self.generation + spouse.generation) / 2))

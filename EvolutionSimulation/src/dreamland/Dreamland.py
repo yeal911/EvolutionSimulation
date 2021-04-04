@@ -42,7 +42,7 @@ class Dreamland:
     def startPopulationThread(self, pt):
         pt.start()
 
-    # return slot no. with input x and y coordinates
+    # return slot code with input x and y coordinates
     @staticmethod
     def returnSlotCode(x, y):
         codeX = math.ceil(x/10) * 10

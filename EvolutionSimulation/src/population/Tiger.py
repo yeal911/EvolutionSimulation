@@ -41,6 +41,9 @@ class Tiger(Population):
         self.fightTimes = 0
         self.breedTimes = 0
 
+        # for debug purpose, key is cycle number, value is location
+        self.moveHistory = {}
+
         # gene related properties initialization
         self.lifespan = 10  # initialize life with 10, maximum 15 after computation based on gene_set
         self.fightCapability = 70  # initialize fight capability with 50, maximum 100 after computation based on gene_set
@@ -72,14 +75,13 @@ class Tiger(Population):
     # fight behaviour of a tiger
     def fight(self, competitor: Population):
         if self.fightCapability > competitor.fightCapability:
-            if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-                # win fight, reset properties
-                self.hungryLevel = 0
-                self.fightTimes += 1
-                competitor.fightTimes += 1
-                competitor.lifeStatus = "Dead"
-                competitor.deathCause = "Fight to death"
-                competitor.deathTime = time.time()
+            # win fight, reset properties
+            self.hungryLevel = 0
+            self.fightTimes += 1
+            competitor.fightTimes += 1
+            competitor.lifeStatus = "Dead"
+            competitor.deathCause = "Fight to death"
+            competitor.deathTime = time.time()
             return "Success"
         elif self.fightCapability == competitor.fightCapability:
             self.hungryLevel += 1

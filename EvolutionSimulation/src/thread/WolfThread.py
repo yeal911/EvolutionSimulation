@@ -42,6 +42,7 @@ class WolfThread(threading.Thread, PopulationThread):
             # set the slot code in the dreamland
             wolf.slotCode = Dreamland.returnSlotCode(wolf.coordinateX, wolf.coordinateY)
             self.group.append(wolf)
+            wolf.moveHistory[self.cycleNumber] = str(wolf.coordinateX) + "|" + str(wolf.coordinateY) + ", " + wolf.slotCode
             # update coordinate map
             self.updateDreamLandMap(wolf, None, wolf.slotCode)
         # add wolf thread to dreamland
@@ -76,17 +77,22 @@ class WolfThread(threading.Thread, PopulationThread):
                         if wolf.hungryLevel > 4:
                             # find food in its own slot, if there is, then flight, if none, change position
                             food = self.searchFood(wolf)
-                            if food is not None:
+                            if food is not None and not food.isBusy:
                                 cycleInfo.fightTimes += 1
                                 fightResult = wolf.fight(food)
                                 # if wins, update location to food's location, and remove food from map
                                 if fightResult == "Success":
+                                    wolf.coordinateX = food.coordinateX
+                                    wolf.coordinateY = food.coordinateY
                                     self.updateDreamLandMap(wolf, wolf.slotCode, food.slotCode)
-                                    self.dreamland.coordinateMap[food.slotCode].remove(food)
+                                    self.removeIndividual(food.slotCode, food)
+                                    # self.dreamland.coordinateMap[food.slotCode].remove(food)
                                     cycleInfo.fightSuccessTimes += 1
+                                    wolf.moveHistory[self.cycleNumber] = str(wolf.coordinateX) + "|" + str(wolf.coordinateY) + ", " + wolf.slotCode
                                 # if fails, remove wolf from map
                                 elif fightResult == "Failure":
-                                    self.dreamland.coordinateMap[wolf.slotCode].remove(wolf)
+                                    self.removeIndividual(wolf.slotCode, wolf)
+                                    # self.dreamland.coordinateMap[wolf.slotCode].remove(wolf)
                                     cycleInfo.newDeath += 1
                                     cycleInfo.fightFailureTimes += 1
                                 else:
@@ -95,12 +101,13 @@ class WolfThread(threading.Thread, PopulationThread):
                             else:
                                 self.moveLocation(wolf)
                                 wolf.hungryLevel += 1
+                                wolf.moveHistory[self.cycleNumber] = str(wolf.coordinateX) + "|" + str(wolf.coordinateY) + ", " + wolf.slotCode
                         # if not hungry enough, prepare for breeding
                         else:
                             # breed logic
                             wolf.hungryLevel += 1
                             spouse = self.searchSpouse(wolf)
-                            if spouse is not None:
+                            if spouse is not None and not spouse.isBusy:
                                 cycleInfo.breedTimes += 1
                                 child = wolf.breed(spouse)
                                 if child is not None:
@@ -111,6 +118,7 @@ class WolfThread(threading.Thread, PopulationThread):
                                     self.group.append(child)
                                     # update coordinate map
                                     self.updateDreamLandMap(child, None, child.slotCode)
+                                    child.moveHistory[self.cycleNumber] = str(child.coordinateX) + "|" + str(child.coordinateY) + ", " + child.slotCode
                                     cycleInfo.newBorn += 1
                     wolf.isBusy = False
                     wolf.age += 1

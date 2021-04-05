@@ -42,6 +42,8 @@ class TigerThread(threading.Thread, PopulationThread):
             # set the slot code in the dreamland
             tiger.slotCode = Dreamland.returnSlotCode(tiger.coordinateX, tiger.coordinateY)
             self.group.append(tiger)
+
+            tiger.moveHistory[self.cycleNumber] = str(tiger.coordinateX) + "|" + str(tiger.coordinateY) + ", " + tiger.slotCode
             # update coordinate map
             self.updateDreamLandMap(tiger, None, tiger.slotCode)
         # add tiger thread to dreamland
@@ -49,7 +51,7 @@ class TigerThread(threading.Thread, PopulationThread):
         # initialize recorder to record every cycle info
         self.recorder.cycleInfo[TigerThread.THREAD_NAME] = {}
 
-    # monitor all wolves, and execute for all their actions
+    # monitor all Tigers, and execute for all their actions
     def run(self):
         while self.continueRunning:
             print(TigerThread.THREAD_NAME + " cycle: " + str(self.cycleNumber + 1) + ".  Remaining individual: " + str(len(self.group)))
@@ -76,17 +78,22 @@ class TigerThread(threading.Thread, PopulationThread):
                         if tiger.hungryLevel > 4:
                             # find food in its own slot, if there is, then flight, if none, change position
                             food = self.searchFood(tiger)
-                            if food is not None:
+                            if food is not None and not food.isBusy:
                                 cycleInfo.fightTimes += 1
                                 fightResult = tiger.fight(food)
                                 # if wins, update location to food's location, and remove food from map
                                 if fightResult == "Success":
+                                    tiger.coordinateX = food.coordinateX
+                                    tiger.coordinateY = food.coordinateY
                                     self.updateDreamLandMap(tiger, tiger.slotCode, food.slotCode)
-                                    self.dreamland.coordinateMap[food.slotCode].remove(food)
+                                    self.removeIndividual(food.slotCode, food)
+                                    # self.dreamland.coordinateMap[food.slotCode].remove(food)
                                     cycleInfo.fightSuccessTimes += 1
+                                    tiger.moveHistory[self.cycleNumber] = str(tiger.coordinateX) + "|" + str(tiger.coordinateY) + ", " + tiger.slotCode
                                 # if fails, remove tiger from map
                                 elif fightResult == "Failure":
-                                    self.dreamland.coordinateMap[tiger.slotCode].remove(tiger)
+                                    self.removeIndividual(tiger.slotCode, tiger)
+                                    # self.dreamland.coordinateMap[tiger.slotCode].remove(tiger)
                                     cycleInfo.newDeath += 1
                                     cycleInfo.fightFailureTimes += 1
                                 else:
@@ -95,12 +102,13 @@ class TigerThread(threading.Thread, PopulationThread):
                             else:
                                 self.moveLocation(tiger)
                                 tiger.hungryLevel += 1
+                                tiger.moveHistory[self.cycleNumber] = str(tiger.coordinateX) + "|" + str(tiger.coordinateY) + ", " + tiger.slotCode
                         # if not hungry enough, prepare for breeding
                         else:
                             # breed logic
                             tiger.hungryLevel += 1
                             spouse = self.searchSpouse(tiger)
-                            if spouse is not None:
+                            if spouse is not None and not spouse.isBusy:
                                 cycleInfo.breedTimes += 1
                                 child = tiger.breed(spouse)
                                 if child is not None:
@@ -111,6 +119,7 @@ class TigerThread(threading.Thread, PopulationThread):
                                     self.group.append(child)
                                     # update coordinate map
                                     self.updateDreamLandMap(child, None, child.slotCode)
+                                    child.moveHistory[self.cycleNumber] = str(child.coordinateX) + "|" + str(child.coordinateY) + ", " + child.slotCode
                                     cycleInfo.newBorn += 1
                     tiger.isBusy = False
                     tiger.age += 1

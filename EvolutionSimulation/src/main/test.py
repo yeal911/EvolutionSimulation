@@ -7,7 +7,7 @@ from EvolutionSimulation.src.tool.Recorder import Recorder
 
 dreamland = Dreamland()
 recorder = Recorder()
-wolfThread = WolfThread(50, dreamland, recorder)
+wolfThread = WolfThread(100, dreamland, recorder)
 tigerThread = TigerThread(10, dreamland, recorder)
 
 Dreamland.startPopulationThread(wolfThread)
@@ -17,7 +17,7 @@ while True:
     time.sleep(1)
     end = time.time()
     print("---Time elapses: " + str(int(end - start)))
-    if end - start > 500:
+    if end - start > 100:
         recorder.writeInfo2File()
         Dreamland.stopPopulationThread(tigerThread)
         Dreamland.stopPopulationThread(wolfThread)

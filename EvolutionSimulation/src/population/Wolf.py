@@ -40,6 +40,7 @@ class Wolf(Population):
         self.isBusy = False
         self.fightTimes = 0
         self.breedTimes = 0
+        self.ownThread = None
 
         # for debug purpose, key is cycle number, value is location
         self.moveHistory = {}
@@ -72,29 +73,25 @@ class Wolf(Population):
         # upper limit of growth period
         self.upperGrowthPeriod = 2 * self.lowerGrowthPeriod
 
-    # fight behaviour of a wolf
-    def fight(self, competitor: Population):
-        if self.fightCapability > competitor.fightCapability:
-            # win fight, reset properties
-            self.hungryLevel = 0
-            self.fightTimes += 1
-            competitor.fightTimes += 1
-            competitor.lifeStatus = "Dead"
-            competitor.deathCause = "Fight to death"
-            competitor.deathTime = time.time()
-            return "Success"
-        elif self.fightCapability == competitor.fightCapability:
-            self.hungryLevel += 1
-            competitor.hungryLevel += 1
-            return "Peace"
-        else:
-            competitor.hungryLevel = 0
-            competitor.fightTimes += 1
-            self.fightTimes += 1
-            self.lifeStatus = "Dead"
-            self.deathCause = "Fight to death"
-            self.deathTime = time.time()
-            return "Failure"
+    # # fight behaviour of a wolf
+    # def fight(self, competitor: Population):
+    #     if self.fightCapability > competitor.fightCapability:
+    #         # win fight, reset properties
+    #         self.hungryLevel = 0
+    #         self.fightTimes += 1
+    #         competitor.ownThread.receiveDefendInfo("Failure", competitor)
+    #         return "Success"
+    #     elif self.fightCapability == competitor.fightCapability:
+    #         self.hungryLevel += 1
+    #         competitor.ownThread.receiveDefendInfo("Peace", competitor)
+    #         return "Peace"
+    #     else:
+    #         competitor.ownThread.receiveDefendInfo("Success", competitor)
+    #         self.fightTimes += 1
+    #         self.lifeStatus = "Dead"
+    #         self.deathCause = "Fight to death"
+    #         self.deathTime = time.time()
+    #         return "Failure"
 
     # # defend behaviour of a wolf
     # def defend(self, population: Population):

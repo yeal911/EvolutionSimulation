@@ -2,6 +2,7 @@ import random
 import threading
 import time
 
+from EvolutionSimulation.src.population.Population import Population
 from EvolutionSimulation.src.thread.PopulationThread import PopulationThread
 from EvolutionSimulation.src.tool.CycleInfo import CycleInfo
 from EvolutionSimulation.src.tool.Recorder import Recorder
@@ -41,8 +42,9 @@ class WolfThread(threading.Thread, PopulationThread):
             wolf.coordinateY = random.randint(0, Dreamland.SIZE_Y)
             # set the slot code in the dreamland
             wolf.slotCode = Dreamland.returnSlotCode(wolf.coordinateX, wolf.coordinateY)
-            self.group.append(wolf)
+            wolf.ownThread = self
             wolf.moveHistory[self.cycleNumber] = str(wolf.coordinateX) + "|" + str(wolf.coordinateY) + ", " + wolf.slotCode
+            self.group.append(wolf)
             # update coordinate map
             self.updateDreamLandMap(wolf, None, wolf.slotCode)
         # add wolf thread to dreamland
@@ -75,7 +77,7 @@ class WolfThread(threading.Thread, PopulationThread):
                         wolf.isBusy = True
                         # add logic for searching food and fight
                         if wolf.hungryLevel > 4:
-                            # find food in its own slot, if there is, then flight, if none, change position
+                            # find food in its own slot, if there is, then fight, if none, change position
                             food = self.searchFood(wolf)
                             if food is not None and not food.isBusy:
                                 cycleInfo.fightTimes += 1
@@ -130,9 +132,9 @@ class WolfThread(threading.Thread, PopulationThread):
                     cycleInfo.popAvgDefendPossibility += wolf.defendPossibility
                     cycleInfo.popAvgTotalBreedingTimes += wolf.TotalBreedingTimes
                 # if there is still live population
+                cycleInfo.liveIndividuals = len(self.group)
+                cycleInfo.deadIndividuals = len(self.dead)
                 if len(self.group) != 0:
-                    cycleInfo.liveIndividuals = len(self.group)
-                    cycleInfo.deadIndividuals = len(self.dead)
                     cycleInfo.popAvgHungryLevel = round(cycleInfo.popAvgHungryLevel / len(self.group), 2)
                     cycleInfo.popAvgAge = round(cycleInfo.popAvgAge / len(self.group), 2)
                     cycleInfo.popAvgLifespan = round(cycleInfo.popAvgLifespan / len(self.group), 2)
@@ -140,7 +142,7 @@ class WolfThread(threading.Thread, PopulationThread):
                     cycleInfo.popAvgAttackPossibility = round(cycleInfo.popAvgAttackPossibility / len(self.group), 2)
                     cycleInfo.popAvgDefendPossibility = round(cycleInfo.popAvgDefendPossibility / len(self.group), 2)
                     cycleInfo.popAvgTotalBreedingTimes = round(cycleInfo.popAvgTotalBreedingTimes / len(self.group), 2)
-                    self.recorder.saveCycleInfo(self.cycleNumber, self, cycleInfo)
+                self.recorder.saveCycleInfo(self.cycleNumber, self, cycleInfo)
                 # sleep for 1 day (1s)
                 time.sleep(1)
             # if all individuals are dead

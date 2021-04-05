@@ -2,6 +2,7 @@ import random
 import threading
 import time
 
+from EvolutionSimulation.src.population.Population import Population
 from EvolutionSimulation.src.thread.PopulationThread import PopulationThread
 from EvolutionSimulation.src.tool.CycleInfo import CycleInfo
 from EvolutionSimulation.src.tool.Recorder import Recorder
@@ -41,9 +42,9 @@ class TigerThread(threading.Thread, PopulationThread):
             tiger.coordinateY = random.randint(0, Dreamland.SIZE_Y)
             # set the slot code in the dreamland
             tiger.slotCode = Dreamland.returnSlotCode(tiger.coordinateX, tiger.coordinateY)
-            self.group.append(tiger)
-
+            tiger.ownThread = self
             tiger.moveHistory[self.cycleNumber] = str(tiger.coordinateX) + "|" + str(tiger.coordinateY) + ", " + tiger.slotCode
+            self.group.append(tiger)
             # update coordinate map
             self.updateDreamLandMap(tiger, None, tiger.slotCode)
         # add tiger thread to dreamland
@@ -51,7 +52,7 @@ class TigerThread(threading.Thread, PopulationThread):
         # initialize recorder to record every cycle info
         self.recorder.cycleInfo[TigerThread.THREAD_NAME] = {}
 
-    # monitor all Tigers, and execute for all their actions
+    # monitor all tigers, and execute for all their actions
     def run(self):
         while self.continueRunning:
             print(TigerThread.THREAD_NAME + " cycle: " + str(self.cycleNumber + 1) + ".  Remaining individual: " + str(len(self.group)))
@@ -76,7 +77,7 @@ class TigerThread(threading.Thread, PopulationThread):
                         tiger.isBusy = True
                         # add logic for searching food and fight
                         if tiger.hungryLevel > 4:
-                            # find food in its own slot, if there is, then flight, if none, change position
+                            # find food in its own slot, if there is, then fight, if none, change position
                             food = self.searchFood(tiger)
                             if food is not None and not food.isBusy:
                                 cycleInfo.fightTimes += 1
@@ -131,9 +132,9 @@ class TigerThread(threading.Thread, PopulationThread):
                     cycleInfo.popAvgDefendPossibility += tiger.defendPossibility
                     cycleInfo.popAvgTotalBreedingTimes += tiger.TotalBreedingTimes
                 # if there is still live population
+                cycleInfo.liveIndividuals = len(self.group)
+                cycleInfo.deadIndividuals = len(self.dead)
                 if len(self.group) != 0:
-                    cycleInfo.liveIndividuals = len(self.group)
-                    cycleInfo.deadIndividuals = len(self.dead)
                     cycleInfo.popAvgHungryLevel = round(cycleInfo.popAvgHungryLevel / len(self.group), 2)
                     cycleInfo.popAvgAge = round(cycleInfo.popAvgAge / len(self.group), 2)
                     cycleInfo.popAvgLifespan = round(cycleInfo.popAvgLifespan / len(self.group), 2)
@@ -141,7 +142,7 @@ class TigerThread(threading.Thread, PopulationThread):
                     cycleInfo.popAvgAttackPossibility = round(cycleInfo.popAvgAttackPossibility / len(self.group), 2)
                     cycleInfo.popAvgDefendPossibility = round(cycleInfo.popAvgDefendPossibility / len(self.group), 2)
                     cycleInfo.popAvgTotalBreedingTimes = round(cycleInfo.popAvgTotalBreedingTimes / len(self.group), 2)
-                    self.recorder.saveCycleInfo(self.cycleNumber, self, cycleInfo)
+                self.recorder.saveCycleInfo(self.cycleNumber, self, cycleInfo)
                 # sleep for 1 day (1s)
                 time.sleep(1)
             # if all individuals are dead

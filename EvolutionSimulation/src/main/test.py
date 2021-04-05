@@ -17,7 +17,12 @@ while True:
     time.sleep(1)
     end = time.time()
     print("---Time elapses: " + str(int(end - start)))
-    if end - start > 100:
+    if end - start > 30:
+        recorder.writeInfo2File()
+        Dreamland.stopPopulationThread(tigerThread)
+        Dreamland.stopPopulationThread(wolfThread)
+        break
+    elif len(wolfThread.group) == 0 or len(tigerThread.group) == 0:
         recorder.writeInfo2File()
         Dreamland.stopPopulationThread(tigerThread)
         Dreamland.stopPopulationThread(wolfThread)

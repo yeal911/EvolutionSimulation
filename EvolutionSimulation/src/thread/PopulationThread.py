@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import inspect
 import random
-import traceback
+import time
 
 from EvolutionSimulation.src.dreamland.Dreamland import Dreamland
 from EvolutionSimulation.src.population.Population import Population
@@ -101,7 +101,7 @@ class PopulationThread:
         # traceback.print_stack()
         self.dreamland.coordinateMap[slotCode].remove(individualForRemove)
 
-# append an individual to coordinate map
+    # append an individual to coordinate map
     def appendIndividual(self, slotCode, individualForAppend):
         # printStr = "***append individual(" + individualForAppend.name + "): " + "slotCode(" + str(slotCode) + ") indSlotCode(" + individualForAppend.slotCode + ") indX("
         # printStr += str(individualForAppend.coordinateX) + ") indY("
@@ -110,3 +110,21 @@ class PopulationThread:
         # print(printStr)
         self.dreamland.coordinateMap[slotCode].append(individualForAppend)
         individualForAppend.slotCode = slotCode
+
+    # receive cycle info for defending
+    def receiveDefendInfo(self, fightResult, pop: Population):
+        ownCycles = self.recorder.cycleInfo[self.THREAD_NAME]
+        cycle = ownCycles[self.cycleNumber]
+        cycle.defendTimes += 1
+        pop.fightTimes += 1
+        if fightResult == "Success":
+            pop.hungryLevel = 0
+            cycle.defendSuccessTimes += 1
+        elif fightResult == "Failure":
+            pop.lifeStatus = "Dead"
+            pop.deathCause = "Fight to death"
+            pop.deathTime = time.time()
+            cycle.defendFailureTimes += 1
+        else:
+            pop.hungryLevel += 1
+            cycle.defendPeaceTimes += 1

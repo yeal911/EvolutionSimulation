@@ -14,9 +14,13 @@ class CycleInfo:
         self.newDeath = 0
         self.breedTimes = 0
         self.fightTimes = 0
+        self.defendTimes = 0
         self.fightSuccessTimes = 0
         self.fightPeaceTimes = 0
         self.fightFailureTimes = 0
+        self.defendSuccessTimes = 0
+        self.defendPeaceTimes = 0
+        self.defendFailureTimes = 0
 
         # average info of a population in one cycle
         self.popAvgHungryLevel = 0

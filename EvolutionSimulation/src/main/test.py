@@ -15,7 +15,7 @@ Dreamland.startPopulationThread(tigerThread)
 start = time.time()
 while True:
     end = time.time()
-    if end - start > 20:
+    if end - start > 200:
         dreamland.stopPopulationThread(wolfThread)
         dreamland.stopPopulationThread(tigerThread)
         recorder.writeInfo2File()

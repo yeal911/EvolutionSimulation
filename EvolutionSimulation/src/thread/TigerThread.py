@@ -119,15 +119,20 @@ class TigerThread(threading.Thread, PopulationThread):
                 cycleInfo.popAvgAttackPossibility += tiger.attackPossibility
                 cycleInfo.popAvgDefendPossibility += tiger.defendPossibility
                 cycleInfo.popAvgTotalBreedingTimes += tiger.TotalBreedingTimes
-            cycleInfo.liveIndividuals = len(self.group)
-            cycleInfo.deadIndividuals = len(self.dead)
-            cycleInfo.popAvgHungryLevel = cycleInfo.popAvgHungryLevel / len(self.group)
-            cycleInfo.popAvgAge = cycleInfo.popAvgAge / len(self.group)
-            cycleInfo.popAvgLifespan = cycleInfo.popAvgLifespan / len(self.group)
-            cycleInfo.popAvgFightCapability = cycleInfo.popAvgFightCapability / len(self.group)
-            cycleInfo.popAvgAttackPossibility = cycleInfo.popAvgAttackPossibility / len(self.group)
-            cycleInfo.popAvgDefendPossibility = cycleInfo.popAvgDefendPossibility / len(self.group)
-            cycleInfo.popAvgTotalBreedingTimes = cycleInfo.popAvgTotalBreedingTimes / len(self.group)
-            self.recorder.saveCycleInfo(self.cycleNumber, self, cycleInfo)
-            # sleep for 1 day (1s)
-            time.sleep(1)
+            # if there is still live population
+            if len(self.group) != 0:
+                cycleInfo.liveIndividuals = len(self.group)
+                cycleInfo.deadIndividuals = len(self.dead)
+                cycleInfo.popAvgHungryLevel = round(cycleInfo.popAvgHungryLevel / len(self.group), 2)
+                cycleInfo.popAvgAge = round(cycleInfo.popAvgAge / len(self.group), 2)
+                cycleInfo.popAvgLifespan = round(cycleInfo.popAvgLifespan / len(self.group), 2)
+                cycleInfo.popAvgFightCapability = round(cycleInfo.popAvgFightCapability / len(self.group), 2)
+                cycleInfo.popAvgAttackPossibility = round(cycleInfo.popAvgAttackPossibility / len(self.group), 2)
+                cycleInfo.popAvgDefendPossibility = round(cycleInfo.popAvgDefendPossibility / len(self.group), 2)
+                cycleInfo.popAvgTotalBreedingTimes = round(cycleInfo.popAvgTotalBreedingTimes / len(self.group), 2)
+                self.recorder.saveCycleInfo(self.cycleNumber, self, cycleInfo)
+                # sleep for 1 day (1s)
+                time.sleep(1)
+            # if all of this population are dead, sleep this thread
+            else:
+                time.sleep(5)

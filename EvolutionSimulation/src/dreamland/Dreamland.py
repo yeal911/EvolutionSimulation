@@ -46,7 +46,7 @@ class Dreamland:
     # stop population thread
     @staticmethod
     def stopPopulationThread(pt):
-        pt.join()
+        pt.continueRunning = False
 
     # return slot code with input x and y coordinates
     @staticmethod

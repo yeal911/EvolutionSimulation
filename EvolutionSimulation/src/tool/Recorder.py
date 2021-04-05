@@ -59,4 +59,5 @@ class Recorder:
                 sheet.write(rowNum, 14, cycleInfo.popAvgAttackPossibility)
                 sheet.write(rowNum, 15, cycleInfo.popAvgDefendPossibility)
                 sheet.write(rowNum, 16, cycleInfo.popAvgTotalBreedingTimes)
+                rowNum += 1
         workbook.save("EvolutionSimulationResult_" + str(time.strftime("%Y%m%d%H%M%S", time.localtime())) + ".xls")

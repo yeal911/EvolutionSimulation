@@ -38,15 +38,7 @@ class TigerThread(threading.Thread, PopulationThread):
         for i in range(0, tiger_count):
             # need to randomly initialize the coordinates of the tiger
             tiger = Tiger()
-            tiger.coordinateX = random.randint(0, Dreamland.SIZE_X)
-            tiger.coordinateY = random.randint(0, Dreamland.SIZE_Y)
-            # set the slot code in the dreamland
-            tiger.slotCode = Dreamland.returnSlotCode(tiger.coordinateX, tiger.coordinateY)
-            tiger.ownThread = self
-            tiger.moveHistory[self.cycleNumber] = str(tiger.coordinateX) + "|" + str(tiger.coordinateY) + ", " + tiger.slotCode
-            self.group.append(tiger)
-            # update coordinate map
-            self.updateDreamLandMap(tiger, None, tiger.slotCode)
+            self.addIndividual2Thread(tiger)
         # add tiger thread to dreamland
         self.dreamland.populationThreadPlayers.append(self)
         # initialize recorder to record every cycle info
@@ -113,14 +105,7 @@ class TigerThread(threading.Thread, PopulationThread):
                                 cycleInfo.breedTimes += 1
                                 child = tiger.breed(spouse)
                                 if child is not None:
-                                    child.coordinateX = random.randint(0, Dreamland.SIZE_X)
-                                    child.coordinateY = random.randint(0, Dreamland.SIZE_Y)
-                                    # set the slot code in the dreamland
-                                    child.slotCode = Dreamland.returnSlotCode(child.coordinateX, child.coordinateY)
-                                    self.group.append(child)
-                                    # update coordinate map
-                                    self.updateDreamLandMap(child, None, child.slotCode)
-                                    child.moveHistory[self.cycleNumber] = str(child.coordinateX) + "|" + str(child.coordinateY) + ", " + child.slotCode
+                                    self.addIndividual2Thread(child)
                                     cycleInfo.newBorn += 1
                     tiger.isBusy = False
                     tiger.age += 1

@@ -89,7 +89,7 @@ class PopulationThread:
         return None
 
     # remove an individual from coordinate map
-    def removeIndividual(self, slotCode, individualForRemove):
+    def removeIndividual(self, slotCode, individualForRemove: Population):
         # printStr = "***remove individual(" + individualForRemove.name + "): " + "slotCode(" + str(slotCode) + ") indSlotCode(" + individualForRemove.slotCode + ") indX("
         # printStr += str(individualForRemove.coordinateX) + ") indY("
         # printStr += str(individualForRemove.coordinateY) + ") life("
@@ -102,7 +102,7 @@ class PopulationThread:
         self.dreamland.coordinateMap[slotCode].remove(individualForRemove)
 
     # append an individual to coordinate map
-    def appendIndividual(self, slotCode, individualForAppend):
+    def appendIndividual(self, slotCode, individualForAppend: Population):
         # printStr = "***append individual(" + individualForAppend.name + "): " + "slotCode(" + str(slotCode) + ") indSlotCode(" + individualForAppend.slotCode + ") indX("
         # printStr += str(individualForAppend.coordinateX) + ") indY("
         # printStr += str(individualForAppend.coordinateY) + ") life("
@@ -114,6 +114,10 @@ class PopulationThread:
     # receive cycle info for defending
     def receiveDefendInfo(self, fightResult, pop: Population):
         ownCycles = self.recorder.cycleInfo[self.THREAD_NAME]
+        # there is a possibility that upon execution of this method, the iteration in run method hasn't finished yet,
+        # so the corresponding cycle info hasn't been saved too wnCycles yet
+        while ownCycles.get(self.cycleNumber, None) is None:
+            time.sleep(0.01)
         cycle = ownCycles[self.cycleNumber]
         cycle.defendTimes += 1
         pop.fightTimes += 1
@@ -128,3 +132,15 @@ class PopulationThread:
         else:
             pop.hungryLevel += 1
             cycle.defendPeaceTimes += 1
+
+    # add individual to thread
+    def addIndividual2Thread(self, pop: Population):
+        pop.coordinateX = random.randint(0, Dreamland.SIZE_X)
+        pop.coordinateY = random.randint(0, Dreamland.SIZE_Y)
+        # set the slot code in the dreamland
+        pop.slotCode = Dreamland.returnSlotCode(pop.coordinateX, pop.coordinateY)
+        pop.ownThread = self
+        self.group.append(pop)
+        # update coordinate map
+        self.updateDreamLandMap(pop, None, pop.slotCode)
+        pop.moveHistory[self.cycleNumber] = str(pop.coordinateX) + "|" + str(pop.coordinateY) + ", " + pop.slotCode

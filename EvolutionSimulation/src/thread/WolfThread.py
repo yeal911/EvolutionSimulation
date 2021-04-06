@@ -38,15 +38,7 @@ class WolfThread(threading.Thread, PopulationThread):
         for i in range(0, wolf_count):
             # need to randomly initialize the coordinates of the wolf
             wolf = Wolf()
-            wolf.coordinateX = random.randint(0, Dreamland.SIZE_X)
-            wolf.coordinateY = random.randint(0, Dreamland.SIZE_Y)
-            # set the slot code in the dreamland
-            wolf.slotCode = Dreamland.returnSlotCode(wolf.coordinateX, wolf.coordinateY)
-            wolf.ownThread = self
-            wolf.moveHistory[self.cycleNumber] = str(wolf.coordinateX) + "|" + str(wolf.coordinateY) + ", " + wolf.slotCode
-            self.group.append(wolf)
-            # update coordinate map
-            self.updateDreamLandMap(wolf, None, wolf.slotCode)
+            self.addIndividual2Thread(wolf)
         # add wolf thread to dreamland
         self.dreamland.populationThreadPlayers.append(self)
         # initialize recorder to record every cycle info
@@ -113,14 +105,7 @@ class WolfThread(threading.Thread, PopulationThread):
                                 cycleInfo.breedTimes += 1
                                 child = wolf.breed(spouse)
                                 if child is not None:
-                                    child.coordinateX = random.randint(0, Dreamland.SIZE_X)
-                                    child.coordinateY = random.randint(0, Dreamland.SIZE_Y)
-                                    # set the slot code in the dreamland
-                                    child.slotCode = Dreamland.returnSlotCode(child.coordinateX, child.coordinateY)
-                                    self.group.append(child)
-                                    # update coordinate map
-                                    self.updateDreamLandMap(child, None, child.slotCode)
-                                    child.moveHistory[self.cycleNumber] = str(child.coordinateX) + "|" + str(child.coordinateY) + ", " + child.slotCode
+                                    self.addIndividual2Thread(child)
                                     cycleInfo.newBorn += 1
                     wolf.isBusy = False
                     wolf.age += 1

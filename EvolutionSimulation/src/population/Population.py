@@ -14,14 +14,6 @@ class Population:
     ANIMAL = 1
     PLANT = 2
 
-    # # forage behaviour of a population
-    # @abstractmethod
-    # def forage(self): pass
-    #
-    # # grow behaviour of a population
-    # @abstractmethod
-    # def grow(self): pass
-
     # fight behaviour of a population individual
     def fight(self, competitor):
         if self.fightCapability > competitor.fightCapability:
@@ -41,11 +33,3 @@ class Population:
             self.deathCause = "Fight to death"
             self.deathTime = time.time()
             return "Failure"
-
-    # # defend behaviour of a population
-    # @abstractmethod
-    # def defend(self): pass
-
-    # # breed behaviour of a population
-    # @abstractmethod
-    # def breed(self, spouse): pass

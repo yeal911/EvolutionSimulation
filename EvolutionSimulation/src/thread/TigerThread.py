@@ -2,7 +2,6 @@ import random
 import threading
 import time
 
-from EvolutionSimulation.src.population.Population import Population
 from EvolutionSimulation.src.thread.PopulationThread import PopulationThread
 from EvolutionSimulation.src.tool.CycleInfo import CycleInfo
 from EvolutionSimulation.src.tool.Recorder import Recorder

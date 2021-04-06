@@ -73,36 +73,12 @@ class Tiger(Population):
         # upper limit of growth period
         self.upperGrowthPeriod = 2 * self.lowerGrowthPeriod
 
-    # # fight behaviour of a tiger
-    # def fight(self, competitor: Population):
-    #     if self.fightCapability > competitor.fightCapability:
-    #         # win fight, reset properties
-    #         self.hungryLevel = 0
-    #         self.fightTimes += 1
-    #         competitor.fightTimes += 1
-    #         competitor.lifeStatus = "Dead"
-    #         competitor.deathCause = "Fight to death"
-    #         competitor.deathTime = time.time()
-    #         return "Success"
-    #     elif self.fightCapability == competitor.fightCapability:
-    #         self.hungryLevel += 1
-    #         competitor.hungryLevel += 1
-    #         return "Peace"
-    #     else:
-    #         competitor.hungryLevel = 0
-    #         competitor.fightTimes += 1
-    #         self.fightTimes += 1
-    #         self.lifeStatus = "Dead"
-    #         self.deathCause = "Fight to death"
-    #         self.deathTime = time.time()
-    #         return "Failure"
-
     # breed behaviour of a tiger
     def breed(self, spouse):
-        if spouse.__class__.__name__ != "Tiger" or self.gender == spouse.gender:
+        if spouse.__class__.__name__ != self.__class__.__name__ or self.gender == spouse.gender:
             print("Different population or same gender, no breed")
             return None
-        if (self.breedTimes < self.TotalBreedingTimes and self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod) and (spouse.breedTimes < spouse.TotalBreedingTimes and spouse.lowerGrowthPeriod < spouse.age < spouse.upperGrowthPeriod):
+        if (self.breedTimes <= self.TotalBreedingTimes and self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod) and (spouse.breedTimes <= spouse.TotalBreedingTimes and spouse.lowerGrowthPeriod < spouse.age < spouse.upperGrowthPeriod):
             self.breedTimes += 1
             spouse.breedTimes += 1
             self.hungryLevel += 1

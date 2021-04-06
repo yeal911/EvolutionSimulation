@@ -73,46 +73,12 @@ class Wolf(Population):
         # upper limit of growth period
         self.upperGrowthPeriod = 2 * self.lowerGrowthPeriod
 
-    # # fight behaviour of a wolf
-    # def fight(self, competitor: Population):
-    #     if self.fightCapability > competitor.fightCapability:
-    #         # win fight, reset properties
-    #         self.hungryLevel = 0
-    #         self.fightTimes += 1
-    #         competitor.ownThread.receiveDefendInfo("Failure", competitor)
-    #         return "Success"
-    #     elif self.fightCapability == competitor.fightCapability:
-    #         self.hungryLevel += 1
-    #         competitor.ownThread.receiveDefendInfo("Peace", competitor)
-    #         return "Peace"
-    #     else:
-    #         competitor.ownThread.receiveDefendInfo("Success", competitor)
-    #         self.fightTimes += 1
-    #         self.lifeStatus = "Dead"
-    #         self.deathCause = "Fight to death"
-    #         self.deathTime = time.time()
-    #         return "Failure"
-
-    # # defend behaviour of a wolf
-    # def defend(self, population: Population):
-    #     print("self.fightCapability " + str(self.fightCapability) + "competitor.fightCapability " + str(population.fightCapability))
-    #     # fightCapability increase in the growth period
-    #     # if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-    #     #     self.fightCapability += 1
-    #     # escape successfully
-    #     if self.fightCapability >= population.fightCapability:
-    #         print(self.name + " defended successfully!")
-    #         return True
-    #     # defend unsuccessfully
-    #     else:
-    #         return False
-
     # breed behaviour of a wolf
     def breed(self, spouse):
-        if spouse.__class__.__name__ != "Wolf" or self.gender == spouse.gender:
+        if spouse.__class__.__name__ != self.__class__.__name__ or self.gender == spouse.gender:
             print("Different population or same gender, no breed")
             return None
-        if (self.breedTimes < self.TotalBreedingTimes and self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod) and (spouse.breedTimes < spouse.TotalBreedingTimes and spouse.lowerGrowthPeriod < spouse.age < spouse.upperGrowthPeriod):
+        if (self.breedTimes <= self.TotalBreedingTimes and self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod) and (spouse.breedTimes <= spouse.TotalBreedingTimes and spouse.lowerGrowthPeriod < spouse.age < spouse.upperGrowthPeriod):
             self.breedTimes += 1
             spouse.breedTimes += 1
             self.hungryLevel += 1

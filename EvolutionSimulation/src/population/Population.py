@@ -22,8 +22,7 @@ class Population:
     # @abstractmethod
     # def grow(self): pass
 
-    # attack behaviour of a population
-    # fight behaviour of a wolf
+    # fight behaviour of a population individual
     def fight(self, competitor):
         if self.fightCapability > competitor.fightCapability:
             # win fight, reset properties

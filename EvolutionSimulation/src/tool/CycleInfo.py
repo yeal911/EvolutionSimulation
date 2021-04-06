@@ -12,6 +12,9 @@ class CycleInfo:
         self.deadIndividuals = 0
         self.newBorn = 0
         self.newDeath = 0
+        self.newDeathFromFight = 0
+        self.newDeathFromNatural = 0
+        self.newDeathFromStarve = 0
         self.breedTimes = 0
         self.fightTimes = 0
         self.defendTimes = 0

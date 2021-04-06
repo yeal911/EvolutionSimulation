@@ -44,7 +44,7 @@ class TigerThread(threading.Thread, PopulationThread):
         # initialize recorder to record every cycle info
         self.recorder.cycleInfo[TigerThread.THREAD_NAME] = {}
 
-    # monitor all tigers, and execute for all their actions
+    # monitor all individuals, and execute for all their actions
     def run(self):
         while self.continueRunning:
             print(TigerThread.THREAD_NAME + " cycle: " + str(self.cycleNumber + 1) + ".  Remaining individual: " + str(len(self.group)))
@@ -56,14 +56,19 @@ class TigerThread(threading.Thread, PopulationThread):
                     if tiger.hungryLevel > 10:
                         tiger.lifeStatus = "Dead"
                         tiger.deathCause = "Starve to death"
+                        cycleInfo.newDeathFromStarve += 1
                     elif tiger.age >= tiger.lifespan:
                         tiger.lifeStatus = "Dead"
                         tiger.deathCause = "Natural death"
+                        cycleInfo.newDeathFromNatural += 1
+                    elif tiger.deathCause == "Fight to death":
+                        cycleInfo.newDeathFromFight += 1
                     # check tiger life status first, move to different category if dead (starve to death/natural death/fight to death)
                     if tiger.lifeStatus == "Dead":
                         tiger.deathTime = time.time()
                         self.group.remove(tiger)
                         self.dead.append(tiger)
+                        cycleInfo.newDeath += 1
                         continue
                     if not tiger.isBusy:
                         tiger.isBusy = True
@@ -87,7 +92,6 @@ class TigerThread(threading.Thread, PopulationThread):
                                 elif fightResult == "Failure":
                                     self.removeIndividual(tiger.slotCode, tiger)
                                     # self.dreamland.coordinateMap[tiger.slotCode].remove(tiger)
-                                    cycleInfo.newDeath += 1
                                     cycleInfo.fightFailureTimes += 1
                                 else:
                                     cycleInfo.fightPeaceTimes += 1

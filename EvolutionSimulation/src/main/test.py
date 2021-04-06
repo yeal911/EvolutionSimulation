@@ -7,8 +7,8 @@ from EvolutionSimulation.src.tool.Recorder import Recorder
 
 dreamland = Dreamland()
 recorder = Recorder()
-wolfThread = WolfThread(100, dreamland, recorder)
-tigerThread = TigerThread(10, dreamland, recorder)
+wolfThread = WolfThread(500, dreamland, recorder)
+tigerThread = TigerThread(20, dreamland, recorder)
 
 Dreamland.startPopulationThread(wolfThread)
 Dreamland.startPopulationThread(tigerThread)

@@ -5,6 +5,7 @@ import time
 
 from EvolutionSimulation.src.dreamland.Dreamland import Dreamland
 from EvolutionSimulation.src.population.Population import Population
+from EvolutionSimulation.src.tool.CycleInfo import CycleInfo
 
 
 class PopulationThread:
@@ -127,7 +128,7 @@ class PopulationThread:
         elif fightResult == "Failure":
             pop.lifeStatus = "Dead"
             pop.deathCause = "Fight to death"
-            pop.deathTime = time.time()
+            pop.deathTime = time.strftime("%Y%m%d%H%M%S%f", time.localtime())
             cycle.defendFailureTimes += 1
         else:
             pop.hungryLevel += 1
@@ -144,3 +145,97 @@ class PopulationThread:
         # update coordinate map
         self.updateDreamLandMap(pop, None, pop.slotCode)
         pop.moveHistory[self.cycleNumber] = str(pop.coordinateX) + "|" + str(pop.coordinateY) + ", " + pop.slotCode
+
+    # monitor all individuals, and execute for all their actions, any thread has different logic, just overwrite this method
+    def threadRun(self):
+        while self.continueRunning:
+            print(self.THREAD_NAME + " cycle: " + str(self.cycleNumber + 1) + ".  Remaining individual: " + str(len(self.group)))
+            if len(self.group) != 0:
+                self.cycleNumber += 1
+                cycleInfo = CycleInfo(self.THREAD_NAME)
+                for individual in self.group:
+                    # check if individual should die naturally
+                    if individual.hungryLevel > 10:
+                        individual.lifeStatus = "Dead"
+                        individual.deathCause = "Starve to death"
+                        cycleInfo.newDeathFromStarve += 1
+                    elif individual.age >= individual.lifespan:
+                        individual.lifeStatus = "Dead"
+                        individual.deathCause = "Natural death"
+                        cycleInfo.newDeathFromNatural += 1
+                    elif individual.deathCause == "Fight to death":
+                        cycleInfo.newDeathFromFight += 1
+                    # check individual life status first, move to different category if dead (starve to death/natural death/fight to death)
+                    if individual.lifeStatus == "Dead":
+                        individual.deathTime = time.strftime("%Y%m%d%H%M%S%f", time.localtime())
+                        self.group.remove(individual)
+                        self.dead.append(individual)
+                        cycleInfo.newDeath += 1
+                        continue
+                    if not individual.isBusy:
+                        individual.isBusy = True
+                        # add logic for searching food and fight
+                        if individual.hungryLevel > 4:
+                            # find food in its own slot, if there is, then fight, if none, change position
+                            food = self.searchFood(individual)
+                            if food is not None and not food.isBusy:
+                                cycleInfo.fightTimes += 1
+                                fightResult = individual.fight(food)
+                                # if wins, update location to food's location, and remove food from map
+                                if fightResult == "Success":
+                                    individual.coordinateX = food.coordinateX
+                                    individual.coordinateY = food.coordinateY
+                                    self.updateDreamLandMap(individual, individual.slotCode, food.slotCode)
+                                    self.removeIndividual(food.slotCode, food)
+                                    # self.dreamland.coordinateMap[food.slotCode].remove(food)
+                                    cycleInfo.fightSuccessTimes += 1
+                                    individual.moveHistory[self.cycleNumber] = str(individual.coordinateX) + "|" + str(individual.coordinateY) + ", " + individual.slotCode
+                                # if fails, remove individual from map
+                                elif fightResult == "Failure":
+                                    self.removeIndividual(individual.slotCode, individual)
+                                    # self.dreamland.coordinateMap[individual.slotCode].remove(individual)
+                                    cycleInfo.fightFailureTimes += 1
+                                else:
+                                    cycleInfo.fightPeaceTimes += 1
+                            # if no food found, move location and become more hungry
+                            else:
+                                self.moveLocation(individual)
+                                individual.hungryLevel += 1
+                                individual.moveHistory[self.cycleNumber] = str(individual.coordinateX) + "|" + str(individual.coordinateY) + ", " + individual.slotCode
+                        # if not hungry enough, prepare for breeding
+                        else:
+                            # breed logic
+                            individual.hungryLevel += 1
+                            spouse = self.searchSpouse(individual)
+                            if spouse is not None and not spouse.isBusy:
+                                cycleInfo.breedTimes += 1
+                                child = individual.breed(spouse)
+                                if child is not None:
+                                    self.addIndividual2Thread(child)
+                                    cycleInfo.newBorn += 1
+                    individual.isBusy = False
+                    individual.age += 1
+                    cycleInfo.popAvgHungryLevel += individual.hungryLevel
+                    cycleInfo.popAvgAge += individual.age
+                    cycleInfo.popAvgLifespan += individual.lifespan
+                    cycleInfo.popAvgFightCapability += individual.fightCapability
+                    cycleInfo.popAvgAttackPossibility += individual.attackPossibility
+                    cycleInfo.popAvgDefendPossibility += individual.defendPossibility
+                    cycleInfo.popAvgTotalBreedingTimes += individual.TotalBreedingTimes
+                # if there is still live population
+                cycleInfo.liveIndividuals = len(self.group)
+                cycleInfo.deadIndividuals = len(self.dead)
+                if len(self.group) != 0:
+                    cycleInfo.popAvgHungryLevel = round(cycleInfo.popAvgHungryLevel / len(self.group), 2)
+                    cycleInfo.popAvgAge = round(cycleInfo.popAvgAge / len(self.group), 2)
+                    cycleInfo.popAvgLifespan = round(cycleInfo.popAvgLifespan / len(self.group), 2)
+                    cycleInfo.popAvgFightCapability = round(cycleInfo.popAvgFightCapability / len(self.group), 2)
+                    cycleInfo.popAvgAttackPossibility = round(cycleInfo.popAvgAttackPossibility / len(self.group), 2)
+                    cycleInfo.popAvgDefendPossibility = round(cycleInfo.popAvgDefendPossibility / len(self.group), 2)
+                    cycleInfo.popAvgTotalBreedingTimes = round(cycleInfo.popAvgTotalBreedingTimes / len(self.group), 2)
+                self.recorder.saveCycleInfo(self.cycleNumber, self, cycleInfo)
+                # sleep for 1 day (1s)
+                time.sleep(1)
+            # if all individuals are dead
+            else:
+                break

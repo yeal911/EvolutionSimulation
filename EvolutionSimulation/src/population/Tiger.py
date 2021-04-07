@@ -12,7 +12,7 @@ class Tiger(Population):
 
     populationName = "Tiger"
 
-    def __init__(self, gene=None, generation=1):
+    def __init__(self, gene=None, generation=1, parents=""):
         # initialize gene_set, if no input parameter gene_set or input gene_set is incorrect, randomly generate genes
         if gene is None:
             self.gene = Gene()
@@ -23,7 +23,8 @@ class Tiger(Population):
         self.gender = genderGroup[random.randint(0, 1)]
         self.name = "tiger-" + str(id(self))  # name it with self's address in memory
         self.generation = generation
-        self.birthTime = time.time()
+        self.parents = parents
+        self.birthTime = time.strftime("%Y%m%d%H%M%S%f", time.localtime())
         self.deathTime = None  # to be writen upon death
         self.deathCause = None # to be write upon death
         self.populationFeedingType = Population.CARNIVORE
@@ -73,23 +74,7 @@ class Tiger(Population):
         # upper limit of growth period
         self.upperGrowthPeriod = 2 * self.lowerGrowthPeriod
 
-    # breed behaviour of a tiger
-    def breed(self, spouse):
-        if spouse.__class__.__name__ != self.__class__.__name__ or self.gender == spouse.gender:
-            print("Different population or same gender, no breed")
-            return None
-        if (self.breedTimes <= self.TotalBreedingTimes and self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod) and (spouse.breedTimes <= spouse.TotalBreedingTimes and spouse.lowerGrowthPeriod < spouse.age < spouse.upperGrowthPeriod):
-            self.breedTimes += 1
-            spouse.breedTimes += 1
-            self.hungryLevel += 1
-            spouse.hungryLevel += 1
-            # rebuild gene_set for new baby tiger, get first half gene set from self, another half from spouse
-            childGeneDigits = []
-            # get first half gene set from self after variation
-            parentX = self.gene.variate()
-            parentY = spouse.gene.variate()
-            for i in range(0, Gene.GENE_LENGTH, 2):
-                childGeneDigits.append(parentX.geneDigits[i])
-                childGeneDigits.append(parentY.geneDigits[i+1])
-            return Tiger(Gene(childGeneDigits), round((self.generation + spouse.generation) / 2))
-        return None
+    # new child born
+    @staticmethod
+    def newChild(gene: Gene, generation, parents):
+        return Tiger(gene, generation, parents)

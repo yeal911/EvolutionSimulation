@@ -3,9 +3,8 @@ import math
 import random
 import time
 
-from EvolutionSimulation.src.thread.PlantSet import PlantSet
-from EvolutionSimulation.src.population.Population import Population
 from EvolutionSimulation.src.gene.Gene import Gene
+from EvolutionSimulation.src.population.Population import Population
 
 
 class Sheep(Population):
@@ -13,26 +12,28 @@ class Sheep(Population):
 
     populationName = "Sheep"
 
-    def __init__(self, gene=None, generation=1):
-        # initialize gene set
+    def __init__(self, gene=None, generation=1, parents=""):
+        # initialize gene_set, if no input parameter gene_set or input gene_set is incorrect, randomly generate genes
         if gene is None:
             self.gene = Gene()
         else:
             self.gene = gene
-
-        self.fightCapability = 5
+        # static properties initialization
+        genderGroup = ["M", "F"]
+        self.gender = genderGroup[random.randint(0, 1)]
         self.name = "sheep-" + str(id(self))  # name it with self's address in memory
-
         self.generation = generation
-        self.birthTime = time.time()
+        self.parents = parents
+        self.birthTime = time.strftime("%Y%m%d%H%M%S", time.localtime())
         self.deathTime = None  # to be writen upon death
+        self.deathCause = None  # to be write upon death
         self.populationFeedingType = Population.HERBIVORE
         self.populationType = Population.ANIMAL
-        self.populationThreat = 2
+        self.populationThreat = 3   # this property is visible to other population, if own value is bigger than other population, then attack; otherwise, don't attack
 
         # dynamic properties initialization
-        self.hungryLevel = 6
-        self.age = 8
+        self.hungryLevel = 1  # maximum hungry level is 10, population will die if beyond 10
+        self.age = 0
         self.lifeStatus = "Alive"
         self.coordinateX = 0
         self.coordinateY = 0
@@ -40,137 +41,40 @@ class Sheep(Population):
         self.isBusy = False
         self.fightTimes = 0
         self.breedTimes = 0
+        self.ownThread = None
+
+        # for debug purpose, key is cycle number, value is location
+        self.moveHistory = {}
 
         # gene related properties initialization
-        self.lifespan = 13  # initialize life with 10, maximum 15 after computation based on gene_set
-        self.fightCapability = 45  # initialize fight capability with 50, maximum 100 after computation based on gene_set
-        self.attackPossibility = 50  # initialize attack possibility with 50, maximum 100 after computation based on gene_set
-        self.defendPossibility = 50  # initialize defend possibility with 50, maximum 100 after computation based on gene_set
-        self.remainingBreedingTimes = 5  # initialize remaining breeding times with 1, maximum 3 after computation based on gene_set
+        self.lifespan = 15  # initialize life with 15, maximum 20 after computation based on gene_set
+        self.fightCapability = 30  # initialize fight capability with 30, maximum 60 after computation based on gene_set
+        self.attackPossibility = 20  # initialize attack possibility with 20, maximum 50 after computation based on gene_set
+        self.defendPossibility = 20  # initialize defend possibility with 20, maximum 50 after computation based on gene_set
+        self.TotalBreedingTimes = 3  # initialize Total breeding times with 1, maximum 5 after computation based on gene_set
 
-        # lifespan in 2 times first 2 digits of gene
+        # the 1st bit of Gene controls lifespan
+        # then compute the addition to be added to initial value of lifespan
         self.lifespan += math.ceil(self.gene.geneDigits[0] / 20)
-        # gender
-        if self.gene.geneDigits[2] % 2 == 0:
-            self.gender = "M"
-        else:
-            self.gender = "F"
-        genderGroup = ["M", "F"]
-        self.gender = genderGroup[random.randint(0, 1)]
-        # attackPossibility
-        self.attackPossibility = self.gene.geneDigits[3]
+        # the 2nd bit of Gene controls fightCapability
+        # then compute the addition to be added to initial value of fightCapability
+        self.fightCapability += math.ceil(self.gene.geneDigits[1] / 3.3)
+        # the 3rd bit of Gene controls attackPossibility
+        # then compute the addition to be added to initial value of attackPossibility
+        self.attackPossibility += math.ceil(self.gene.geneDigits[2] / 3.3)
+        # the 4th bit of Gene controls defendPossibility
+        # then compute the addition to be added to initial value of defendPossibility
+        self.defendPossibility += math.ceil(self.gene.geneDigits[3] / 3.3)
+        # the 5th bit of Gene controls TotalBreedingTimes
+        # then compute the addition to be added to initial value of TotalBreedingTimes
+        self.TotalBreedingTimes += round(math.ceil(self.gene.geneDigits[4] / 50))
 
-        # defendPossibility
-        self.defendPossibility = self.gene.geneDigits[4]
-
-        # fightPossibility
-        self.fightCapability = min(60, self.gene.geneDigits[7])
-
-        # hungryLevel
-        # self.hungryLevel = (self.gene.geneDigits[5] + self.gene.geneDigits[6]) / 2
-        self.hungryLevel = 8
         # lower limit of growth period
-        # self.lowerGrowthPeriod = self.lifespan / 3
-        self.lowerGrowthPeriod = self.lifespan / 3
-
+        self.lowerGrowthPeriod = math.ceil(self.lifespan / 3)
         # upper limit of growth period
         self.upperGrowthPeriod = 2 * self.lowerGrowthPeriod
 
-    # # forage behaviour of sheep
-    def forage(self, foodSet: PlantSet):
-        foodSet.group.remove()
-        if self.hungryLevel == 0:
-            return False
-        else:
-            self.hungryLevel -= 1
-            return True
-
-    # grow behaviour of a sheep
-    def grow(self):
-        # If lifespan is over 15, it should die
-        if self.age >= self.lifespan:
-            print("Lifespan is " + str(self.lifespan) + "," + "Now should die :(")
-            self.lifeStatus = "Dead"
-            return False
-        # Otherwise it will increase
-        self.age += 1
-        self.hungryLevel += 1
-        if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-            self.defendPossibility += 1
-            self.attackPossibility += 1
-            self.fightCapability += 1
-        elif self.age >= self.upperGrowthPeriod:
-            self.defendPossibility -= 1
-            self.attackPossibility -= 1
-            self.hungryLevel -= 1
-            self.fightCapability -= 1
-
-    # attack behaviour of a sheep
-    # def attack(self, population: Population):
-    #     print("fightCapability " + str(self.fightCapability) + " fightCapability " + str(
-    #         population.fightCapability))
-    #     # attackPossibility increase in the growth period
-    #     if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-    #         self.fightCapability += 1
-    #     # attack successfully
-    #     if self.fightCapability > population.fightCapability:
-    #         print(self.name + " attack" + population.name + " successfully! Fight happened")
-    #         if self.fightCapability - population.fightCapability > 2:
-    #             self.fightCapability += 1
-    #             population.fightCapability -= 1
-    #         else:
-    #             population.fightCapability += 1
-    #             self.fightCapability -= 1
-    #         return True
-    #     # attack unsuccessfully, fight not happen
-    #     else:
-    #         return False
-    #
-    # # defend behaviour of a sheep
-    # def defend(self, population: Population):
-    #     print(" fightCapability " + str(self.fightCapability) + " fightCapability " + str(
-    #         population.fightCapability))
-    #     # defendPossibility increase in the growth period
-    #     if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-    #         self.fightCapability += 1
-    #     # escape successfully
-    #     if self.fightCapability > population.fightCapability:
-    #         print(self.name + " escape successfully! No fight happened")
-    #         return True
-    #     # escape unsuccessfully,fight may happen
-    #     else:
-    #         if population.fightCapability - self.fightCapability > 2:
-    #             self.fightCapability -= 1
-    #             population.fightCapability += 1
-    #         else:
-    #             population.fightCapability -= 1
-    #             self.fightCapability += 1
-    #         return False
-
-    def fight(self, population: Population):
-        if self.fightCapability > population.fightCapability:
-            if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-                self.fightCapability += 1
-                return "Success"
-        elif self.fightCapability == population.fightCapability:
-            return "Peace"
-        else:
-            self.lifeStatus = "Dead"
-            return "Failure"
-
-    # breed behaviour of a sheep
-    def breed(self, spouse: Population):
-        if self.gender == spouse.gender:
-            print("Same gender, no breed")
-            return
-        if self.remainingBreedingTimes > 0:
-            if self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod:
-                self.remainingBreedingTimes -= 1
-                gene = self.gene.recombine(spouse.gene)
-                print("Father is " + str(self.gene.geneDigits) + " Mother is " + str(spouse.gene.geneDigits))
-                new_sheep = Sheep(gene, round((self.generation + spouse.generation) / 2))
-                return new_sheep
-
-    # set gene
-    def set_gene(self, gene: Gene):
-        self.gene = gene
+    # new child born
+    @staticmethod
+    def newChild(gene: Gene, generation, parents):
+        return Sheep(gene, generation, parents)

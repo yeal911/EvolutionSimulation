@@ -144,7 +144,6 @@ class PopulationThread:
         self.group.append(pop)
         # update coordinate map
         self.updateDreamLandMap(pop, None, pop.slotCode)
-        pop.moveHistory[self.cycleNumber] = str(pop.coordinateX) + "|" + str(pop.coordinateY) + ", " + pop.slotCode
 
     # monitor all individuals, and execute for all their actions, any thread has different logic, just overwrite this method
     def threadRun(self):
@@ -175,7 +174,7 @@ class PopulationThread:
                     if not individual.isBusy:
                         individual.isBusy = True
                         # add logic for searching food and fight
-                        if individual.hungryLevel > 4:
+                        if individual.hungryLevel > 5:
                             # find food in its own slot, if there is, then fight, if none, change position
                             food = self.searchFood(individual)
                             if food is not None and not food.isBusy:

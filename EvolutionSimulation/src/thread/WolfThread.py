@@ -1,9 +1,6 @@
-import random
 import threading
-import time
 
 from EvolutionSimulation.src.thread.PopulationThread import PopulationThread
-from EvolutionSimulation.src.tool.CycleInfo import CycleInfo
 from EvolutionSimulation.src.tool.Recorder import Recorder
 from EvolutionSimulation.src.dreamland.Dreamland import Dreamland
 from EvolutionSimulation.src.population.Wolf import Wolf

@@ -26,7 +26,7 @@ class Tiger(Population):
         self.parents = parents
         self.birthTime = time.strftime("%Y%m%d%H%M%S", time.localtime())
         self.deathTime = None  # to be writen upon death
-        self.deathCause = None # to be write upon death
+        self.deathCause = None  # to be write upon death
         self.populationFeedingType = Population.CARNIVORE
         self.populationType = Population.ANIMAL
         self.populationThreat = 8   # this property is visible to other population, if own value is bigger than other population, then attack; otherwise, don't attack

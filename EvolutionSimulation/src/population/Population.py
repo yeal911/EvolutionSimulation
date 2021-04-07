@@ -33,7 +33,7 @@ class Population:
             self.fightTimes += 1
             self.lifeStatus = "Dead"
             self.deathCause = "Fight to death"
-            self.deathTime = time.strftime("%Y%m%d%H%M%S%f", time.localtime())
+            self.deathTime = time.strftime("%Y%m%d%H%M%S", time.localtime())
             return "Failure"
 
     # breed behaviour of a tiger

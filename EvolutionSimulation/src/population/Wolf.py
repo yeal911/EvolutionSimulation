@@ -24,7 +24,7 @@ class Wolf(Population):
         self.name = "wolf-" + str(id(self))  # name it with self's address in memory
         self.generation = generation
         self.parents = parents
-        self.birthTime = time.strftime("%Y%m%d%H%M%S%f", time.localtime())
+        self.birthTime = time.strftime("%Y%m%d%H%M%S", time.localtime())
         self.deathTime = None  # to be writen upon death
         self.deathCause = None # to be write upon death
         self.populationFeedingType = Population.CARNIVORE

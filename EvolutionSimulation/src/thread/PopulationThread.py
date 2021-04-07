@@ -128,7 +128,7 @@ class PopulationThread:
         elif fightResult == "Failure":
             pop.lifeStatus = "Dead"
             pop.deathCause = "Fight to death"
-            pop.deathTime = time.strftime("%Y%m%d%H%M%S%f", time.localtime())
+            pop.deathTime = time.strftime("%Y%m%d%H%M%S", time.localtime())
             cycle.defendFailureTimes += 1
         else:
             pop.hungryLevel += 1
@@ -167,7 +167,7 @@ class PopulationThread:
                         cycleInfo.newDeathFromFight += 1
                     # check individual life status first, move to different category if dead (starve to death/natural death/fight to death)
                     if individual.lifeStatus == "Dead":
-                        individual.deathTime = time.strftime("%Y%m%d%H%M%S%f", time.localtime())
+                        individual.deathTime = time.strftime("%Y%m%d%H%M%S", time.localtime())
                         self.group.remove(individual)
                         self.dead.append(individual)
                         cycleInfo.newDeath += 1

@@ -23,7 +23,7 @@ while True:
     time.sleep(1)
     end = time.time()
     print("---Time elapses: " + str(int(end - start)))
-    if end - start > 30:
+    if end - start > 10:
         Dreamland.stopPopulationThread(plantThread)
         Dreamland.stopPopulationThread(sheepThread)
         Dreamland.stopPopulationThread(tigerThread)
@@ -39,3 +39,7 @@ while True:
         recorder.writeCycleInfo2File()
         recorder.writePopulationInfo2File()
         break
+
+print("sheep group " + str(len(sheepThread.group)))
+print("wolf group " + str(len(wolfThread.group)))
+print("tiger group " + str(len(tigerThread.group)))

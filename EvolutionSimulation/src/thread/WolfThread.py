@@ -31,6 +31,7 @@ class WolfThread(threading.Thread, PopulationThread):
         self.initCount = wolf_count
         self.group = []
         self.dead = []
+        self.num = []
         self.cycleNumber = 0
         for i in range(0, wolf_count):
             # need to randomly initialize the coordinates of the wolf

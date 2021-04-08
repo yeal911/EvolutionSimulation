@@ -31,6 +31,7 @@ class TigerThread(threading.Thread, PopulationThread):
         self.initCount = tiger_count
         self.group = []
         self.dead = []
+        self.num = []
         self.cycleNumber = 0
         for i in range(0, tiger_count):
             # need to randomly initialize the coordinates of the tiger

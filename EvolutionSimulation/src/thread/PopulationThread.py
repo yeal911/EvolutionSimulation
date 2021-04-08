@@ -149,6 +149,9 @@ class PopulationThread:
     # monitor all individuals, and execute for all their actions, any thread has different logic, just overwrite this method
     def animalThreadRun(self):
         while self.continueRunning:
+            length = len(self.group)
+            self.num.append(length)
+            print("length is " + str(len(self.group)))
             print(self.THREAD_NAME + " cycle: " + str(self.cycleNumber + 1) + ".  Remaining individual: " + str(len(self.group)))
             if len(self.group) != 0:
                 self.cycleNumber += 1

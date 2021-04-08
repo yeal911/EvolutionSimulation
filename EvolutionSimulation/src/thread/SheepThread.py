@@ -31,6 +31,7 @@ class SheepThread(threading.Thread, PopulationThread):
         self.initCount = sheep_count
         self.group = []
         self.dead = []
+        self.num = []
         self.cycleNumber = 0
         for i in range(0, sheep_count):
             # need to randomly initialize the coordinates of the sheep

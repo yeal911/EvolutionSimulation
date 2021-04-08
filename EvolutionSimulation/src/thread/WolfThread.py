@@ -20,6 +20,7 @@ class WolfThread(threading.Thread, PopulationThread):
     dead: all dead individuals
     """
     THREAD_NAME = "WolfThread"
+    THREAD_TYPE = "Animal"
 
     # initialize wolf thread
     def __init__(self, wolf_count, dreamland: Dreamland, recorder: Recorder):
@@ -42,4 +43,4 @@ class WolfThread(threading.Thread, PopulationThread):
 
     # monitor all individuals, and execute for all their actions
     def run(self):
-        self.threadRun()
+        self.animalThreadRun()

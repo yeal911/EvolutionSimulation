@@ -20,6 +20,7 @@ class TigerThread(threading.Thread, PopulationThread):
     dead: all dead individuals
     """
     THREAD_NAME = "TigerThread"
+    THREAD_TYPE = "Animal"
 
     # initialize tiger thread
     def __init__(self, tiger_count, dreamland: Dreamland, recorder: Recorder):
@@ -42,4 +43,4 @@ class TigerThread(threading.Thread, PopulationThread):
 
     # monitor all individuals, and execute for all their actions
     def run(self):
-        self.threadRun()
+        self.animalThreadRun()

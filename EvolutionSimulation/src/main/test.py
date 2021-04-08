@@ -8,7 +8,7 @@ from EvolutionSimulation.src.thread.WolfThread import WolfThread
 from EvolutionSimulation.src.tool.Recorder import Recorder
 
 dreamland = Dreamland()
-recorder = Recorder()
+recorder = Recorder(dreamland)
 plantThread = PlantThread(100, dreamland, recorder)
 sheepThread = SheepThread(500, dreamland, recorder)
 wolfThread = WolfThread(500, dreamland, recorder)
@@ -28,12 +28,14 @@ while True:
         Dreamland.stopPopulationThread(sheepThread)
         Dreamland.stopPopulationThread(tigerThread)
         Dreamland.stopPopulationThread(wolfThread)
-        recorder.writeInfo2File()
+        recorder.writeCycleInfo2File()
+        recorder.writePopulationInfo2File()
         break
     elif len(wolfThread.group) == 0 and len(tigerThread.group) == 0 and len(sheepThread.group) == 0:
         Dreamland.stopPopulationThread(plantThread)
         Dreamland.stopPopulationThread(sheepThread)
         Dreamland.stopPopulationThread(tigerThread)
         Dreamland.stopPopulationThread(wolfThread)
-        recorder.writeInfo2File()
+        recorder.writeCycleInfo2File()
+        recorder.writePopulationInfo2File()
         break

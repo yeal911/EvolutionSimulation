@@ -20,6 +20,7 @@ class SheepThread(threading.Thread, PopulationThread):
     dead: all dead individuals
     """
     THREAD_NAME = "SheepThread"
+    THREAD_TYPE = "Animal"
 
     # initialize sheep thread
     def __init__(self, sheep_count, dreamland: Dreamland, recorder: Recorder):
@@ -42,4 +43,4 @@ class SheepThread(threading.Thread, PopulationThread):
 
     # monitor all individuals, and execute for all their actions
     def run(self):
-        self.threadRun()
+        self.animalThreadRun()

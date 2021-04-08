@@ -4,6 +4,7 @@ import random
 import time
 
 from EvolutionSimulation.src.dreamland.Dreamland import Dreamland
+from EvolutionSimulation.src.population.Plant import Plant
 from EvolutionSimulation.src.population.Population import Population
 from EvolutionSimulation.src.tool.CycleInfo import CycleInfo
 
@@ -18,8 +19,8 @@ class PopulationThread:
     # update coordinate map after individual's location changing
     def updateDreamLandMap(self, individual: Population, original_slot_code, target_slot_code):
         if original_slot_code is not None:
-            self.removeIndividual(original_slot_code, individual)
-        self.appendIndividual(target_slot_code, individual)
+            self.removeIndividualFromMap(original_slot_code, individual)
+        self.appendIndividual2Map(target_slot_code, individual)
         # targetSlotIndividuals = self.dreamland.coordinateMap[target_slot_code]
         # targetSlotIndividuals.append(individual)
         # individual.slotCode = target_slot_code
@@ -90,7 +91,7 @@ class PopulationThread:
         return None
 
     # remove an individual from coordinate map
-    def removeIndividual(self, slotCode, individualForRemove: Population):
+    def removeIndividualFromMap(self, slotCode, individualForRemove: Population):
         # printStr = "***remove individual(" + individualForRemove.name + "): " + "slotCode(" + str(slotCode) + ") indSlotCode(" + individualForRemove.slotCode + ") indX("
         # printStr += str(individualForRemove.coordinateX) + ") indY("
         # printStr += str(individualForRemove.coordinateY) + ") life("
@@ -103,7 +104,7 @@ class PopulationThread:
         self.dreamland.coordinateMap[slotCode].remove(individualForRemove)
 
     # append an individual to coordinate map
-    def appendIndividual(self, slotCode, individualForAppend: Population):
+    def appendIndividual2Map(self, slotCode, individualForAppend: Population):
         # printStr = "***append individual(" + individualForAppend.name + "): " + "slotCode(" + str(slotCode) + ") indSlotCode(" + individualForAppend.slotCode + ") indX("
         # printStr += str(individualForAppend.coordinateX) + ") indY("
         # printStr += str(individualForAppend.coordinateY) + ") life("
@@ -146,7 +147,7 @@ class PopulationThread:
         self.updateDreamLandMap(pop, None, pop.slotCode)
 
     # monitor all individuals, and execute for all their actions, any thread has different logic, just overwrite this method
-    def threadRun(self):
+    def animalThreadRun(self):
         while self.continueRunning:
             print(self.THREAD_NAME + " cycle: " + str(self.cycleNumber + 1) + ".  Remaining individual: " + str(len(self.group)))
             if len(self.group) != 0:
@@ -185,13 +186,13 @@ class PopulationThread:
                                     individual.coordinateX = food.coordinateX
                                     individual.coordinateY = food.coordinateY
                                     self.updateDreamLandMap(individual, individual.slotCode, food.slotCode)
-                                    self.removeIndividual(food.slotCode, food)
+                                    self.removeIndividualFromMap(food.slotCode, food)
                                     # self.dreamland.coordinateMap[food.slotCode].remove(food)
                                     cycleInfo.fightSuccessTimes += 1
                                     individual.moveHistory[self.cycleNumber] = str(individual.coordinateX) + "|" + str(individual.coordinateY) + ", " + individual.slotCode
                                 # if fails, remove individual from map
                                 elif fightResult == "Failure":
-                                    self.removeIndividual(individual.slotCode, individual)
+                                    self.removeIndividualFromMap(individual.slotCode, individual)
                                     # self.dreamland.coordinateMap[individual.slotCode].remove(individual)
                                     cycleInfo.fightFailureTimes += 1
                                 else:
@@ -238,3 +239,51 @@ class PopulationThread:
             # if all individuals are dead
             else:
                 break
+
+    # plant thread run
+    def plantThreadRun(self):
+        while self.continueRunning:
+            print(self.THREAD_NAME + " cycle: " + str(self.cycleNumber + 1) + ".  Remaining individual: " + str(len(self.group)))
+            self.cycleNumber += 1
+            cycleInfo = CycleInfo(self.THREAD_NAME)
+            # generate new plants in each round if plants count is less than 10 times of the slots
+            if len(self.group) < int(Dreamland.SIZE_X * Dreamland.SIZE_Y) / 100 * 10:
+                for i in range(0, self.cyclePlantCount):
+                    # need to randomly initialize the coordinates of the plant
+                    plant = Plant()
+                    self.addIndividual2Thread(plant)
+                cycleInfo.newBorn = self.cyclePlantCount
+            if len(self.group) != 0:
+                for individual in self.group:
+                    # check if individual should die naturally
+                    if individual.age >= individual.lifespan:
+                        individual.lifeStatus = "Dead"
+                        individual.deathCause = "Natural death"
+                        cycleInfo.newDeathFromNatural += 1
+                    elif individual.deathCause == "Fight to death":
+                        cycleInfo.newDeathFromFight += 1
+                    # check individual life status first, move to different category if dead (starve to death/natural death/fight to death)
+                    if individual.lifeStatus == "Dead":
+                        individual.deathTime = time.strftime("%Y%m%d%H%M%S", time.localtime())
+                        self.group.remove(individual)
+                        self.dead.append(individual)
+                        cycleInfo.newDeath += 1
+                        continue
+                    individual.age += 1
+                    cycleInfo.popAvgAge += individual.age
+                    cycleInfo.popAvgLifespan += individual.lifespan
+                    cycleInfo.popAvgFightCapability += individual.fightCapability
+                    cycleInfo.popAvgAttackPossibility += individual.attackPossibility
+                    cycleInfo.popAvgDefendPossibility += individual.defendPossibility
+            # if there is still live population
+            cycleInfo.liveIndividuals = len(self.group)
+            cycleInfo.deadIndividuals = len(self.dead)
+            if len(self.group) != 0:
+                cycleInfo.popAvgAge = round(cycleInfo.popAvgAge / len(self.group), 2)
+                cycleInfo.popAvgLifespan = round(cycleInfo.popAvgLifespan / len(self.group), 2)
+                cycleInfo.popAvgFightCapability = round(cycleInfo.popAvgFightCapability / len(self.group), 2)
+                cycleInfo.popAvgAttackPossibility = round(cycleInfo.popAvgAttackPossibility / len(self.group), 2)
+                cycleInfo.popAvgDefendPossibility = round(cycleInfo.popAvgDefendPossibility / len(self.group), 2)
+            self.recorder.saveCycleInfo(self.cycleNumber, self, cycleInfo)
+            # sleep for 1 day (1s)
+            time.sleep(1)

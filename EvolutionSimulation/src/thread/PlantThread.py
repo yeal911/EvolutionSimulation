@@ -22,6 +22,7 @@ class PlantThread(threading.Thread, PopulationThread):
     dead: all dead individuals
     """
     THREAD_NAME = "PlantThread"
+    THREAD_TYPE = "Plant"
 
     # initialize plant thread
     def __init__(self, cycle_plant_count, dreamland: Dreamland, recorder: Recorder):
@@ -44,48 +45,4 @@ class PlantThread(threading.Thread, PopulationThread):
 
     # monitor all individuals, and execute for all their actions
     def run(self):
-        while self.continueRunning:
-            print(self.THREAD_NAME + " cycle: " + str(self.cycleNumber + 1) + ".  Remaining individual: " + str(len(self.group)))
-            self.cycleNumber += 1
-            cycleInfo = CycleInfo(self.THREAD_NAME)
-            # generate new plants in each round if plants count is less than 10 times of the slots
-            if len(self.group) < int(Dreamland.SIZE_X * Dreamland.SIZE_Y) / 100 * 10:
-                for i in range(0, self.cyclePlantCount):
-                    # need to randomly initialize the coordinates of the plant
-                    plant = Plant()
-                    self.addIndividual2Thread(plant)
-                cycleInfo.newBorn = self.cyclePlantCount
-            if len(self.group) != 0:
-                for individual in self.group:
-                    # check if individual should die naturally
-                    if individual.age >= individual.lifespan:
-                        individual.lifeStatus = "Dead"
-                        individual.deathCause = "Natural death"
-                        cycleInfo.newDeathFromNatural += 1
-                    elif individual.deathCause == "Fight to death":
-                        cycleInfo.newDeathFromFight += 1
-                    # check individual life status first, move to different category if dead (starve to death/natural death/fight to death)
-                    if individual.lifeStatus == "Dead":
-                        individual.deathTime = time.strftime("%Y%m%d%H%M%S", time.localtime())
-                        self.group.remove(individual)
-                        self.dead.append(individual)
-                        cycleInfo.newDeath += 1
-                        continue
-                    individual.age += 1
-                    cycleInfo.popAvgAge += individual.age
-                    cycleInfo.popAvgLifespan += individual.lifespan
-                    cycleInfo.popAvgFightCapability += individual.fightCapability
-                    cycleInfo.popAvgAttackPossibility += individual.attackPossibility
-                    cycleInfo.popAvgDefendPossibility += individual.defendPossibility
-            # if there is still live population
-            cycleInfo.liveIndividuals = len(self.group)
-            cycleInfo.deadIndividuals = len(self.dead)
-            if len(self.group) != 0:
-                cycleInfo.popAvgAge = round(cycleInfo.popAvgAge / len(self.group), 2)
-                cycleInfo.popAvgLifespan = round(cycleInfo.popAvgLifespan / len(self.group), 2)
-                cycleInfo.popAvgFightCapability = round(cycleInfo.popAvgFightCapability / len(self.group), 2)
-                cycleInfo.popAvgAttackPossibility = round(cycleInfo.popAvgAttackPossibility / len(self.group), 2)
-                cycleInfo.popAvgDefendPossibility = round(cycleInfo.popAvgDefendPossibility / len(self.group), 2)
-            self.recorder.saveCycleInfo(self.cycleNumber, self, cycleInfo)
-            # sleep for 1 day (1s)
-            time.sleep(1)
+        self.plantThreadRun()

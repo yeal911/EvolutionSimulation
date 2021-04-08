@@ -4,6 +4,7 @@ import time
 from xlwt import Pattern
 import xlwt
 
+from EvolutionSimulation.src.dreamland.Dreamland import Dreamland
 from EvolutionSimulation.src.thread.PopulationThread import PopulationThread
 from EvolutionSimulation.src.tool.CycleInfo import CycleInfo
 
@@ -11,17 +12,18 @@ from EvolutionSimulation.src.tool.CycleInfo import CycleInfo
 class Recorder:
     """this class is used to record all the necessary information during the evolution"""
 
-    def __init__(self):
+    def __init__(self, dreamland: Dreamland):
         # cycle info, key is population Thread Name, value is another map (key is cycle number, and value is CycleInfo)
         self.cycleInfo = {}
+        self.dreamland = dreamland
 
     # save cycle information
     def saveCycleInfo(self, cycle_number, pt: PopulationThread, cycle_info: CycleInfo):
         threadRecorder = self.cycleInfo[pt.THREAD_NAME]
         threadRecorder[cycle_number] = cycle_info
 
-    # write all info to excel file
-    def writeInfo2File(self):
+    # write all cycle info to excel file
+    def writeCycleInfo2File(self):
         workbook = xlwt.Workbook()
         # set header style
         headerStyle = xlwt.XFStyle()
@@ -68,3 +70,76 @@ class Recorder:
                 sheet.write(rowNum, 23, cycleInfo.popAvgTotalBreedingTimes)
                 rowNum += 1
         workbook.save("EvolutionSimulationResult_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + ".xls")
+
+    # write all population info to excel file
+    def writePopulationInfo2File(self):
+        workbook = xlwt.Workbook()
+        # set header style
+        headerStyle = xlwt.XFStyle()
+        headerFont = xlwt.Font()
+        headerFont.bold = True
+        headerStyle.font = headerFont
+        headerPattern = Pattern()
+        headerPattern.pattern = Pattern.SOLID_PATTERN
+        headerPattern.pattern_fore_colour = 50  # green
+        headerStyle.pattern = headerPattern
+        # write run result to excel file
+
+        for thread in self.dreamland.populationThreadPlayers:
+            sheet = workbook.add_sheet(thread.THREAD_NAME, True)
+            headerText = ["name", "gender", "parents", "age", "birthTime", "deathTime", "deathCause", "populationThreat", "hungryLevel", "lifeStatus", "coordinateX", "coordinateY", "slotCode", "isBusy", "fightTimes", "breedTimes", "moveHistory", "lifespan", "fightCapability", "attackPossibility", "defendPossibility", "TotalBreedingTimes"]
+            for i in range(0, len(headerText)):
+                sheet.write(0, i, headerText[i], headerStyle)
+            rowNum = 1
+            if thread.THREAD_TYPE == "Animal":
+                for ind in (thread.group + thread.dead):
+                    sheet.write(rowNum, 0, ind.name)
+                    sheet.write(rowNum, 1, ind.gender)
+                    sheet.write(rowNum, 2, ind.parents)
+                    sheet.write(rowNum, 3, ind.age)
+                    sheet.write(rowNum, 4, ind.birthTime)
+                    sheet.write(rowNum, 5, ind.deathTime)
+                    sheet.write(rowNum, 6, ind.deathCause)
+                    sheet.write(rowNum, 7, ind.populationThreat)
+                    sheet.write(rowNum, 8, ind.hungryLevel)
+                    sheet.write(rowNum, 9, ind.lifeStatus)
+                    sheet.write(rowNum, 10, ind.coordinateX)
+                    sheet.write(rowNum, 11, ind.coordinateY)
+                    sheet.write(rowNum, 12, ind.slotCode)
+                    sheet.write(rowNum, 13, ind.isBusy)
+                    sheet.write(rowNum, 14, ind.fightTimes)
+                    sheet.write(rowNum, 15, ind.breedTimes)
+                    sheet.write(rowNum, 16, Recorder.dict2String(ind.moveHistory))
+                    sheet.write(rowNum, 17, ind.lifespan)
+                    sheet.write(rowNum, 18, ind.fightCapability)
+                    sheet.write(rowNum, 19, ind.attackPossibility)
+                    sheet.write(rowNum, 20, ind.defendPossibility)
+                    sheet.write(rowNum, 21, ind.TotalBreedingTimes)
+                    rowNum += 1
+            elif thread.THREAD_TYPE == "Plant":
+                for ind in (thread.group + thread.dead):
+                    sheet.write(rowNum, 0, ind.name)
+                    sheet.write(rowNum, 3, ind.age)
+                    sheet.write(rowNum, 4, ind.birthTime)
+                    sheet.write(rowNum, 5, ind.deathTime)
+                    sheet.write(rowNum, 6, ind.deathCause)
+                    sheet.write(rowNum, 7, ind.populationThreat)
+                    sheet.write(rowNum, 9, ind.lifeStatus)
+                    sheet.write(rowNum, 10, ind.coordinateX)
+                    sheet.write(rowNum, 11, ind.coordinateY)
+                    sheet.write(rowNum, 12, ind.slotCode)
+                    sheet.write(rowNum, 13, ind.isBusy)
+                    sheet.write(rowNum, 14, ind.fightTimes)
+                    sheet.write(rowNum, 17, ind.lifespan)
+                    sheet.write(rowNum, 18, ind.fightCapability)
+                    sheet.write(rowNum, 19, ind.attackPossibility)
+                    sheet.write(rowNum, 20, ind.defendPossibility)
+                    rowNum += 1
+        workbook.save("EvolutionSimulationIndividuals_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + ".xls")
+
+    @staticmethod
+    def dict2String(dict_map: {}):
+        returnValue = ""
+        for key in dict_map:
+            returnValue += str(key) + "," + dict_map[key] + ";"
+        return returnValue

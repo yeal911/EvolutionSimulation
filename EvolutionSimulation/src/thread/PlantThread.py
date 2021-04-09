@@ -33,6 +33,8 @@ class PlantThread(threading.Thread, PopulationThread):
         self.cyclePlantCount = cycle_plant_count
         self.group = []
         self.dead = []
+        self.num = []
+        self.newDeathNum = []
         self.cycleNumber = 0
         for i in range(0, self.cyclePlantCount):
             # need to randomly initialize the coordinates of the plant

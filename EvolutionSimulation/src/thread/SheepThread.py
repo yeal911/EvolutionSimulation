@@ -32,6 +32,15 @@ class SheepThread(threading.Thread, PopulationThread):
         self.group = []
         self.dead = []
         self.num = []
+        self.newBronNum = []
+        self.newDeathNum = []
+        self.avgHungryLevel = []
+        self.avgLifespan = []
+        self.avgFightCapability = []
+        self.avgAge = []
+        self.avgAttackPossibility = []
+        self.avgDefendPossibility = []
+        self.avgTotalBreedingTimes =[]
         self.cycleNumber = 0
         for i in range(0, sheep_count):
             # need to randomly initialize the coordinates of the sheep

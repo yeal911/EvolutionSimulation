@@ -149,13 +149,11 @@ class PopulationThread:
     # monitor all individuals, and execute for all their actions, any thread has different logic, just overwrite this method
     def animalThreadRun(self):
         while self.continueRunning:
-            length = len(self.group)
-            self.num.append(length)
-            print("length is " + str(len(self.group)))
+            self.num.append(len(self.group))
             print(self.THREAD_NAME + " cycle: " + str(self.cycleNumber + 1) + ".  Remaining individual: " + str(len(self.group)))
+            cycleInfo = CycleInfo(self.THREAD_NAME)
             if len(self.group) != 0:
                 self.cycleNumber += 1
-                cycleInfo = CycleInfo(self.THREAD_NAME)
                 for individual in self.group:
                     # check if individual should die naturally
                     if individual.hungryLevel > 10:
@@ -242,10 +240,22 @@ class PopulationThread:
             # if all individuals are dead
             else:
                 break
+            self.newBronNum.append(cycleInfo.newBorn)
+            self.newDeathNum.append(cycleInfo.newDeath)
+            self.avgHungryLevel.append(cycleInfo.popAvgHungryLevel)
+            self.avgLifespan.append(cycleInfo.popAvgLifespan)
+            self.avgFightCapability.append(cycleInfo.popAvgFightCapability)
+            self.avgAge.append(cycleInfo.popAvgAge)
+            self.avgAttackPossibility.append(cycleInfo.popAvgAttackPossibility)
+            self.avgDefendPossibility.append(cycleInfo.popAvgDefendPossibility)
+            self.avgTotalBreedingTimes.append(cycleInfo.popAvgTotalBreedingTimes)
+            print("cycleInfo.newBorn is " + str(cycleInfo.newBorn))
+            print("cycleInfo.newDeath is " + str(cycleInfo.newDeath))
 
     # plant thread run
     def plantThreadRun(self):
         while self.continueRunning:
+            self.num.append(len(self.group))
             print(self.THREAD_NAME + " cycle: " + str(self.cycleNumber + 1) + ".  Remaining individual: " + str(len(self.group)))
             self.cycleNumber += 1
             cycleInfo = CycleInfo(self.THREAD_NAME)
@@ -290,3 +300,4 @@ class PopulationThread:
             self.recorder.saveCycleInfo(self.cycleNumber, self, cycleInfo)
             # sleep for 1 day (1s)
             time.sleep(1)
+            self.newDeathNum.append(cycleInfo.newDeath)

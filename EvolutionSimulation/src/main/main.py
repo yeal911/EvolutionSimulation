@@ -15,10 +15,10 @@ from EvolutionSimulation.src.thread.TigerThread import TigerThread
 from EvolutionSimulation.src.thread.WolfThread import WolfThread
 from EvolutionSimulation.src.tool.Recorder import Recorder
 
-TIGER_AMOUNT = 45
-WOLF_AMOUNT = 50
-SHEEP_AMOUNT = 30
-GRASS_AMOUNT = 50
+TIGER_AMOUNT = 450
+WOLF_AMOUNT = 500
+SHEEP_AMOUNT = 800
+GRASS_AMOUNT = 500
 
 dreamland = Dreamland()
 recorder = Recorder(dreamland)
@@ -63,32 +63,30 @@ class EvolutionBackground:
         Dreamland.startPopulationThread(tigerThread)
         start = time.time()
 
-        while not self.__end:
-            if not self.__pause:
-                time.sleep(1)
-                end = time.time()
-                print("---Time elapses: " + str(int(end - start)))
+        while not self.__pause:
+            # if not self.__pause:
+            time.sleep(1)
+            end = time.time()
+            print("---Time elapses: " + str(int(end - start)))
 
-                if end - start > 15:
-                    Dreamland.stopPopulationThread(plantThread)
-                    Dreamland.stopPopulationThread(sheepThread)
-                    Dreamland.stopPopulationThread(tigerThread)
-                    Dreamland.stopPopulationThread(wolfThread)
-
-                    # global_ms.draw.emit(dreamland)
-                    self.loop_times += 1
-                    # recorder.writeInfo2File()
-                    break
-                elif len(wolfThread.group) == 0 and len(tigerThread.group) == 0 and len(sheepThread.group) == 0:
-                    Dreamland.stopPopulationThread(plantThread)
-                    Dreamland.stopPopulationThread(sheepThread)
-                    Dreamland.stopPopulationThread(tigerThread)
-                    Dreamland.stopPopulationThread(wolfThread)
-
-                    # global_ms.draw.emit()
-                    self.loop_times += 1
-
-                    break
+            # if end - start > 10:
+            #     Dreamland.stopPopulationThread(plantThread)
+            #     Dreamland.stopPopulationThread(sheepThread)
+            #     Dreamland.stopPopulationThread(tigerThread)
+            #     Dreamland.stopPopulationThread(wolfThread)
+            #
+            #     break
+            # elif len(wolfThread.group) == 0 and len(tigerThread.group) == 0 and len(sheepThread.group) == 0:
+            #     Dreamland.stopPopulationThread(plantThread)
+            #     Dreamland.stopPopulationThread(sheepThread)
+            #     Dreamland.stopPopulationThread(tigerThread)
+            #     Dreamland.stopPopulationThread(wolfThread)
+            #
+            #     break
+        Dreamland.stopPopulationThread(plantThread)
+        Dreamland.stopPopulationThread(sheepThread)
+        Dreamland.stopPopulationThread(tigerThread)
+        Dreamland.stopPopulationThread(wolfThread)
 
 
 class Evolution:
@@ -105,11 +103,50 @@ class Evolution:
         self.curve_amount_tiger = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen('r', width=1), name='Tiger Amount')
         self.curve_amount_wolf = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen('g', width=1), name='Wolf Amount')
         self.curve_amount_sheep = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen('b', width=1), name='Sheep Amount')
-        self.curve_amount_grass = self.ui.plot_grass.getPlotItem().plot(pen=pg.mkPen('y', width=1),name='Grass Amount')
+        self.curve_amount_grass = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen('y', width=1), name='Grass Amount')
+
+
+        self.ui.plot_animals_change.addLegend()
+        self.curve_add_tiger = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen('r', width=1), name='Tiger Born')
+        self.curve_sub_tiger = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen('g', width=1), name='Tiger Dead')
+        self.curve_add_wolf = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen('b', width=1), name='Wolf Born')
+        self.curve_sub_wolf = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen('c', width=1), name='Wolf Dead')
+        self.curve_add_sheep = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen('m', width=1), name='Sheep Born')
+        self.curve_sub_sheep = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen('y', width=1), name='Sheep Dead')
+        self.curve_sub_grass = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen('d', width=1), name='Grass Cost')
+
+
+        self.ui.plot_tiger_gene.addLegend()
+        self.curve_tiger_gene_hungry_level = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen('r', width=1), name='Hungry Level')
+        self.curve_tiger_gene_lifespan = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen('y', width=1), name='LifeSpan')
+        self.curve_tiger_gene_fightCapability = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen('g', width=1), name='fightCapability')
+        self.curve_tiger_gene_age = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen('w', width=1), name='Age')
+        self.curve_tiger_gene_attack = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen('c', width=1), name='AttackPossibility')
+        self.curve_tiger_gene_defend = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen('m', width=1), name='DefendPossibility')
+        self.curve_tiger_gene_breed = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen('b', width=1), name='BreedingTimes')
+
+        self.ui.plot_wolf_gene.addLegend()
+        self.curve_wolf_gene_hungry_level = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen('r', width=1), name='Hungry Level')
+        self.curve_wolf_gene_lifespan = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen('y', width=1), name='LifeSpan')
+        self.curve_wolf_gene_fightCapability = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen('g', width=1), name='fightCapability')
+        self.curve_wolf_gene_age = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen('w', width=1), name='Age')
+        self.curve_wolf_gene_attack = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen('c', width=1), name='AttackPossibility')
+        self.curve_wolf_gene_defend = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen('m', width=1), name='DefendPossibility')
+        self.curve_wolf_gene_breed = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen('b', width=1), name='BreedingTimes')
+
+
+        self.ui.plot_sheep_gene.addLegend()
+        self.curve_sheep_gene_hungry_level = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen('r', width=1), name='Hungry Level')
+        self.curve_sheep_gene_lifespan = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen('y', width=1), name='LifeSpan')
+        self.curve_sheep_gene_fightCapability = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen('g', width=1), name='fightCapability')
+        self.curve_sheep_gene_age = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen('w', width=1), name='Age')
+        self.curve_sheep_gene_attack = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen('c', width=1), name='AttackPossibility')
+        self.curve_sheep_gene_defend = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen('m', width=1), name='DefendPossibility')
+        self.curve_sheep_gene_breed = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen('b', width=1), name='BreedingTimes')
+
 
         self.ui.simulate_btn.clicked.connect(self.simulate_clicked)
-        # self.ui.pause_btn.clicked.connect(self.pause_clicked)
-        # self.ui.plot_custom_btn.clicked.connect(self.plot_custom_clicked)
+        self.ui.pause_btn.clicked.connect(self.pause_clicked)
 
         #设置时间区间修改事件监听
         self.age_range = int(self.ui.age_range_edit.text())
@@ -148,13 +185,71 @@ class Evolution:
         self.timer.timeout.connect(self.draw_amounts)
         self.timer.start(100)
 
+    def pause_clicked(self):
+        if self.pause_status:
+            print("点击了恢复")
+            self.ui.pause_btn.setEnabled(False)
+            print("执行恢复")
+            self.bg_running_obj.resume()
+            print("恢复成功")
+            self.pause_status = False
+            self.ui.pause_btn.setEnabled(True)
+            self.ui.pause_btn.setText("Pause")
+        else:
+            print("点击了暂停")
+            self.ui.pause_btn.setEnabled(False)
+            print("执行暂停")
+            self.bg_running_obj.pause()
+            print("暂停成功")
+            self.pause_status = True
+            self.ui.pause_btn.setEnabled(True)
+            self.ui.pause_btn.setText("Continue")
+
     def draw_amounts(self):
+        self.ui.loop_count_label.setText(str(len(tigerThread.num)))
+
         self.curve_amount_tiger.setData(range(0, len(tigerThread.num)), tigerThread.num)
         self.curve_amount_wolf.setData(range(0, len(wolfThread.num)), wolfThread.num)
         self.curve_amount_sheep.setData(range(0, len(sheepThread.num)), sheepThread.num)
+        self.curve_amount_grass.setData(range(0, len(plantThread.num)), plantThread.num)
 
-    # def update_env(self, env):
-    #     self.env = env
+        self.curve_add_tiger.setData(range(0, len(tigerThread.newBronNum)), tigerThread.newBronNum)
+        self.curve_sub_tiger.setData(range(0, len(tigerThread.newDeathNum)), tigerThread.newDeathNum)
+
+        self.curve_add_wolf.setData(range(0, len(wolfThread.newBronNum)), wolfThread.newBronNum)
+        self.curve_sub_wolf.setData(range(0, len(wolfThread.newDeathNum)), wolfThread.newDeathNum)
+
+        self.curve_add_sheep.setData(range(0, len(sheepThread.newBronNum)), sheepThread.newBronNum)
+        self.curve_sub_sheep.setData(range(0, len(sheepThread.newDeathNum)), sheepThread.newDeathNum)
+
+        # self.curve_add_grass.setData()
+        self.curve_sub_grass.setData(range(0, len(plantThread.newDeathNum)), plantThread.newDeathNum)
+
+        self.curve_tiger_gene_hungry_level.setData(range(0, len(tigerThread.avgHungryLevel)), tigerThread.avgHungryLevel)
+        self.curve_tiger_gene_lifespan.setData(range(0, len(tigerThread.avgLifespan)), tigerThread.avgLifespan)
+        self.curve_tiger_gene_fightCapability.setData(range(0, len(tigerThread.avgFightCapability)), tigerThread.avgFightCapability)
+        self.curve_tiger_gene_age.setData(range(0, len(tigerThread.avgAge)), tigerThread.avgAge)
+        self.curve_tiger_gene_attack.setData(range(0, len(tigerThread.avgAttackPossibility)), tigerThread.avgAttackPossibility)
+        self.curve_tiger_gene_defend.setData(range(0, len(tigerThread.avgDefendPossibility)), tigerThread.avgDefendPossibility)
+        self.curve_tiger_gene_breed.setData(range(0, len(tigerThread.avgTotalBreedingTimes)), tigerThread.avgTotalBreedingTimes)
+
+
+        self.curve_wolf_gene_hungry_level.setData(range(0, len(wolfThread.avgHungryLevel)), wolfThread.avgHungryLevel)
+        self.curve_wolf_gene_lifespan.setData(range(0, len(wolfThread.avgLifespan)), wolfThread.avgLifespan)
+        self.curve_wolf_gene_fightCapability.setData(range(0, len(wolfThread.avgFightCapability)), wolfThread.avgFightCapability)
+        self.curve_wolf_gene_age.setData(range(0, len(wolfThread.avgAge)), wolfThread.avgAge)
+        self.curve_wolf_gene_attack.setData(range(0, len(wolfThread.avgAttackPossibility)), wolfThread.avgAttackPossibility)
+        self.curve_wolf_gene_defend.setData(range(0, len(wolfThread.avgDefendPossibility)), wolfThread.avgDefendPossibility)
+        self.curve_wolf_gene_breed.setData(range(0, len(wolfThread.avgTotalBreedingTimes)), wolfThread.avgTotalBreedingTimes)
+
+
+        self.curve_sheep_gene_hungry_level.setData(range(0, len(sheepThread.avgHungryLevel)), sheepThread.avgHungryLevel)
+        self.curve_sheep_gene_lifespan.setData(range(0, len(sheepThread.avgLifespan)), sheepThread.avgLifespan)
+        self.curve_sheep_gene_fightCapability.setData(range(0, len(sheepThread.avgFightCapability)), sheepThread.avgFightCapability)
+        self.curve_sheep_gene_age.setData(range(0, len(sheepThread.avgAge)), sheepThread.avgAge)
+        self.curve_sheep_gene_attack.setData(range(0, len(sheepThread.avgAttackPossibility)), sheepThread.avgAttackPossibility)
+        self.curve_sheep_gene_defend.setData(range(0, len(sheepThread.avgDefendPossibility)), sheepThread.avgDefendPossibility)
+        self.curve_sheep_gene_breed.setData(range(0, len(sheepThread.avgTotalBreedingTimes)), sheepThread.avgTotalBreedingTimes)
 
 
 app = QApplication([])

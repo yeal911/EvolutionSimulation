@@ -221,7 +221,7 @@ class PopulationThread:
                     cycleInfo.popAvgFightCapability += individual.fightCapability
                     cycleInfo.popAvgAttackPossibility += individual.attackPossibility
                     cycleInfo.popAvgDefendPossibility += individual.defendPossibility
-                    cycleInfo.popAvgtotalBreedingTimes += individual.totalBreedingTimes
+                    cycleInfo.popAvgTotalBreedingTimes += individual.totalBreedingTimes
                 # if there is still live population
                 cycleInfo.liveIndividuals = len(self.group)
                 cycleInfo.deadIndividuals = len(self.dead)

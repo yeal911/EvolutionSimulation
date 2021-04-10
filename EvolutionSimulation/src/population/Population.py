@@ -1,4 +1,5 @@
 # from abc import ABCMeta, abstractmethod
+import math
 import time
 
 from EvolutionSimulation.src.gene.Gene import Gene
@@ -53,5 +54,5 @@ class Population:
             for i in range(0, Gene.GENE_LENGTH, 2):
                 childGeneDigits.append(parentX.geneDigits[i])
                 childGeneDigits.append(parentY.geneDigits[i+1])
-            return self.newChild(Gene(childGeneDigits), round((self.generation + spouse.generation) / 2), self.name + "/" + spouse.name)
+            return self.newChild(Gene(childGeneDigits), math.ceil((self.generation + spouse.generation) / 2 + 1), self.name + "/" + spouse.name)
         return None

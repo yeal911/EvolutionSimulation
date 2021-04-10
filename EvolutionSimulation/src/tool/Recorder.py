@@ -86,7 +86,7 @@ class Recorder:
 
         for thread in self.dreamland.populationThreadPlayers:
             sheet = workbook.add_sheet(thread.THREAD_NAME, True)
-            headerText = ["name", "gender", "parents", "age", "birthTime", "deathTime", "deathCause", "populationThreat", "hungryLevel", "lifeStatus", "coordinateX", "coordinateY", "slotCode", "isBusy", "fightTimes", "breedTimes", "moveHistory", "lifespan", "fightCapability", "attackPossibility", "defendPossibility", "totalBreedingTimes"]
+            headerText = ["name", "gender", "generation", "gene", "parents", "age", "birthTime", "deathTime", "deathCause", "populationThreat", "hungryLevel", "lifeStatus", "coordinateX", "coordinateY", "slotCode", "isBusy", "fightTimes", "breedTimes", "moveHistory", "lifespan", "fightCapability", "attackPossibility", "defendPossibility", "totalBreedingTimes"]
             for i in range(0, len(headerText)):
                 sheet.write(0, i, headerText[i], headerStyle)
             rowNum = 1
@@ -94,45 +94,47 @@ class Recorder:
                 for ind in (thread.group + thread.dead):
                     sheet.write(rowNum, 0, ind.name)
                     sheet.write(rowNum, 1, ind.gender)
-                    sheet.write(rowNum, 2, ind.parents)
-                    sheet.write(rowNum, 3, ind.age)
-                    sheet.write(rowNum, 4, ind.birthTime)
-                    sheet.write(rowNum, 5, ind.deathTime)
-                    sheet.write(rowNum, 6, ind.deathCause)
-                    sheet.write(rowNum, 7, ind.populationThreat)
-                    sheet.write(rowNum, 8, ind.hungryLevel)
-                    sheet.write(rowNum, 9, ind.lifeStatus)
-                    sheet.write(rowNum, 10, ind.coordinateX)
-                    sheet.write(rowNum, 11, ind.coordinateY)
-                    sheet.write(rowNum, 12, ind.slotCode)
-                    sheet.write(rowNum, 13, ind.isBusy)
-                    sheet.write(rowNum, 14, ind.fightTimes)
-                    sheet.write(rowNum, 15, ind.breedTimes)
-                    sheet.write(rowNum, 16, Recorder.dict2String(ind.moveHistory))
-                    sheet.write(rowNum, 17, ind.lifespan)
-                    sheet.write(rowNum, 18, ind.fightCapability)
-                    sheet.write(rowNum, 19, ind.attackPossibility)
-                    sheet.write(rowNum, 20, ind.defendPossibility)
-                    sheet.write(rowNum, 21, ind.totalBreedingTimes)
+                    sheet.write(rowNum, 2, ind.generation)
+                    sheet.write(rowNum, 3, Recorder.list2String(ind.gene.geneDigits))
+                    sheet.write(rowNum, 4, ind.parents)
+                    sheet.write(rowNum, 5, ind.age)
+                    sheet.write(rowNum, 6, ind.birthTime)
+                    sheet.write(rowNum, 7, ind.deathTime)
+                    sheet.write(rowNum, 8, ind.deathCause)
+                    sheet.write(rowNum, 9, ind.populationThreat)
+                    sheet.write(rowNum, 10, ind.hungryLevel)
+                    sheet.write(rowNum, 11, ind.lifeStatus)
+                    sheet.write(rowNum, 12, ind.coordinateX)
+                    sheet.write(rowNum, 13, ind.coordinateY)
+                    sheet.write(rowNum, 14, ind.slotCode)
+                    sheet.write(rowNum, 15, ind.isBusy)
+                    sheet.write(rowNum, 16, ind.fightTimes)
+                    sheet.write(rowNum, 17, ind.breedTimes)
+                    sheet.write(rowNum, 18, Recorder.dict2String(ind.moveHistory))
+                    sheet.write(rowNum, 19, ind.lifespan)
+                    sheet.write(rowNum, 20, ind.fightCapability)
+                    sheet.write(rowNum, 21, ind.attackPossibility)
+                    sheet.write(rowNum, 22, ind.defendPossibility)
+                    sheet.write(rowNum, 23, ind.totalBreedingTimes)
                     rowNum += 1
             elif thread.THREAD_TYPE == "Plant":
                 for ind in (thread.group + thread.dead):
                     sheet.write(rowNum, 0, ind.name)
-                    sheet.write(rowNum, 3, ind.age)
-                    sheet.write(rowNum, 4, ind.birthTime)
-                    sheet.write(rowNum, 5, ind.deathTime)
-                    sheet.write(rowNum, 6, ind.deathCause)
-                    sheet.write(rowNum, 7, ind.populationThreat)
-                    sheet.write(rowNum, 9, ind.lifeStatus)
-                    sheet.write(rowNum, 10, ind.coordinateX)
-                    sheet.write(rowNum, 11, ind.coordinateY)
-                    sheet.write(rowNum, 12, ind.slotCode)
-                    sheet.write(rowNum, 13, ind.isBusy)
-                    sheet.write(rowNum, 14, ind.fightTimes)
-                    sheet.write(rowNum, 17, ind.lifespan)
-                    sheet.write(rowNum, 18, ind.fightCapability)
-                    sheet.write(rowNum, 19, ind.attackPossibility)
-                    sheet.write(rowNum, 20, ind.defendPossibility)
+                    sheet.write(rowNum, 5, ind.age)
+                    sheet.write(rowNum, 6, ind.birthTime)
+                    sheet.write(rowNum, 7, ind.deathTime)
+                    sheet.write(rowNum, 8, ind.deathCause)
+                    sheet.write(rowNum, 9, ind.populationThreat)
+                    sheet.write(rowNum, 11, ind.lifeStatus)
+                    sheet.write(rowNum, 12, ind.coordinateX)
+                    sheet.write(rowNum, 13, ind.coordinateY)
+                    sheet.write(rowNum, 14, ind.slotCode)
+                    sheet.write(rowNum, 15, ind.isBusy)
+                    sheet.write(rowNum, 16, ind.fightTimes)
+                    sheet.write(rowNum, 19, ind.lifespan)
+                    sheet.write(rowNum, 20, ind.fightCapability)
+                    sheet.write(rowNum, 21, ind.attackPossibility)
+                    sheet.write(rowNum, 22, ind.defendPossibility)
                     rowNum += 1
         workbook.save("EvolutionSimulationIndividuals_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + ".xls")
 
@@ -141,4 +143,11 @@ class Recorder:
         returnValue = ""
         for key in dict_map:
             returnValue += str(key) + "," + dict_map[key] + ";"
+        return returnValue
+
+    @staticmethod
+    def list2String(listArray: []):
+        returnValue = ""
+        for tmp in listArray:
+            returnValue += str(tmp) + ","
         return returnValue

@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 class CycleInfo:
     """defines all the cycle info"""
 

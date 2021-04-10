@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 import math
 import random
 import time
@@ -51,8 +50,9 @@ class Sheep(Population):
         self.fightCapability = 30  # initialize fight capability with 30, maximum 60 after computation based on gene_set
         self.attackPossibility = 20  # initialize attack possibility with 20, maximum 50 after computation based on gene_set
         self.defendPossibility = 20  # initialize defend possibility with 20, maximum 50 after computation based on gene_set
-        self.TotalBreedingTimes = 3  # initialize Total breeding times with 1, maximum 5 after computation based on gene_set
-
+        self.totalBreedingTimes = 3  # initialize Total breeding times with 1, maximum 5 after computation based on gene_set
+        # self.
+        
         # the 1st bit of Gene controls lifespan
         # then compute the addition to be added to initial value of lifespan
         self.lifespan += math.ceil(self.gene.geneDigits[0] / 20)
@@ -65,9 +65,9 @@ class Sheep(Population):
         # the 4th bit of Gene controls defendPossibility
         # then compute the addition to be added to initial value of defendPossibility
         self.defendPossibility += math.ceil(self.gene.geneDigits[3] / 3.3)
-        # the 5th bit of Gene controls TotalBreedingTimes
-        # then compute the addition to be added to initial value of TotalBreedingTimes
-        self.TotalBreedingTimes += round(math.ceil(self.gene.geneDigits[4] / 50))
+        # the 5th bit of Gene controls totalBreedingTimes
+        # then compute the addition to be added to initial value of totalBreedingTimes
+        self.totalBreedingTimes += round(math.ceil(self.gene.geneDigits[4] / 50))
 
         # lower limit of growth period
         self.lowerGrowthPeriod = math.ceil(self.lifespan / 3)

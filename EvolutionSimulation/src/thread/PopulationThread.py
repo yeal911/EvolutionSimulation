@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 import inspect
 import random
 import time
@@ -190,7 +189,7 @@ class PopulationThread:
                                     self.removeIndividualFromMap(food.slotCode, food)
                                     # self.dreamland.coordinateMap[food.slotCode].remove(food)
                                     cycleInfo.fightSuccessTimes += 1
-                                    individual.moveHistory[self.cycleNumber] = str(individual.coordinateX) + "|" + str(individual.coordinateY) + ", " + individual.slotCode
+                                    individual.moveHistory[self.cycleNumber] = str(individual.coordinateX) + "|" + str(individual.coordinateY) + "," + individual.slotCode
                                 # if fails, remove individual from map
                                 elif fightResult == "Failure":
                                     self.removeIndividualFromMap(individual.slotCode, individual)
@@ -202,7 +201,7 @@ class PopulationThread:
                             else:
                                 self.moveLocation(individual)
                                 individual.hungryLevel += 1
-                                individual.moveHistory[self.cycleNumber] = str(individual.coordinateX) + "|" + str(individual.coordinateY) + ", " + individual.slotCode
+                                individual.moveHistory[self.cycleNumber] = str(individual.coordinateX) + "|" + str(individual.coordinateY) + "," + individual.slotCode
                         # if not hungry enough, prepare for breeding
                         else:
                             # breed logic
@@ -222,7 +221,7 @@ class PopulationThread:
                     cycleInfo.popAvgFightCapability += individual.fightCapability
                     cycleInfo.popAvgAttackPossibility += individual.attackPossibility
                     cycleInfo.popAvgDefendPossibility += individual.defendPossibility
-                    cycleInfo.popAvgTotalBreedingTimes += individual.TotalBreedingTimes
+                    cycleInfo.popAvgtotalBreedingTimes += individual.totalBreedingTimes
                 # if there is still live population
                 cycleInfo.liveIndividuals = len(self.group)
                 cycleInfo.deadIndividuals = len(self.dead)

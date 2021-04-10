@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 import time
 
 from xlwt import Pattern
@@ -87,7 +86,7 @@ class Recorder:
 
         for thread in self.dreamland.populationThreadPlayers:
             sheet = workbook.add_sheet(thread.THREAD_NAME, True)
-            headerText = ["name", "gender", "parents", "age", "birthTime", "deathTime", "deathCause", "populationThreat", "hungryLevel", "lifeStatus", "coordinateX", "coordinateY", "slotCode", "isBusy", "fightTimes", "breedTimes", "moveHistory", "lifespan", "fightCapability", "attackPossibility", "defendPossibility", "TotalBreedingTimes"]
+            headerText = ["name", "gender", "parents", "age", "birthTime", "deathTime", "deathCause", "populationThreat", "hungryLevel", "lifeStatus", "coordinateX", "coordinateY", "slotCode", "isBusy", "fightTimes", "breedTimes", "moveHistory", "lifespan", "fightCapability", "attackPossibility", "defendPossibility", "totalBreedingTimes"]
             for i in range(0, len(headerText)):
                 sheet.write(0, i, headerText[i], headerStyle)
             rowNum = 1
@@ -114,7 +113,7 @@ class Recorder:
                     sheet.write(rowNum, 18, ind.fightCapability)
                     sheet.write(rowNum, 19, ind.attackPossibility)
                     sheet.write(rowNum, 20, ind.defendPossibility)
-                    sheet.write(rowNum, 21, ind.TotalBreedingTimes)
+                    sheet.write(rowNum, 21, ind.totalBreedingTimes)
                     rowNum += 1
             elif thread.THREAD_TYPE == "Plant":
                 for ind in (thread.group + thread.dead):

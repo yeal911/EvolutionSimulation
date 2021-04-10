@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 import math
 import random
 import time
@@ -51,7 +50,7 @@ class Wolf(Population):
         self.fightCapability = 50  # initialize fight capability with 50, maximum 100 after computation based on gene_set
         self.attackPossibility = 50  # initialize attack possibility with 50, maximum 100 after computation based on gene_set
         self.defendPossibility = 50  # initialize defend possibility with 50, maximum 100 after computation based on gene_set
-        self.TotalBreedingTimes = 1  # initialize Total breeding times with 1, maximum 3 after computation based on gene_set
+        self.totalBreedingTimes = 1  # initialize Total breeding times with 1, maximum 3 after computation based on gene_set
 
         # the 1st bit of Gene controls lifespan
         # then compute the addition to be added to initial value of lifespan
@@ -65,9 +64,9 @@ class Wolf(Population):
         # the 4th bit of Gene controls defendPossibility
         # then compute the addition to be added to initial value of defendPossibility
         self.defendPossibility += math.ceil(self.gene.geneDigits[3] / 2)
-        # the 5th bit of Gene controls TotalBreedingTimes
-        # then compute the addition to be added to initial value of TotalBreedingTimes
-        self.TotalBreedingTimes += round(math.ceil(self.gene.geneDigits[4] / 50))
+        # the 5th bit of Gene controls totalBreedingTimes
+        # then compute the addition to be added to initial value of totalBreedingTimes
+        self.totalBreedingTimes += round(math.ceil(self.gene.geneDigits[4] / 50))
 
         # lower limit of growth period
         self.lowerGrowthPeriod = math.ceil(self.lifespan / 3)

@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 # from abc import ABCMeta, abstractmethod
 import time
 
@@ -41,7 +40,7 @@ class Population:
         if spouse.__class__.__name__ != self.__class__.__name__ or self.gender == spouse.gender:
             print("Different population or same gender, no breed")
             return None
-        if (self.breedTimes <= self.TotalBreedingTimes and self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod) and (spouse.breedTimes <= spouse.TotalBreedingTimes and spouse.lowerGrowthPeriod < spouse.age < spouse.upperGrowthPeriod):
+        if (self.breedTimes <= self.totalBreedingTimes and self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod) and (spouse.breedTimes <= spouse.totalBreedingTimes and spouse.lowerGrowthPeriod < spouse.age < spouse.upperGrowthPeriod):
             self.breedTimes += 1
             spouse.breedTimes += 1
             self.hungryLevel += 1

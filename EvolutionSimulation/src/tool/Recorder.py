@@ -36,7 +36,7 @@ class Recorder:
         # write run result to excel file
         for threadKey in self.cycleInfo.keys():
             sheet = workbook.add_sheet(threadKey, True)
-            headerText = ["cycleNumber", "liveIndividuals", "deadIndividuals", "newBorn", "newDeath", "newDeathFromFight", "newDeathFromNatural", "newDeathFromStarve", "breedTimes", "fightTimes", "fightSuccessTimes", "fightPeaceTimes", "fightFailureTimes", "defendTimes", "defendSuccessTimes", "defendPeaceTimes", "defendFailureTimes", "popAvgHungryLevel", "popAvgAge", "popAvgLifespan", "popAvgFightCapability", "popAvgAttackPossibility", "popAvgDefendPossibility", "popAvgTotalBreedingTimes"]
+            headerText = ["cycleNumber", "liveIndividuals", "deadIndividuals", "newBorn", "newDeath", "newDeathFromFight", "newDeathFromNatural", "newDeathFromStarve", "breedTimes", "fightTimes", "fightSuccessTimes", "fightPeaceTimes", "fightFailureTimes", "FleeSuccessTimes", "defendTimes", "defendSuccessTimes", "defendPeaceTimes", "defendFailureTimes", "popAvgHungryLevel", "popAvgAge", "popAvgLifespan", "popAvgFightCapability", "popAvgAttackPossibility", "popAvgDefendPossibility", "popAvgTotalBreedingTimes"]
             for i in range(0, len(headerText)):
                 sheet.write(0, i, headerText[i], headerStyle)
             rowNum = 1
@@ -56,17 +56,18 @@ class Recorder:
                 sheet.write(rowNum, 10, cycleInfo.fightSuccessTimes)
                 sheet.write(rowNum, 11, cycleInfo.fightPeaceTimes)
                 sheet.write(rowNum, 12, cycleInfo.fightFailureTimes)
-                sheet.write(rowNum, 13, cycleInfo.defendTimes)
-                sheet.write(rowNum, 14, cycleInfo.defendSuccessTimes)
-                sheet.write(rowNum, 15, cycleInfo.defendPeaceTimes)
-                sheet.write(rowNum, 16, cycleInfo.defendFailureTimes)
-                sheet.write(rowNum, 17, cycleInfo.popAvgHungryLevel)
-                sheet.write(rowNum, 18, cycleInfo.popAvgAge)
-                sheet.write(rowNum, 19, cycleInfo.popAvgLifespan)
-                sheet.write(rowNum, 20, cycleInfo.popAvgFightCapability)
-                sheet.write(rowNum, 21, cycleInfo.popAvgAttackPossibility)
-                sheet.write(rowNum, 22, cycleInfo.popAvgDefendPossibility)
-                sheet.write(rowNum, 23, cycleInfo.popAvgTotalBreedingTimes)
+                sheet.write(rowNum, 13, cycleInfo.FleeSuccessTimes)
+                sheet.write(rowNum, 14, cycleInfo.defendTimes)
+                sheet.write(rowNum, 15, cycleInfo.defendSuccessTimes)
+                sheet.write(rowNum, 16, cycleInfo.defendPeaceTimes)
+                sheet.write(rowNum, 17, cycleInfo.defendFailureTimes)
+                sheet.write(rowNum, 18, cycleInfo.popAvgHungryLevel)
+                sheet.write(rowNum, 19, cycleInfo.popAvgAge)
+                sheet.write(rowNum, 20, cycleInfo.popAvgLifespan)
+                sheet.write(rowNum, 21, cycleInfo.popAvgFightCapability)
+                sheet.write(rowNum, 22, cycleInfo.popAvgAttackPossibility)
+                sheet.write(rowNum, 23, cycleInfo.popAvgDefendPossibility)
+                sheet.write(rowNum, 24, cycleInfo.popAvgTotalBreedingTimes)
                 rowNum += 1
         workbook.save("EvolutionSimulationResult_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + ".xls")
 
@@ -86,7 +87,7 @@ class Recorder:
 
         for thread in self.dreamland.populationThreadPlayers:
             sheet = workbook.add_sheet(thread.THREAD_NAME, True)
-            headerText = ["name", "gender", "generation", "gene", "parents", "age", "birthTime", "deathTime", "deathCause", "populationThreat", "hungryLevel", "lifeStatus", "coordinateX", "coordinateY", "slotCode", "isBusy", "fightTimes", "breedTimes", "moveHistory", "lifespan", "fightCapability", "attackPossibility", "defendPossibility", "totalBreedingTimes"]
+            headerText = ["name", "gender", "generation", "gene", "parents", "age", "birthTime", "deathTime", "deathCause", "populationThreat", "hungryLevel", "lifeStatus", "coordinateX", "coordinateY", "slotCode", "isBusy", "fightTimes", "fleeSuccessTimes", "fleeFailureTimes",  "breedTimes", "moveHistory", "lifespan", "fightCapability", "attackPossibility", "defendPossibility", "totalBreedingTimes"]
             for i in range(0, len(headerText)):
                 sheet.write(0, i, headerText[i], headerStyle)
             rowNum = 1
@@ -109,13 +110,15 @@ class Recorder:
                     sheet.write(rowNum, 14, ind.slotCode)
                     sheet.write(rowNum, 15, ind.isBusy)
                     sheet.write(rowNum, 16, ind.fightTimes)
-                    sheet.write(rowNum, 17, ind.breedTimes)
-                    sheet.write(rowNum, 18, Recorder.dict2String(ind.moveHistory))
-                    sheet.write(rowNum, 19, ind.lifespan)
-                    sheet.write(rowNum, 20, ind.fightCapability)
-                    sheet.write(rowNum, 21, ind.attackPossibility)
-                    sheet.write(rowNum, 22, ind.defendPossibility)
-                    sheet.write(rowNum, 23, ind.totalBreedingTimes)
+                    sheet.write(rowNum, 17, ind.fleeSuccessTimes)
+                    sheet.write(rowNum, 18, ind.fleeFailureTimes)
+                    sheet.write(rowNum, 19, ind.breedTimes)
+                    sheet.write(rowNum, 20, Recorder.dict2String(ind.moveHistory))
+                    sheet.write(rowNum, 21, ind.lifespan)
+                    sheet.write(rowNum, 22, ind.fightCapability)
+                    sheet.write(rowNum, 23, ind.attackPossibility)
+                    sheet.write(rowNum, 24, ind.defendPossibility)
+                    sheet.write(rowNum, 25, ind.totalBreedingTimes)
                     rowNum += 1
             elif thread.THREAD_TYPE == "Plant":
                 for ind in (thread.group + thread.dead):
@@ -131,10 +134,10 @@ class Recorder:
                     sheet.write(rowNum, 14, ind.slotCode)
                     sheet.write(rowNum, 15, ind.isBusy)
                     sheet.write(rowNum, 16, ind.fightTimes)
-                    sheet.write(rowNum, 19, ind.lifespan)
-                    sheet.write(rowNum, 20, ind.fightCapability)
-                    sheet.write(rowNum, 21, ind.attackPossibility)
-                    sheet.write(rowNum, 22, ind.defendPossibility)
+                    sheet.write(rowNum, 21, ind.lifespan)
+                    sheet.write(rowNum, 22, ind.fightCapability)
+                    sheet.write(rowNum, 23, ind.attackPossibility)
+                    sheet.write(rowNum, 24, ind.defendPossibility)
                     rowNum += 1
         workbook.save("EvolutionSimulationIndividuals_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + ".xls")
 

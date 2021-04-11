@@ -39,6 +39,8 @@ class Wolf(Population):
         self.slotCode = ""
         self.isBusy = False
         self.fightTimes = 0
+        self.fleeSuccessTimes = 0
+        self.fleeFailureTimes = 0
         self.breedTimes = 0
         self.ownThread = None
 
@@ -51,6 +53,7 @@ class Wolf(Population):
         self.attackPossibility = 50  # initialize attack possibility with 50, maximum 100 after computation based on gene_set
         self.defendPossibility = 50  # initialize defend possibility with 50, maximum 100 after computation based on gene_set
         self.totalBreedingTimes = 1  # initialize Total breeding times with 1, maximum 3 after computation based on gene_set
+        self.runningSpeed = 70  # initialize running speed with 70, maximum 100 after computation based on gene_set
 
         # the 1st bit of Gene controls lifespan
         # then compute the addition to be added to initial value of lifespan
@@ -67,6 +70,9 @@ class Wolf(Population):
         # the 5th bit of Gene controls totalBreedingTimes
         # then compute the addition to be added to initial value of totalBreedingTimes
         self.totalBreedingTimes += round(math.ceil(self.gene.geneDigits[4] / 50))
+        # the 6th bit of Gene controls runningSpeed
+        # then compute the addition to be added to initial value of runningSpeed
+        self.runningSpeed += round(self.gene.geneDigits[5] / 3.3)
 
         # lower limit of growth period
         self.lowerGrowthPeriod = math.ceil(self.lifespan / 3)

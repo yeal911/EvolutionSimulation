@@ -18,6 +18,18 @@ class Population:
 
     # fight behaviour of a population individual
     def fight(self, competitor):
+        # if competitor is animal, check if competitor will try to escape
+        if competitor.populationType == Population.ANIMAL:
+            # competitor will try to flee
+            if self.populationThreat - competitor.populationThreat >= 2:
+                distance = math.sqrt(math.pow(self.coordinateX - competitor.coordinateX, 2) + math.pow(self.coordinateY - competitor.coordinateY, 2))
+                # competitor escapes successful
+                if self.runningSpeed <= competitor.runningSpeed or distance * 10 / (self.runningSpeed - competitor.runningSpeed) > 10:
+                    competitor.fleeSuccessTimes += 1
+                    # print("Flee")
+                    return "Flee"
+                else:
+                    competitor.fleeFailureTimes += 1
         if self.fightCapability > competitor.fightCapability:
             # win fight, reset properties
             self.hungryLevel = 0

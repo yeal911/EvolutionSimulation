@@ -19,6 +19,7 @@ class CycleInfo:
         self.fightSuccessTimes = 0
         self.fightPeaceTimes = 0
         self.fightFailureTimes = 0
+        self.FleeSuccessTimes = 0
         self.defendSuccessTimes = 0
         self.defendPeaceTimes = 0
         self.defendFailureTimes = 0

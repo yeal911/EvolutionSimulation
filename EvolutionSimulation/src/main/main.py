@@ -1,3 +1,5 @@
+import os
+import sys
 import time
 
 
@@ -96,7 +98,7 @@ class Evolution:
 
         loader = QUiLoader()
         loader.registerCustomWidget(pg.PlotWidget)
-        self.ui = loader.load("../ui/main.ui")
+        self.ui = loader.load("E:/Python/EvolutionSimulation/src/ui/main.ui")
         self.cur_draw_age = 0
 
         self.ui.plot_animals.addLegend()

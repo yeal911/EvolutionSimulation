@@ -23,7 +23,7 @@ while True:
     time.sleep(1)
     end = time.time()
     print("---Time elapses: " + str(int(end - start)))
-    if end - start > 10:
+    if end - start > 60:
         Dreamland.stopPopulationThread(plantThread)
         Dreamland.stopPopulationThread(sheepThread)
         Dreamland.stopPopulationThread(tigerThread)

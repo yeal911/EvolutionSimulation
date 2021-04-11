@@ -195,8 +195,8 @@ class PopulationThread:
                                     self.removeIndividualFromMap(individual.slotCode, individual)
                                     # self.dreamland.coordinateMap[individual.slotCode].remove(individual)
                                     cycleInfo.fightFailureTimes += 1
-                                else:
-                                    cycleInfo.fightPeaceTimes += 1
+                                elif fightResult == "Flee":
+                                    cycleInfo.FleeSuccessTimes += 1
                             # if no food found, move location and become more hungry
                             else:
                                 self.moveLocation(individual)

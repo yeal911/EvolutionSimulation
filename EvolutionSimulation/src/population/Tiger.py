@@ -39,6 +39,8 @@ class Tiger(Population):
         self.slotCode = ""
         self.isBusy = False
         self.fightTimes = 0
+        self.fleeSuccessTimes = 0
+        self.fleeFailureTimes = 0
         self.breedTimes = 0
         self.ownThread = None
 
@@ -47,10 +49,11 @@ class Tiger(Population):
 
         # gene related properties initialization
         self.lifespan = 10  # initialize life with 10, maximum 15 after computation based on gene_set
-        self.fightCapability = 70  # initialize fight capability with 50, maximum 100 after computation based on gene_set
-        self.attackPossibility = 70  # initialize attack possibility with 50, maximum 100 after computation based on gene_set
-        self.defendPossibility = 70  # initialize defend possibility with 50, maximum 100 after computation based on gene_set
+        self.fightCapability = 70  # initialize fight capability with 70, maximum 100 after computation based on gene_set
+        self.attackPossibility = 70  # initialize attack possibility with 70, maximum 100 after computation based on gene_set
+        self.defendPossibility = 70  # initialize defend possibility with 70, maximum 100 after computation based on gene_set
         self.totalBreedingTimes = 1  # initialize remaining breeding times with 1, maximum 2 after computation based on gene_set
+        self.runningSpeed = 70  # initialize running speed with 70, maximum 100 after computation based on gene_set
 
         # the 1st bit of Gene controls lifespan
         # then compute the addition to be added to initial value of lifespan
@@ -67,6 +70,9 @@ class Tiger(Population):
         # the 5th bit of Gene controls totalBreedingTimes
         # then compute the addition to be added to initial value of totalBreedingTimes
         self.totalBreedingTimes += round(self.gene.geneDigits[4] / 50)
+        # the 6th bit of Gene controls runningSpeed
+        # then compute the addition to be added to initial value of runningSpeed
+        self.runningSpeed += round(self.gene.geneDigits[5] / 3.3)
 
         # lower limit of growth period
         self.lowerGrowthPeriod = math.ceil(self.lifespan / 3)

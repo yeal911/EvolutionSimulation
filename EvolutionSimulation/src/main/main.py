@@ -1,7 +1,7 @@
 import time
 
-from PyQt5 import uic
-from PyQt5.QtWidgets import QApplication, QMessageBox
+
+from PySide2.QtWidgets import QApplication, QMessageBox
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtCore import Signal, QObject, QTimer
 import pyqtgraph as pg
@@ -94,9 +94,9 @@ class Evolution:
     def __init__(self):
         self.env = None
 
-        # loader = QUiLoader()
-        # loader.registerCustomWidget(pg.PlotWidget)
-        self.ui = uic.loadUi("../ui/main.ui")
+        loader = QUiLoader()
+        loader.registerCustomWidget(pg.PlotWidget)
+        self.ui = loader.load("../ui/main.ui")
         self.cur_draw_age = 0
 
         self.ui.plot_animals.addLegend()

@@ -52,7 +52,7 @@ class Sheep(Population):
         self.fightCapability = 30  # initialize fight capability with 30, maximum 60 after computation based on gene_set
         self.attackPossibility = 20  # initialize attack possibility with 20, maximum 50 after computation based on gene_set
         self.defendPossibility = 20  # initialize defend possibility with 20, maximum 50 after computation based on gene_set
-        self.totalBreedingTimes = 3  # initialize Total breeding times with 1, maximum 5 after computation based on gene_set
+        self.totalBreedingTimes = 5  # initialize Total breeding times with 5, maximum 10 after computation based on gene_set
         self.runningSpeed = 30  # initialize running speed with 30, maximum 50 after computation based on gene_set
 
         # the 1st bit of Gene controls lifespan
@@ -69,15 +69,15 @@ class Sheep(Population):
         self.defendPossibility += math.ceil(self.gene.geneDigits[3] / 3.3)
         # the 5th bit of Gene controls totalBreedingTimes
         # then compute the addition to be added to initial value of totalBreedingTimes
-        self.totalBreedingTimes += round(math.ceil(self.gene.geneDigits[4] / 50))
+        self.totalBreedingTimes += round(math.ceil(self.gene.geneDigits[4] / 20))
         # the 6th bit of Gene controls runningSpeed
         # then compute the addition to be added to initial value of runningSpeed
         self.runningSpeed += round(self.gene.geneDigits[5] / 3.3)
 
         # lower limit of growth period
-        self.lowerGrowthPeriod = math.ceil(self.lifespan / 3)
+        self.lowerGrowthPeriod = math.ceil(self.lifespan / 5)
         # upper limit of growth period
-        self.upperGrowthPeriod = 2 * self.lowerGrowthPeriod
+        self.upperGrowthPeriod = 4 * self.lowerGrowthPeriod
 
     # new child born
     @staticmethod

@@ -48,7 +48,7 @@ class Population:
             self.deathTime = time.strftime("%Y%m%d%H%M%S", time.localtime())
             return "Failure"
 
-    # breed behaviour of a tiger
+    # breed behaviour of an animal population individual
     def breed(self, spouse):
         if spouse.__class__.__name__ != self.__class__.__name__ or self.gender == spouse.gender:
             print("Different population or same gender, no breed")

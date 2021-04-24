@@ -12,8 +12,8 @@ class Dreamland:
     populationThreadPlayers: stores all the Population Threads which should be added in Thread's own structure method
     coordinateMap: it is a dict, it has all the land slot no.s as the key, and the value is population individuals which are added/removed from Thread's logic
     """
-    SIZE_X = 100
-    SIZE_Y = 100
+    SIZE_X = 500
+    SIZE_Y = 500
 
     def __init__(self):
         # all population thread players

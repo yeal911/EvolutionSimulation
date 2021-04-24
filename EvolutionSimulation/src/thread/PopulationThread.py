@@ -113,7 +113,7 @@ class PopulationThread:
         individualForAppend.slotCode = slotCode
 
     # receive cycle info for defending
-    def receiveDefendInfo(self, fightResult, pop: Population):
+    def receiveDefendInfo(self, fight_result, pop: Population):
         ownCycles = self.recorder.cycleInfo[self.THREAD_NAME]
         # there is a possibility that upon execution of this method, the iteration in run method hasn't finished yet,
         # so the corresponding cycle info hasn't been saved too wnCycles yet
@@ -122,10 +122,10 @@ class PopulationThread:
         cycle = ownCycles[self.cycleNumber]
         cycle.defendTimes += 1
         pop.fightTimes += 1
-        if fightResult == "Success":
+        if fight_result == "Success":
             pop.hungryLevel = 0
             cycle.defendSuccessTimes += 1
-        elif fightResult == "Failure":
+        elif fight_result == "Failure":
             pop.lifeStatus = "Dead"
             pop.deathCause = "Fight to death"
             pop.deathTime = time.strftime("%Y%m%d%H%M%S", time.localtime())
@@ -165,7 +165,8 @@ class PopulationThread:
                         cycleInfo.newDeathFromNatural += 1
                     elif individual.deathCause == "Fight to death":
                         cycleInfo.newDeathFromFight += 1
-                    # check individual life status first, move to different category if dead (starve to death/natural death/fight to death)
+                    # check individual life status first, move to different category if dead (starve to death/natural
+                    # death/fight to death)
                     if individual.lifeStatus == "Dead":
                         individual.deathTime = time.strftime("%Y%m%d%H%M%S", time.localtime())
                         self.group.remove(individual)
@@ -248,8 +249,8 @@ class PopulationThread:
             self.avgAttackPossibility.append(cycleInfo.popAvgAttackPossibility)
             self.avgDefendPossibility.append(cycleInfo.popAvgDefendPossibility)
             self.avgTotalBreedingTimes.append(cycleInfo.popAvgTotalBreedingTimes)
-            print("cycleInfo.newBorn is " + str(cycleInfo.newBorn))
-            print("cycleInfo.newDeath is " + str(cycleInfo.newDeath))
+            # print("cycleInfo.newBorn is " + str(cycleInfo.newBorn))
+            # print("cycleInfo.newDeath is " + str(cycleInfo.newDeath))
 
     # plant thread run
     def plantThreadRun(self):
@@ -259,7 +260,7 @@ class PopulationThread:
             self.cycleNumber += 1
             cycleInfo = CycleInfo(self.THREAD_NAME)
             # generate new plants in each round if plants count is less than 10 times of the slots
-            if len(self.group) < int(Dreamland.SIZE_X * Dreamland.SIZE_Y) / 100 * 10:
+            if len(self.group) < int(Dreamland.SIZE_X * Dreamland.SIZE_Y) / 100:
                 for i in range(0, self.cyclePlantCount):
                     # need to randomly initialize the coordinates of the plant
                     plant = Plant()
@@ -274,7 +275,8 @@ class PopulationThread:
                         cycleInfo.newDeathFromNatural += 1
                     elif individual.deathCause == "Fight to death":
                         cycleInfo.newDeathFromFight += 1
-                    # check individual life status first, move to different category if dead (starve to death/natural death/fight to death)
+                    # check individual life status first, move to different category if dead (starve to death/natural
+                    # death/fight to death)
                     if individual.lifeStatus == "Dead":
                         individual.deathTime = time.strftime("%Y%m%d%H%M%S", time.localtime())
                         self.group.remove(individual)

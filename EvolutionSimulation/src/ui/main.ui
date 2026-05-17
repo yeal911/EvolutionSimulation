@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>3000</width>
-    <height>2000</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -73,10 +73,10 @@
   <widget class="QTabWidget" name="plot_tabs">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>170</y>
-     <width>2500</width>
-     <height>1600</height>
+     <x>8</x>
+     <y>68</y>
+     <width>1264</width>
+     <height>634</height>
     </rect>
    </property>
    <property name="font">
@@ -92,13 +92,21 @@
      <string>Number of Population</string>
     </attribute>
     <widget class="PlotWidget" name="plot_animals" native="true">
+
      <property name="geometry">
+
       <rect>
-       <x>20</x>
-       <y>20</y>
-       <width>2400</width>
-       <height>1361</height>
+
+       <x>0</x>
+
+       <y>0</y>
+
+       <width>100</width>
+
+       <height>100</height>
+
       </rect>
+
      </property>
     </widget>
    </widget>
@@ -107,13 +115,21 @@
      <string>Population Change Data</string>
     </attribute>
     <widget class="PlotWidget" name="plot_animals_change" native="true">
+
      <property name="geometry">
+
       <rect>
-       <x>20</x>
-       <y>10</y>
-       <width>2400</width>
-       <height>1361</height>
+
+       <x>0</x>
+
+       <y>0</y>
+
+       <width>100</width>
+
+       <height>100</height>
+
       </rect>
+
      </property>
     </widget>
    </widget>
@@ -122,13 +138,21 @@
      <string>Tiger Gene</string>
     </attribute>
     <widget class="PlotWidget" name="plot_tiger_gene" native="true">
+
      <property name="geometry">
+
       <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>2400</width>
-       <height>1361</height>
+
+       <x>0</x>
+
+       <y>0</y>
+
+       <width>100</width>
+
+       <height>100</height>
+
       </rect>
+
      </property>
     </widget>
    </widget>
@@ -137,13 +161,21 @@
      <string>Wolf Gene</string>
     </attribute>
     <widget class="PlotWidget" name="plot_wolf_gene" native="true">
+
      <property name="geometry">
+
       <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>2400</width>
-       <height>1361</height>
+
+       <x>0</x>
+
+       <y>0</y>
+
+       <width>100</width>
+
+       <height>100</height>
+
       </rect>
+
      </property>
     </widget>
    </widget>
@@ -152,13 +184,21 @@
      <string>Sheep Gene</string>
     </attribute>
     <widget class="PlotWidget" name="plot_sheep_gene" native="true">
+
      <property name="geometry">
+
       <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>2400</width>
-       <height>1361</height>
+
+       <x>0</x>
+
+       <y>0</y>
+
+       <width>100</width>
+
+       <height>100</height>
+
       </rect>
+
      </property>
     </widget>
    </widget>
@@ -167,13 +207,21 @@
      <string>Customise</string>
     </attribute>
     <widget class="PlotWidget" name="plot_custom" native="true">
+
      <property name="geometry">
+
       <rect>
-       <x>10</x>
-       <y>70</y>
-       <width>1111</width>
-       <height>531</height>
+
+       <x>0</x>
+
+       <y>0</y>
+
+       <width>100</width>
+
+       <height>100</height>
+
       </rect>
+
      </property>
     </widget>
     <widget class="QWidget" name="horizontalLayoutWidget_6">

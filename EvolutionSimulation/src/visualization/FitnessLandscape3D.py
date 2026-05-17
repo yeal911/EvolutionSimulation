@@ -15,10 +15,13 @@ class FitnessLandscape3D(QWidget):
         super().__init__(parent)
         self.layout = QVBoxLayout(self)
         if not HAS_OPENGL:
-            self.layout.addWidget(QLabel("PyOpenGL not installed. 3D view unavailable.\nInstall with: pip install PyOpenGL"))
+            label = QLabel("PyOpenGL not installed. 3D view unavailable.\nInstall with: pip install PyOpenGL")
+            label.setStyleSheet("color: #C8D6E5; font-size: 12px; padding: 20px;")
+            self.layout.addWidget(label)
             self.view = None
             return
         self.view = gl.GLViewWidget()
+        self.view.setBackgroundColor(15, 25, 35)
         self.layout.addWidget(self.view)
         self.view.setCameraPosition(distance=200, elevation=30, azimuth=45)
         self.gene_x = 0
@@ -33,7 +36,6 @@ class FitnessLandscape3D(QWidget):
     def update_landscape(self, threads):
         if not HAS_OPENGL or self.view is None:
             return
-        # Collect all dead individuals with known parents (offspring count proxy)
         all_dead = []
         for thread in threads:
             if thread.THREAD_TYPE == "Animal":
@@ -41,7 +43,6 @@ class FitnessLandscape3D(QWidget):
         if len(all_dead) < 10:
             return
 
-        # Grid gene space
         grid = 20
         x_vals = np.linspace(0, 99, grid)
         y_vals = np.linspace(0, 99, grid)

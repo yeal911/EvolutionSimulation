@@ -9,7 +9,7 @@ import time
 
 from PySide6.QtWidgets import (QApplication, QMessageBox, QTabWidget, QWidget,
                                QVBoxLayout, QHBoxLayout, QPushButton, QCheckBox,
-                               QTextEdit, QListWidget, QLabel, QSplitter)
+                               QTextEdit, QListWidget, QLabel, QSplitter, QSizePolicy)
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import Signal, QObject, QTimer
 import pyqtgraph as pg
@@ -45,6 +45,31 @@ plantThread = PlantThread(GRASS_AMOUNT, dreamland, recorder)
 sheepThread = SheepThread(SHEEP_AMOUNT, dreamland, recorder)
 wolfThread = WolfThread(WOLF_AMOUNT, dreamland, recorder)
 tigerThread = TigerThread(TIGER_AMOUNT, dreamland, recorder)
+
+# Color palette for curves - distinct, modern colors
+_CLR_POP_TIGER  = '#FF6B6B'   # coral red
+_CLR_POP_WOLF   = '#4ECB71'   # green
+_CLR_POP_SHEEP  = '#4A9EFF'   # blue
+_CLR_POP_GRASS  = '#FFD93D'   # yellow
+
+_CLR_BORN_TIGER = '#FF6B6B'
+_CLR_DEAD_TIGER = '#4ECB71'
+_CLR_BORN_WOLF  = '#4A9EFF'
+_CLR_DEAD_WOLF  = '#00D4AA'
+_CLR_BORN_SHEEP = '#C084FC'
+_CLR_DEAD_SHEEP = '#FFD93D'
+_CLR_COST_GRASS = '#94A3B8'
+
+_CLR_GENE_HUNGRY   = '#FF6B6B'
+_CLR_GENE_LIFESPAN = '#FFD93D'
+_CLR_GENE_FIGHT    = '#4ECB71'
+_CLR_GENE_AGE      = '#E2E8F0'
+_CLR_GENE_ATTACK   = '#00D4AA'
+_CLR_GENE_DEFEND   = '#C084FC'
+_CLR_GENE_BREED    = '#4A9EFF'
+_CLR_GENE_CAMOUFLAGE    = '#FF9F7F'
+_CLR_GENE_ATTRACTIVENESS = '#FFCC80'
+_CLR_GENE_TERRITORY     = '#80E8A0'
 
 
 class EvolutionBackground:
@@ -85,6 +110,10 @@ class EvolutionBackground:
 
 class Evolution:
 
+    # Names of the original pyqtgraph PlotWidget tabs (for resize handling)
+    _PLOT_TAB_NAMES = ['plot_animals', 'plot_animals_change',
+                       'plot_tiger_gene', 'plot_wolf_gene', 'plot_sheep_gene']
+
     def __init__(self):
         self.env = None
 
@@ -93,53 +122,53 @@ class Evolution:
         ui_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ui", "main.ui")
         self.ui = loader.load(ui_path)
         self.cur_draw_age = 0
-        # Hook resize FIRST, then resize, so the initial layout is applied immediately
+
+        # Hook resize event (but do NOT resize yet - layout must be set up first)
         self._original_resize = self.ui.resizeEvent
         self.ui.resizeEvent = self._on_window_resize
-        self.ui.resize(1280, 720)
 
         # Original plots
         self.ui.plot_animals.addLegend()
-        self.curve_amount_tiger = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen('r', width=1), name='Tiger Amount')
-        self.curve_amount_wolf = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen('g', width=1), name='Wolf Amount')
-        self.curve_amount_sheep = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen('b', width=1), name='Sheep Amount')
-        self.curve_amount_grass = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen('y', width=1), name='Grass Amount')
+        self.curve_amount_tiger = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen(_CLR_POP_TIGER, width=2), name='Tiger Amount')
+        self.curve_amount_wolf = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen(_CLR_POP_WOLF, width=2), name='Wolf Amount')
+        self.curve_amount_sheep = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen(_CLR_POP_SHEEP, width=2), name='Sheep Amount')
+        self.curve_amount_grass = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen(_CLR_POP_GRASS, width=2), name='Grass Amount')
 
         self.ui.plot_animals_change.addLegend()
-        self.curve_add_tiger = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen('r', width=1), name='Tiger Born')
-        self.curve_sub_tiger = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen('g', width=1), name='Tiger Dead')
-        self.curve_add_wolf = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen('b', width=1), name='Wolf Born')
-        self.curve_sub_wolf = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen('c', width=1), name='Wolf Dead')
-        self.curve_add_sheep = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen('m', width=1), name='Sheep Born')
-        self.curve_sub_sheep = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen('y', width=1), name='Sheep Dead')
-        self.curve_sub_grass = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen('d', width=1), name='Grass Cost')
+        self.curve_add_tiger = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen(_CLR_BORN_TIGER, width=2), name='Tiger Born')
+        self.curve_sub_tiger = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen(_CLR_DEAD_TIGER, width=2), name='Tiger Dead')
+        self.curve_add_wolf = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen(_CLR_BORN_WOLF, width=2), name='Wolf Born')
+        self.curve_sub_wolf = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen(_CLR_DEAD_WOLF, width=2), name='Wolf Dead')
+        self.curve_add_sheep = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen(_CLR_BORN_SHEEP, width=2), name='Sheep Born')
+        self.curve_sub_sheep = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen(_CLR_DEAD_SHEEP, width=2), name='Sheep Dead')
+        self.curve_sub_grass = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen(_CLR_COST_GRASS, width=2), name='Grass Cost')
 
         self.ui.plot_tiger_gene.addLegend()
-        self.curve_tiger_gene_hungry_level = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen('r', width=1), name='Hungry Level')
-        self.curve_tiger_gene_lifespan = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen('y', width=1), name='LifeSpan')
-        self.curve_tiger_gene_fightCapability = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen('g', width=1), name='fightCapability')
-        self.curve_tiger_gene_age = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen('w', width=1), name='Age')
-        self.curve_tiger_gene_attack = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen('c', width=1), name='AttackPossibility')
-        self.curve_tiger_gene_defend = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen('m', width=1), name='DefendPossibility')
-        self.curve_tiger_gene_breed = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen('b', width=1), name='BreedingTimes')
+        self.curve_tiger_gene_hungry_level = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_HUNGRY, width=2), name='Hungry Level')
+        self.curve_tiger_gene_lifespan = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_LIFESPAN, width=2), name='LifeSpan')
+        self.curve_tiger_gene_fightCapability = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_FIGHT, width=2), name='fightCapability')
+        self.curve_tiger_gene_age = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_AGE, width=2), name='Age')
+        self.curve_tiger_gene_attack = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_ATTACK, width=2), name='AttackPossibility')
+        self.curve_tiger_gene_defend = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_DEFEND, width=2), name='DefendPossibility')
+        self.curve_tiger_gene_breed = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_BREED, width=2), name='BreedingTimes')
 
         self.ui.plot_wolf_gene.addLegend()
-        self.curve_wolf_gene_hungry_level = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen('r', width=1), name='Hungry Level')
-        self.curve_wolf_gene_lifespan = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen('y', width=1), name='LifeSpan')
-        self.curve_wolf_gene_fightCapability = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen('g', width=1), name='fightCapability')
-        self.curve_wolf_gene_age = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen('w', width=1), name='Age')
-        self.curve_wolf_gene_attack = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen('c', width=1), name='AttackPossibility')
-        self.curve_wolf_gene_defend = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen('m', width=1), name='DefendPossibility')
-        self.curve_wolf_gene_breed = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen('b', width=1), name='BreedingTimes')
+        self.curve_wolf_gene_hungry_level = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_HUNGRY, width=2), name='Hungry Level')
+        self.curve_wolf_gene_lifespan = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_LIFESPAN, width=2), name='LifeSpan')
+        self.curve_wolf_gene_fightCapability = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_FIGHT, width=2), name='fightCapability')
+        self.curve_wolf_gene_age = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_AGE, width=2), name='Age')
+        self.curve_wolf_gene_attack = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_ATTACK, width=2), name='AttackPossibility')
+        self.curve_wolf_gene_defend = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_DEFEND, width=2), name='DefendPossibility')
+        self.curve_wolf_gene_breed = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_BREED, width=2), name='BreedingTimes')
 
         self.ui.plot_sheep_gene.addLegend()
-        self.curve_sheep_gene_hungry_level = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen('r', width=1), name='Hungry Level')
-        self.curve_sheep_gene_lifespan = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen('y', width=1), name='LifeSpan')
-        self.curve_sheep_gene_fightCapability = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen('g', width=1), name='fightCapability')
-        self.curve_sheep_gene_age = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen('w', width=1), name='Age')
-        self.curve_sheep_gene_attack = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen('c', width=1), name='AttackPossibility')
-        self.curve_sheep_gene_defend = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen('m', width=1), name='DefendPossibility')
-        self.curve_sheep_gene_breed = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen('b', width=1), name='BreedingTimes')
+        self.curve_sheep_gene_hungry_level = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_HUNGRY, width=2), name='Hungry Level')
+        self.curve_sheep_gene_lifespan = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_LIFESPAN, width=2), name='LifeSpan')
+        self.curve_sheep_gene_fightCapability = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_FIGHT, width=2), name='fightCapability')
+        self.curve_sheep_gene_age = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_AGE, width=2), name='Age')
+        self.curve_sheep_gene_attack = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_ATTACK, width=2), name='AttackPossibility')
+        self.curve_sheep_gene_defend = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_DEFEND, width=2), name='DefendPossibility')
+        self.curve_sheep_gene_breed = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_BREED, width=2), name='BreedingTimes')
 
         # Add new gene attribute curves for new traits
         self._add_new_gene_curves()
@@ -171,20 +200,24 @@ class Evolution:
         self.env_thread = None
         self._frame_counter = 0
 
+        # NOW apply the initial window size - AFTER all layouts are set up
+        # so that QVBoxLayout can properly size the PlotWidgets on first resize
+        self.ui.resize(1280, 720)
+
     def _add_new_gene_curves(self):
         """Add curves for camouflage, attractiveness, territory tendency."""
         # Tiger
-        self.curve_tiger_gene_camouflage = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen((255, 100, 100), width=1), name='Camouflage')
-        self.curve_tiger_gene_attractiveness = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen((255, 200, 100), width=1), name='Attractiveness')
-        self.curve_tiger_gene_territory = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen((100, 255, 100), width=1), name='Territory')
+        self.curve_tiger_gene_camouflage = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_CAMOUFLAGE, width=2), name='Camouflage')
+        self.curve_tiger_gene_attractiveness = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_ATTRACTIVENESS, width=2), name='Attractiveness')
+        self.curve_tiger_gene_territory = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_TERRITORY, width=2), name='Territory')
         # Wolf
-        self.curve_wolf_gene_camouflage = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen((255, 100, 100), width=1), name='Camouflage')
-        self.curve_wolf_gene_attractiveness = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen((255, 200, 100), width=1), name='Attractiveness')
-        self.curve_wolf_gene_territory = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen((100, 255, 100), width=1), name='Territory')
+        self.curve_wolf_gene_camouflage = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_CAMOUFLAGE, width=2), name='Camouflage')
+        self.curve_wolf_gene_attractiveness = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_ATTRACTIVENESS, width=2), name='Attractiveness')
+        self.curve_wolf_gene_territory = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_TERRITORY, width=2), name='Territory')
         # Sheep
-        self.curve_sheep_gene_camouflage = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen((255, 100, 100), width=1), name='Camouflage')
-        self.curve_sheep_gene_attractiveness = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen((255, 200, 100), width=1), name='Attractiveness')
-        self.curve_sheep_gene_territory = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen((100, 255, 100), width=1), name='Territory')
+        self.curve_sheep_gene_camouflage = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_CAMOUFLAGE, width=2), name='Camouflage')
+        self.curve_sheep_gene_attractiveness = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_ATTRACTIVENESS, width=2), name='Attractiveness')
+        self.curve_sheep_gene_territory = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen(_CLR_GENE_TERRITORY, width=2), name='Territory')
 
     def _add_enhanced_visualization_tabs(self):
         """Add new visualization tabs to the existing QTabWidget."""
@@ -362,10 +395,9 @@ class Evolution:
                     # Ensure Y axis never goes below 0 so the origin is always in view
                     plot_item.getViewBox().setLimits(yMin=0)
 
-
     def _setup_plot_style(self):
         """Improve readability of all real-time charts."""
-        pg.setConfigOptions(antialias=True, foreground='#D6E2F0')
+        pg.setConfigOptions(antialias=True, foreground='#C8D6E5')
 
         style_configs = [
             (self.ui.plot_animals, 'Population Size', 'Count'),
@@ -382,38 +414,59 @@ class Evolution:
             if plot_item is None:
                 continue
 
-            plot_item.showGrid(x=True, y=True, alpha=0.25)
+            # Grid
+            plot_item.showGrid(x=True, y=True, alpha=0.15)
+
+            # Axis labels
             plot_item.setLabel('bottom', 'Time (tick)')
             plot_item.setLabel('left', y_label)
-            plot_item.setTitle(f'<span style="font-size:12pt; font-weight:600; color:#EAF2FF;">{title}</span>')
-            plot_item.getAxis('bottom').setStyle(tickTextOffset=10, autoExpandTextSpace=True)
-            plot_item.getAxis('left').setStyle(autoExpandTextSpace=True)
-            plot_item.getAxis('bottom').setHeight(48)
-            plot_item.getAxis('left').setWidth(62)
-            plot_item.layout.setContentsMargins(12, 10, 28, 22)
 
+            # Title
+            plot_item.setTitle(
+                f'<span style="font-size:13pt; font-weight:600; color:#EAF2FF;">{title}</span>')
+
+            # Axis styling
+            axis_bottom = plot_item.getAxis('bottom')
+            axis_left = plot_item.getAxis('left')
+            axis_bottom.setStyle(tickTextOffset=12, autoExpandTextSpace=True)
+            axis_left.setStyle(autoExpandTextSpace=True)
+            axis_bottom.setHeight(56)
+            axis_left.setWidth(68)
+
+            # Critical fix: generous content margins so axis labels are never clipped
+            # Order: left, top, right, bottom
+            plot_item.layout.setContentsMargins(16, 14, 40, 36)
+
+            # ViewBox background for contrast
+            vb = plot_item.getViewBox()
+            vb.setBackgroundColor('#0F1923')
+
+            # Legend styling
             legend = plot_item.legend
             if legend is not None:
-                legend.setBrush(pg.mkBrush(20, 30, 45, 180))
-                legend.setPen(pg.mkPen((120, 150, 180), width=1))
+                legend.setBrush(pg.mkBrush(15, 25, 40, 200))
+                legend.setPen(pg.mkPen((80, 120, 160), width=1))
 
     def _setup_tab_layouts(self):
         """Add QVBoxLayout to simple tabs so PlotWidgets auto-fill the tab page.
-        Bottom margin is generous so X-axis labels are never clipped."""
-        plot_names = ['plot_animals', 'plot_animals_change',
-                      'plot_tiger_gene', 'plot_wolf_gene', 'plot_sheep_gene']
-        for plot_name in plot_names:
+        Also set expanding size policy so PlotWidgets stretch to fill available space."""
+        for plot_name in self._PLOT_TAB_NAMES:
             plot_widget = getattr(self.ui, plot_name, None)
             if plot_widget is None:
                 continue
+            # Set expanding size policy so the PlotWidget fills the tab
+            plot_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            plot_widget.setMinimumSize(200, 150)
+
             tab_page = plot_widget.parentWidget()
             if tab_page is None:
                 continue
             if tab_page.layout() is not None:
                 continue
             layout = QVBoxLayout(tab_page)
-            # Large bottom margin specifically for pyqtgraph X-axis tick labels
-            layout.setContentsMargins(10, 8, 26, 52)
+            # Margins: left, top, right, bottom
+            # Generous bottom/right so X-axis tick labels and Y-axis are never clipped
+            layout.setContentsMargins(6, 4, 6, 4)
             layout.setSpacing(0)
             layout.addWidget(plot_widget)
 
@@ -428,43 +481,45 @@ class Evolution:
             return
 
         # ---- Compact top toolbar (two rows) ----
-        y1 = 8
+        ctrl_h = 30   # height for input controls (accommodates 12pt font LineEdit)
+        btn_h = 28    # height for buttons
+        y1 = 6
         x = 10
         if hasattr(self.ui, 'simulate_btn'):
-            self.ui.simulate_btn.setGeometry(x, y1, 70, 26); x += 78
+            self.ui.simulate_btn.setGeometry(x, y1, 72, btn_h); x += 80
         if hasattr(self.ui, 'pause_btn'):
-            self.ui.pause_btn.setGeometry(x, y1, 70, 26); x += 86
+            self.ui.pause_btn.setGeometry(x, y1, 72, btn_h); x += 88
 
         layout_row1 = [
-            ('horizontalLayoutWidget_2', 130),  # Plant
-            ('horizontalLayoutWidget_3', 130),  # Sheep
-            ('horizontalLayoutWidget_4', 120),  # Wolf
             ('horizontalLayoutWidget_5', 120),  # Tiger
+            ('horizontalLayoutWidget_2', 130),  # Plant
+            ('horizontalLayoutWidget_4', 120),  # Wolf
+            ('horizontalLayoutWidget_3', 130),  # Sheep
         ]
         for name, lw_w in layout_row1:
             lw = getattr(self.ui, name, None)
             if lw:
-                lw.setGeometry(x, y1, lw_w, 26)
-                x += lw_w + 6
+                lw.setGeometry(x, y1, lw_w, ctrl_h)
+                x += lw_w + 8
 
-        y2 = 38
+        y2 = y1 + ctrl_h + 4
         x2 = 10
         lw = getattr(self.ui, 'horizontalLayoutWidget', None)
         if lw:
-            lw.setGeometry(x2, y2, 140, 22); x2 += 150
+            lw.setGeometry(x2, y2, 150, 24); x2 += 160
         lw = getattr(self.ui, 'horizontalLayoutWidget_10', None)
         if lw:
-            lw.setGeometry(x2, y2, 140, 22)
+            lw.setGeometry(x2, y2, 150, 24)
 
         # ---- plot_tabs fills everything below the toolbar ----
-        tabs_y = 68
+        tabs_y = y2 + 24 + 6
         tabs = getattr(self.ui, 'plot_tabs', None)
         if tabs is not None:
-            tabs.setGeometry(8, tabs_y, w - 16, h - tabs_y - 18)
+            tabs.setGeometry(8, tabs_y, w - 16, h - tabs_y - 6)
 
     def _update_plot_ranges(self):
-        """Let pyqtgraph auto-range handle everything; it knows best how to keep axes visible.
-        We only ensure Y never drops below 0 (already set via setLimits in _setup_plot_interaction)."""
+        """Auto-range plots but force Y-axis to always start from 0
+        so the coordinate origin is always visible."""
         self._frame_counter += 1
         if self._frame_counter % 10 == 0:
             for plot_widget in [self.ui.plot_animals, self.ui.plot_animals_change,
@@ -473,10 +528,14 @@ class Evolution:
                     plot_item = plot_widget.getPlotItem()
                     if plot_item is not None:
                         plot_item.autoRange()
+                        # Force Y range to start from 0 so origin is always visible
+                        vb = plot_item.getViewBox()
+                        y_range = vb.viewRange()[1]
+                        if y_range[0] > 0:
+                            vb.setYRange(0, y_range[1], padding=0)
 
 
 app = QApplication([])
 evolution = Evolution()
-# Show at default 1280x720; user can resize/maximize manually if screen permits
 evolution.ui.show()
 app.exec_()

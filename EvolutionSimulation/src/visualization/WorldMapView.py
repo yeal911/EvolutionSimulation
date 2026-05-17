@@ -14,11 +14,11 @@ class _LegendItem(QWidget):
 
         swatch = QLabel()
         swatch.setFixedSize(12, 12)
-        swatch.setStyleSheet(f"background-color: {color.name()}; border: 1px solid #cccccc;")
+        swatch.setStyleSheet(f"background-color: {color.name()}; border: 1px solid #555555; border-radius: 2px;")
         layout.addWidget(swatch)
 
         lbl = QLabel(text)
-        lbl.setStyleSheet("color: white; font-size: 11px;")
+        lbl.setStyleSheet("color: #C8D6E5; font-size: 11px;")
         layout.addWidget(lbl)
         layout.addStretch()
 
@@ -27,18 +27,18 @@ class WorldMapView(QGraphicsView):
     """2D spatial world map rendering individuals as colored dots."""
 
     COLORS = {
-        "Tiger": QColor(255, 50, 50),
-        "Wolf": QColor(100, 100, 100),
-        "Sheep": QColor(50, 50, 255),
-        "Plant": QColor(50, 200, 50),
+        "Tiger": QColor(255, 107, 107),
+        "Wolf": QColor(148, 163, 184),
+        "Sheep": QColor(74, 158, 255),
+        "Plant": QColor(78, 203, 113),
     }
 
     TERRAIN_COLORS = {
-        0: QColor(240, 240, 200),   # Plain
-        1: QColor(100, 180, 100),   # Forest
-        2: QColor(230, 210, 150),   # Desert
-        3: QColor(100, 150, 220),   # Water
-        4: QColor(160, 160, 160),   # Mountain
+        0: QColor(45, 55, 72),    # Plain (dark)
+        1: QColor(30, 70, 50),    # Forest
+        2: QColor(80, 65, 40),    # Desert
+        3: QColor(30, 55, 90),    # Water
+        4: QColor(60, 60, 65),    # Mountain
     }
 
     def __init__(self, dreamland, parent=None):
@@ -46,56 +46,50 @@ class WorldMapView(QGraphicsView):
         self.dreamland = dreamland
         self.scene = QGraphicsScene(self)
         self.setScene(self.scene)
-        # Make the map expand to fill the tab
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.setMinimumSize(200, 200)
-        # Disable user zoom/pan/scroll
         self.setDragMode(QGraphicsView.NoDrag)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        # Fix scene bounds to world coordinates
         self.scene.setSceneRect(0, 0, 500, 500)
         self.showTrails = True
-        # Draw terrain once
         self._terrain_items = []
         self._draw_terrain()
-        # Keep references to dynamic items so we can remove them incrementally
         self._dynamic_items = []
-        # Build a QWidget legend overlay (does NOT block scene items)
         self._build_legend_overlay()
+        # Dark viewport background
+        self.setStyleSheet("background-color: #0F1923;")
 
     def _build_legend_overlay(self):
-        """Create a floating legend widget on top of the viewport, not inside the scene."""
+        """Create a floating legend widget on top of the viewport."""
         self._legend_panel = QWidget(self)
-        self._legend_panel.setStyleSheet("background-color: rgba(0, 0, 0, 180); border-radius: 4px;")
+        self._legend_panel.setStyleSheet("background-color: rgba(15, 25, 35, 210); border-radius: 6px;")
         vbox = QVBoxLayout(self._legend_panel)
-        vbox.setContentsMargins(6, 6, 6, 6)
+        vbox.setContentsMargins(8, 6, 8, 6)
         vbox.setSpacing(2)
 
         entries = [
-            (self.COLORS["Tiger"], "Tiger 虎"),
-            (self.COLORS["Wolf"], "Wolf 狼"),
-            (self.COLORS["Sheep"], "Sheep 羊"),
-            (self.COLORS["Plant"], "Plant 草"),
-            (QColor(139, 69, 19), "Nest 巢穴"),
-            (QColor(255, 215, 0), "Gold border = Rich 富饶区"),
-            (self.TERRAIN_COLORS[0], "Plain 平原"),
-            (self.TERRAIN_COLORS[1], "Forest 森林"),
-            (self.TERRAIN_COLORS[2], "Desert 沙漠"),
-            (self.TERRAIN_COLORS[3], "Water 水域"),
-            (self.TERRAIN_COLORS[4], "Mountain 山地"),
+            (self.COLORS["Tiger"], "Tiger"),
+            (self.COLORS["Wolf"], "Wolf"),
+            (self.COLORS["Sheep"], "Sheep"),
+            (self.COLORS["Plant"], "Plant"),
+            (QColor(139, 69, 19), "Nest"),
+            (QColor(255, 215, 0), "Gold = Rich"),
+            (self.TERRAIN_COLORS[0], "Plain"),
+            (self.TERRAIN_COLORS[1], "Forest"),
+            (self.TERRAIN_COLORS[2], "Desert"),
+            (self.TERRAIN_COLORS[3], "Water"),
+            (self.TERRAIN_COLORS[4], "Mountain"),
         ]
         for color, text in entries:
             vbox.addWidget(_LegendItem(color, text, self._legend_panel))
 
-        # Fixed size, positioned at top-left of the viewport (not scene)
-        self._legend_panel.setFixedSize(180, 220)
+        self._legend_panel.setFixedSize(150, 220)
         self._legend_panel.move(8, 8)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
         self._apply_transform()
-        # Keep legend at top-left of viewport on resize
         if hasattr(self, '_legend_panel'):
             self._legend_panel.move(8, 8)
 
@@ -106,7 +100,7 @@ class WorldMapView(QGraphicsView):
             x = int(parts[0]) - slot_size
             y = int(parts[1]) - slot_size
             rect = QGraphicsRectItem(x, y, slot_size, slot_size)
-            color = self.TERRAIN_COLORS.get(terrain_type, QColor(200, 200, 200))
+            color = self.TERRAIN_COLORS.get(terrain_type, QColor(40, 40, 45))
             if slot_code in self.dreamland.richSlots:
                 pen = QPen(QColor(255, 215, 0))
                 pen.setWidth(2)
@@ -123,10 +117,8 @@ class WorldMapView(QGraphicsView):
         self._dynamic_items.clear()
 
     def update_map(self, threads):
-        # Remove old dynamic items (individuals, nests, trails) incrementally
         self._clear_dynamic_items()
 
-        # Draw nests
         for slot_code, nests in self.dreamland.nestMap.items():
             for nest in nests:
                 parts = slot_code.split("A")
@@ -138,27 +130,22 @@ class WorldMapView(QGraphicsView):
                 self.scene.addItem(ellipse)
                 self._dynamic_items.append(ellipse)
 
-        # Draw individuals
         for thread in threads:
             species = thread.THREAD_NAME.replace("Thread", "")
             base_color = self.COLORS.get(species, QColor(200, 200, 200))
             for ind in thread.group:
                 x = ind.coordinateX
                 y = ind.coordinateY
-                # Larger size for visibility
                 size = min(14, max(5, ind.fightCapability / 8))
                 ellipse = QGraphicsEllipseItem(x - size/2, y - size/2, size, size)
-                # High opacity for visibility
                 opacity = max(0.6, 1.0 - ind.age / (ind.lifespan + 1))
                 color = QColor(base_color)
                 color.setAlphaF(opacity)
                 ellipse.setBrush(QBrush(color))
-                # White border to make individuals pop against terrain
-                ellipse.setPen(QPen(QColor(255, 255, 255, 120), 1))
+                ellipse.setPen(QPen(QColor(255, 255, 255, 100), 0.8))
                 self.scene.addItem(ellipse)
                 self._dynamic_items.append(ellipse)
 
-        # Draw trails (last 10 moves only, brighter)
         if self.showTrails:
             for thread in threads:
                 if thread.THREAD_TYPE != "Animal":
@@ -168,7 +155,6 @@ class WorldMapView(QGraphicsView):
                     hist = list(ind.moveHistory.items())
                     if len(hist) < 2:
                         continue
-                    # Only last 10 points
                     recent = hist[-10:]
                     points = []
                     for cycle, loc in recent:
@@ -180,10 +166,9 @@ class WorldMapView(QGraphicsView):
                         line = self.scene.addLine(points[i-1][0], points[i-1][1],
                                                    points[i][0], points[i][1],
                                                    QPen(QColor(base_color.red(), base_color.green(),
-                                                               base_color.blue(), 100), 2))
+                                                               base_color.blue(), 80), 1.5))
                         self._dynamic_items.append(line)
 
-        # Apply transform so the world fills the viewport, left-top aligned
         self._apply_transform()
 
     def _apply_transform(self):
@@ -194,7 +179,6 @@ class WorldMapView(QGraphicsView):
         scale = min(vw / 500.0, vh / 500.0)
         self.resetTransform()
         self.scale(scale, scale)
-        # Ensure no pan offset
         self.setAlignment(Qt.AlignLeft | Qt.AlignTop)
 
     def set_show_trails(self, show):

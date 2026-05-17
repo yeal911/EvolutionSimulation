@@ -74,6 +74,28 @@ class Sheep(Population):
         # then compute the addition to be added to initial value of runningSpeed
         self.runningSpeed += round(self.gene.geneDigits[5] / 3.3)
 
+        # New gene-derived traits
+        # bit 6: camouflage (0-99)
+        self.camouflage = self.gene.geneDigits[6]
+        # bit 7: greenbeard badge (0-9)
+        self.greenbeardBadge = self.gene.geneDigits[7] // 10
+        # bit 8: attractiveness (0-99)
+        self.attractiveness = self.gene.geneDigits[8]
+        # bit 9: territory/nest tendency (0-99)
+        self.territoryTendency = self.gene.geneDigits[9]
+
+        # Prisoner's Dilemma strategy derived from gene combination
+        strategy_val = (self.gene.geneDigits[2] + self.gene.geneDigits[3]) % 4
+        self.pdStrategy = strategy_val
+        self.pdHistory = {}
+        self.reputation = 0
+
+        # Parasite infection
+        self.parasites = []
+
+        # Nest ownership (extended phenotype)
+        self.ownedNest = None
+
         # lower limit of growth period
         self.lowerGrowthPeriod = math.ceil(self.lifespan / 5)
         # upper limit of growth period

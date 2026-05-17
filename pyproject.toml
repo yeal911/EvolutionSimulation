@@ -1,0 +1,6 @@
+[project]
+name = "evolutionsimulation"
+version = "0.1.0"
+requires-python = ">=3.13"
+# Dependencies are already installed in .venv (see uv.lock or install manually)
+dependencies = []

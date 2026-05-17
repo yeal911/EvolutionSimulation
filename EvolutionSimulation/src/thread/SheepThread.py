@@ -41,6 +41,9 @@ class SheepThread(threading.Thread, PopulationThread):
         self.avgAttackPossibility = []
         self.avgDefendPossibility = []
         self.avgTotalBreedingTimes =[]
+        self.avgCamouflage = []
+        self.avgAttractiveness = []
+        self.avgTerritoryTendency = []
         self.cycleNumber = 0
         for i in range(0, sheep_count):
             # need to randomly initialize the coordinates of the sheep

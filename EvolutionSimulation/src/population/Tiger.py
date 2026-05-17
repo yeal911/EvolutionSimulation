@@ -69,10 +69,24 @@ class Tiger(Population):
         self.defendPossibility += math.ceil(self.gene.geneDigits[3] / 3.3)
         # the 5th bit of Gene controls totalBreedingTimes
         # then compute the addition to be added to initial value of totalBreedingTimes
-        self.totalBreedingTimes += round(self.gene.geneDigits[4] / 50)
+        self.totalBreedingTimes += round(math.ceil(self.gene.geneDigits[4] / 50))
         # the 6th bit of Gene controls runningSpeed
         # then compute the addition to be added to initial value of runningSpeed
         self.runningSpeed += round(self.gene.geneDigits[5] / 3.3)
+
+        # New gene-derived traits
+        self.camouflage = self.gene.geneDigits[6]
+        self.greenbeardBadge = self.gene.geneDigits[7] // 10
+        self.attractiveness = self.gene.geneDigits[8]
+        self.territoryTendency = self.gene.geneDigits[9]
+
+        strategy_val = (self.gene.geneDigits[2] + self.gene.geneDigits[3]) % 4
+        self.pdStrategy = strategy_val
+        self.pdHistory = {}
+        self.reputation = 0
+
+        self.parasites = []
+        self.ownedNest = None
 
         # lower limit of growth period
         self.lowerGrowthPeriod = math.ceil(self.lifespan / 3)

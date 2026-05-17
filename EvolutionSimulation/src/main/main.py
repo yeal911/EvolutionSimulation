@@ -1,11 +1,17 @@
 import os
 import sys
+# Add project root to path so imports like EvolutionSimulation.src.xxx work
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
 import time
 
-
-from PySide2.QtWidgets import QApplication, QMessageBox
-from PySide2.QtUiTools import QUiLoader
-from PySide2.QtCore import Signal, QObject, QTimer
+from PySide6.QtWidgets import (QApplication, QMessageBox, QTabWidget, QWidget,
+                               QVBoxLayout, QHBoxLayout, QPushButton, QCheckBox,
+                               QTextEdit, QListWidget, QLabel, QSplitter)
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtCore import Signal, QObject, QTimer
 import pyqtgraph as pg
 from threading import Thread
 from pyqtgraph.Qt import QtGui, QtCore
@@ -17,10 +23,20 @@ from EvolutionSimulation.src.thread.TigerThread import TigerThread
 from EvolutionSimulation.src.thread.WolfThread import WolfThread
 from EvolutionSimulation.src.tool.Recorder import Recorder
 
-TIGER_AMOUNT = 450
-WOLF_AMOUNT = 500
-SHEEP_AMOUNT = 800
-GRASS_AMOUNT = 500
+# New visualization imports
+from EvolutionSimulation.src.visualization.WorldMapView import WorldMapView
+from EvolutionSimulation.src.visualization.GeneHistogram import GeneHistogramWidget
+from EvolutionSimulation.src.visualization.EventLogWidget import EventLogWidget
+from EvolutionSimulation.src.visualization.FoodWebGraph import FoodWebWidget
+from EvolutionSimulation.src.visualization.FitnessLandscape3D import FitnessLandscape3D
+from EvolutionSimulation.src.visualization.StrategyMatrix import StrategyMatrixWidget
+from EvolutionSimulation.src.visualization.HeatmapWidget import HeatmapWidget
+from EvolutionSimulation.src.visualization.PhylogenyGraph import PhylogenyWidget
+
+TIGER_AMOUNT = 40
+WOLF_AMOUNT = 60
+SHEEP_AMOUNT = 80
+GRASS_AMOUNT = 50
 
 dreamland = Dreamland()
 recorder = Recorder(dreamland)
@@ -29,14 +45,6 @@ plantThread = PlantThread(GRASS_AMOUNT, dreamland, recorder)
 sheepThread = SheepThread(SHEEP_AMOUNT, dreamland, recorder)
 wolfThread = WolfThread(WOLF_AMOUNT, dreamland, recorder)
 tigerThread = TigerThread(TIGER_AMOUNT, dreamland, recorder)
-
-
-# class MySignals(QObject):
-#     draw = Signal(Dreamland)
-#
-#
-# global_ms = MySignals()
-
 
 
 class EvolutionBackground:
@@ -66,25 +74,9 @@ class EvolutionBackground:
         start = time.time()
 
         while not self.__pause:
-            # if not self.__pause:
             time.sleep(1)
             end = time.time()
             print("---Time elapses: " + str(int(end - start)))
-
-            # if end - start > 10:
-            #     Dreamland.stopPopulationThread(plantThread)
-            #     Dreamland.stopPopulationThread(sheepThread)
-            #     Dreamland.stopPopulationThread(tigerThread)
-            #     Dreamland.stopPopulationThread(wolfThread)
-            #
-            #     break
-            # elif len(wolfThread.group) == 0 and len(tigerThread.group) == 0 and len(sheepThread.group) == 0:
-            #     Dreamland.stopPopulationThread(plantThread)
-            #     Dreamland.stopPopulationThread(sheepThread)
-            #     Dreamland.stopPopulationThread(tigerThread)
-            #     Dreamland.stopPopulationThread(wolfThread)
-            #
-            #     break
         Dreamland.stopPopulationThread(plantThread)
         Dreamland.stopPopulationThread(sheepThread)
         Dreamland.stopPopulationThread(tigerThread)
@@ -98,15 +90,22 @@ class Evolution:
 
         loader = QUiLoader()
         loader.registerCustomWidget(pg.PlotWidget)
-        self.ui = loader.load(os.path.abspath('..') + "\\ui\\main.ui")
+        ui_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ui", "main.ui")
+        self.ui = loader.load(ui_path)
         self.cur_draw_age = 0
+        # Set a reasonable default window size; maximize on show
+        # Reasonable default size; maximize often overflows small screens
+        self.ui.resize(1280, 720)
+        # Hook resize so plot widgets fill the window dynamically
+        self._original_resize = self.ui.resizeEvent
+        self.ui.resizeEvent = self._on_window_resize
 
+        # Original plots
         self.ui.plot_animals.addLegend()
         self.curve_amount_tiger = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen('r', width=1), name='Tiger Amount')
         self.curve_amount_wolf = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen('g', width=1), name='Wolf Amount')
         self.curve_amount_sheep = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen('b', width=1), name='Sheep Amount')
         self.curve_amount_grass = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen('y', width=1), name='Grass Amount')
-
 
         self.ui.plot_animals_change.addLegend()
         self.curve_add_tiger = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen('r', width=1), name='Tiger Born')
@@ -116,7 +115,6 @@ class Evolution:
         self.curve_add_sheep = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen('m', width=1), name='Sheep Born')
         self.curve_sub_sheep = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen('y', width=1), name='Sheep Dead')
         self.curve_sub_grass = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen('d', width=1), name='Grass Cost')
-
 
         self.ui.plot_tiger_gene.addLegend()
         self.curve_tiger_gene_hungry_level = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen('r', width=1), name='Hungry Level')
@@ -136,7 +134,6 @@ class Evolution:
         self.curve_wolf_gene_defend = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen('m', width=1), name='DefendPossibility')
         self.curve_wolf_gene_breed = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen('b', width=1), name='BreedingTimes')
 
-
         self.ui.plot_sheep_gene.addLegend()
         self.curve_sheep_gene_hungry_level = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen('r', width=1), name='Hungry Level')
         self.curve_sheep_gene_lifespan = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen('y', width=1), name='LifeSpan')
@@ -146,32 +143,105 @@ class Evolution:
         self.curve_sheep_gene_defend = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen('m', width=1), name='DefendPossibility')
         self.curve_sheep_gene_breed = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen('b', width=1), name='BreedingTimes')
 
+        # Add new gene attribute curves for new traits
+        self._add_new_gene_curves()
+
+        # Add new tabs to existing tab widget
+        self._add_enhanced_visualization_tabs()
+
+        # Disable user zoom/pan on original plots; ranges managed manually
+        self._setup_plot_interaction()
+
+        # Put simple PlotWidget-only tabs into a layout so they auto-fill
+        self._setup_tab_layouts()
 
         self.ui.simulate_btn.clicked.connect(self.simulate_clicked)
         self.ui.pause_btn.clicked.connect(self.pause_clicked)
 
-        #设置时间区间修改事件监听
         self.age_range = int(self.ui.age_range_edit.text())
         self.ui.age_range_edit.editingFinished.connect(self.age_range_edit_finished)
 
-        #后台线程通知更新进化数据
-        # global_ms.draw.connect(self.update_env)
-
-        #当前是否在处理模拟暂停或者模拟恢复，因为暂停或恢复需要等待小段时间，期间不要让再次点击
         self.pause_click_handling = False
-
         self.pause_status = False
 
-        #后台线程运行的逻辑
         self.bg_running_obj = EvolutionBackground()
 
         self.timer = None
         self.env_thread = None
 
+    def _add_new_gene_curves(self):
+        """Add curves for camouflage, attractiveness, territory tendency."""
+        # Tiger
+        self.curve_tiger_gene_camouflage = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen((255, 100, 100), width=1), name='Camouflage')
+        self.curve_tiger_gene_attractiveness = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen((255, 200, 100), width=1), name='Attractiveness')
+        self.curve_tiger_gene_territory = self.ui.plot_tiger_gene.getPlotItem().plot(pen=pg.mkPen((100, 255, 100), width=1), name='Territory')
+        # Wolf
+        self.curve_wolf_gene_camouflage = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen((255, 100, 100), width=1), name='Camouflage')
+        self.curve_wolf_gene_attractiveness = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen((255, 200, 100), width=1), name='Attractiveness')
+        self.curve_wolf_gene_territory = self.ui.plot_wolf_gene.getPlotItem().plot(pen=pg.mkPen((100, 255, 100), width=1), name='Territory')
+        # Sheep
+        self.curve_sheep_gene_camouflage = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen((255, 100, 100), width=1), name='Camouflage')
+        self.curve_sheep_gene_attractiveness = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen((255, 200, 100), width=1), name='Attractiveness')
+        self.curve_sheep_gene_territory = self.ui.plot_sheep_gene.getPlotItem().plot(pen=pg.mkPen((100, 255, 100), width=1), name='Territory')
+
+    def _add_enhanced_visualization_tabs(self):
+        """Add new visualization tabs to the existing QTabWidget."""
+        tab_widget = None
+        # Check if self.ui itself is a QTabWidget
+        if isinstance(self.ui, QTabWidget):
+            tab_widget = self.ui
+        else:
+            # Recursive search
+            def find_tab_widget(widget):
+                if isinstance(widget, QTabWidget):
+                    return widget
+                for child in widget.children():
+                    if isinstance(child, (QWidget,)):
+                        result = find_tab_widget(child)
+                        if result:
+                            return result
+                return None
+            tab_widget = find_tab_widget(self.ui)
+
+        if tab_widget is None:
+            print("Warning: Could not find QTabWidget in UI")
+            return
+
+        # 1. World Map
+        self.world_map = WorldMapView(dreamland)
+        tab_widget.addTab(self.world_map, "World Map")
+
+        # 2. Heatmap
+        self.heatmap = HeatmapWidget(dreamland)
+        tab_widget.addTab(self.heatmap, "Density Heatmap")
+
+        # 3. Gene Histograms
+        self.gene_hist = GeneHistogramWidget()
+        tab_widget.addTab(self.gene_hist, "Gene Distribution")
+
+        # 4. Food Web
+        self.food_web = FoodWebWidget()
+        tab_widget.addTab(self.food_web, "Food Web")
+
+        # 5. Phylogeny
+        self.phylogeny = PhylogenyWidget()
+        tab_widget.addTab(self.phylogeny, "Pedigree Tree")
+
+        # 6. Strategy Matrix
+        self.strategy_matrix = StrategyMatrixWidget()
+        tab_widget.addTab(self.strategy_matrix, "Strategy Matrix")
+
+        # 7. Event Log
+        self.event_log = EventLogWidget()
+        tab_widget.addTab(self.event_log, "Event Log")
+
+        # 8. 3D Fitness Landscape
+        self.fitness_3d = FitnessLandscape3D()
+        tab_widget.addTab(self.fitness_3d, "Fitness 3D")
+
     def age_range_edit_finished(self):
         self.age_range = int(self.ui.age_range_edit.text())
         print("时间区间编辑完成")
-
 
     def simulate_clicked(self):
         if self.timer:
@@ -179,7 +249,6 @@ class Evolution:
         if self.env_thread and self.env_thread.is_alive():
             self.bg_running_obj.terminate()
             self.env_thread.join()
-        # self.update_params()
         self.env_thread = Thread(target=self.bg_running_obj.run, args=())
         self.env_thread.daemon = True
         self.env_thread.start()
@@ -210,6 +279,7 @@ class Evolution:
     def draw_amounts(self):
         self.ui.loop_count_label.setText(str(len(tigerThread.num)))
 
+        # Original curves
         self.curve_amount_tiger.setData(range(0, len(tigerThread.num)), tigerThread.num)
         self.curve_amount_wolf.setData(range(0, len(wolfThread.num)), wolfThread.num)
         self.curve_amount_sheep.setData(range(0, len(sheepThread.num)), sheepThread.num)
@@ -217,14 +287,10 @@ class Evolution:
 
         self.curve_add_tiger.setData(range(0, len(tigerThread.newBronNum)), tigerThread.newBronNum)
         self.curve_sub_tiger.setData(range(0, len(tigerThread.newDeathNum)), tigerThread.newDeathNum)
-
         self.curve_add_wolf.setData(range(0, len(wolfThread.newBronNum)), wolfThread.newBronNum)
         self.curve_sub_wolf.setData(range(0, len(wolfThread.newDeathNum)), wolfThread.newDeathNum)
-
         self.curve_add_sheep.setData(range(0, len(sheepThread.newBronNum)), sheepThread.newBronNum)
         self.curve_sub_sheep.setData(range(0, len(sheepThread.newDeathNum)), sheepThread.newDeathNum)
-
-        # self.curve_add_grass.setData()
         self.curve_sub_grass.setData(range(0, len(plantThread.newDeathNum)), plantThread.newDeathNum)
 
         self.curve_tiger_gene_hungry_level.setData(range(0, len(tigerThread.avgHungryLevel)), tigerThread.avgHungryLevel)
@@ -235,7 +301,6 @@ class Evolution:
         self.curve_tiger_gene_defend.setData(range(0, len(tigerThread.avgDefendPossibility)), tigerThread.avgDefendPossibility)
         self.curve_tiger_gene_breed.setData(range(0, len(tigerThread.avgTotalBreedingTimes)), tigerThread.avgTotalBreedingTimes)
 
-
         self.curve_wolf_gene_hungry_level.setData(range(0, len(wolfThread.avgHungryLevel)), wolfThread.avgHungryLevel)
         self.curve_wolf_gene_lifespan.setData(range(0, len(wolfThread.avgLifespan)), wolfThread.avgLifespan)
         self.curve_wolf_gene_fightCapability.setData(range(0, len(wolfThread.avgFightCapability)), wolfThread.avgFightCapability)
@@ -243,7 +308,6 @@ class Evolution:
         self.curve_wolf_gene_attack.setData(range(0, len(wolfThread.avgAttackPossibility)), wolfThread.avgAttackPossibility)
         self.curve_wolf_gene_defend.setData(range(0, len(wolfThread.avgDefendPossibility)), wolfThread.avgDefendPossibility)
         self.curve_wolf_gene_breed.setData(range(0, len(wolfThread.avgTotalBreedingTimes)), wolfThread.avgTotalBreedingTimes)
-
 
         self.curve_sheep_gene_hungry_level.setData(range(0, len(sheepThread.avgHungryLevel)), sheepThread.avgHungryLevel)
         self.curve_sheep_gene_lifespan.setData(range(0, len(sheepThread.avgLifespan)), sheepThread.avgLifespan)
@@ -253,13 +317,154 @@ class Evolution:
         self.curve_sheep_gene_defend.setData(range(0, len(sheepThread.avgDefendPossibility)), sheepThread.avgDefendPossibility)
         self.curve_sheep_gene_breed.setData(range(0, len(sheepThread.avgTotalBreedingTimes)), sheepThread.avgTotalBreedingTimes)
 
+        # New gene attribute curves
+        if hasattr(tigerThread, 'avgCamouflage'):
+            self.curve_tiger_gene_camouflage.setData(range(0, len(tigerThread.avgCamouflage)), tigerThread.avgCamouflage)
+            self.curve_tiger_gene_attractiveness.setData(range(0, len(tigerThread.avgAttractiveness)), tigerThread.avgAttractiveness)
+            self.curve_tiger_gene_territory.setData(range(0, len(tigerThread.avgTerritoryTendency)), tigerThread.avgTerritoryTendency)
+        if hasattr(wolfThread, 'avgCamouflage'):
+            self.curve_wolf_gene_camouflage.setData(range(0, len(wolfThread.avgCamouflage)), wolfThread.avgCamouflage)
+            self.curve_wolf_gene_attractiveness.setData(range(0, len(wolfThread.avgAttractiveness)), wolfThread.avgAttractiveness)
+            self.curve_wolf_gene_territory.setData(range(0, len(wolfThread.avgTerritoryTendency)), wolfThread.avgTerritoryTendency)
+        if hasattr(sheepThread, 'avgCamouflage'):
+            self.curve_sheep_gene_camouflage.setData(range(0, len(sheepThread.avgCamouflage)), sheepThread.avgCamouflage)
+            self.curve_sheep_gene_attractiveness.setData(range(0, len(sheepThread.avgAttractiveness)), sheepThread.avgAttractiveness)
+            self.curve_sheep_gene_territory.setData(range(0, len(sheepThread.avgTerritoryTendency)), sheepThread.avgTerritoryTendency)
+
+        # Update enhanced visualizations
+        threads = [tigerThread, wolfThread, sheepThread, plantThread]
+        self.world_map.update_map(threads)
+        self.heatmap.update_heatmap(threads)
+
+        # Update gene histogram for currently visible species
+        self.gene_hist.update_histograms(tigerThread)
+
+        self.food_web.update_graph()
+        self.phylogeny.update_tree(threads)
+        self.strategy_matrix.update_matrix()
+        self.fitness_3d.update_landscape(threads)
+
+        # Update plot ranges: Y-axis dynamically fits current data with padding
+        self._update_plot_ranges()
+
+    def _setup_plot_interaction(self):
+        """Disable user zoom/pan on original plots."""
+        for plot_widget in [self.ui.plot_animals, self.ui.plot_animals_change,
+                            self.ui.plot_tiger_gene, self.ui.plot_wolf_gene, self.ui.plot_sheep_gene]:
+            if plot_widget is not None:
+                plot_item = plot_widget.getPlotItem()
+                if plot_item is not None:
+                    plot_item.setMouseEnabled(x=False, y=False)
+                    plot_item.setMenuEnabled(False)
+                    plot_item.hideButtons()
+
+    def _setup_tab_layouts(self):
+        """Add QVBoxLayout to simple tabs so PlotWidgets auto-fill the tab page.
+        This avoids manual geometry calculations in resizeEvent."""
+        plot_names = ['plot_animals', 'plot_animals_change',
+                      'plot_tiger_gene', 'plot_wolf_gene', 'plot_sheep_gene']
+        for plot_name in plot_names:
+            plot_widget = getattr(self.ui, plot_name, None)
+            if plot_widget is None:
+                continue
+            tab_page = plot_widget.parentWidget()
+            if tab_page is None:
+                continue
+            if tab_page.layout() is not None:
+                continue
+            layout = QVBoxLayout(tab_page)
+            layout.setContentsMargins(4, 4, 4, 4)
+            layout.setSpacing(0)
+            layout.addWidget(plot_widget)
+
+    def _on_window_resize(self, event):
+        """Dynamically resize plot_tabs to fill the window.
+        PlotWidgets inside tabs auto-fill thanks to QVBoxLayout."""
+        if hasattr(self, '_original_resize') and self._original_resize:
+            self._original_resize(event)
+        w = self.ui.width()
+        h = self.ui.height()
+        if w < 400 or h < 300:
+            return
+
+        # ---- Compact top toolbar (two rows) ----
+        y1 = 8
+        x = 10
+        if hasattr(self.ui, 'simulate_btn'):
+            self.ui.simulate_btn.setGeometry(x, y1, 70, 26); x += 78
+        if hasattr(self.ui, 'pause_btn'):
+            self.ui.pause_btn.setGeometry(x, y1, 70, 26); x += 86
+
+        layout_row1 = [
+            ('horizontalLayoutWidget_2', 130),  # Plant
+            ('horizontalLayoutWidget_3', 130),  # Sheep
+            ('horizontalLayoutWidget_4', 120),  # Wolf
+            ('horizontalLayoutWidget_5', 120),  # Tiger
+        ]
+        for name, lw_w in layout_row1:
+            lw = getattr(self.ui, name, None)
+            if lw:
+                lw.setGeometry(x, y1, lw_w, 26)
+                x += lw_w + 6
+
+        y2 = 38
+        x2 = 10
+        lw = getattr(self.ui, 'horizontalLayoutWidget', None)
+        if lw:
+            lw.setGeometry(x2, y2, 140, 22); x2 += 150
+        lw = getattr(self.ui, 'horizontalLayoutWidget_10', None)
+        if lw:
+            lw.setGeometry(x2, y2, 140, 22)
+
+        # ---- plot_tabs fills everything below the toolbar ----
+        tabs_y = 68
+        tabs = getattr(self.ui, 'plot_tabs', None)
+        if tabs is not None:
+            tabs.setGeometry(10, tabs_y, w - 20, h - tabs_y - 10)
+
+    def _update_plot_ranges(self):
+        """Dynamically fit Y-axis to current data max * 1.15 so curves are always clearly visible.
+        X-axis shows full history."""
+
+        def safe_max(data_list):
+            return max(data_list) if data_list else 0
+
+        # --- plot_animals ---
+        pi_animals = self.ui.plot_animals.getPlotItem()
+        max_val = max(
+            safe_max(tigerThread.num),
+            safe_max(wolfThread.num),
+            safe_max(sheepThread.num),
+            safe_max(plantThread.num),
+        )
+        y_max = max(max_val * 1.15, 10)
+        # Use ViewBox.setRange with explicit padding so origin (0) stays visible
+        pi_animals.getViewBox().setRange(xRange=(0, max(len(tigerThread.num), 1)),
+                                          yRange=(0, y_max), padding=0.02)
+
+        # --- plot_animals_change ---
+        pi_change = self.ui.plot_animals_change.getPlotItem()
+        all_change_data = (
+            tigerThread.newBronNum + tigerThread.newDeathNum +
+            wolfThread.newBronNum + wolfThread.newDeathNum +
+            sheepThread.newBronNum + sheepThread.newDeathNum +
+            plantThread.newDeathNum
+        )
+        max_val = max(all_change_data) if all_change_data else 0
+        y_max = max(max_val * 1.15, 5)
+        pi_change.getViewBox().setRange(xRange=(0, max(len(tigerThread.newBronNum), 1)),
+                                         yRange=(0, y_max), padding=0.02)
+
+        # --- gene plots ---
+        for plot_widget in [self.ui.plot_tiger_gene, self.ui.plot_wolf_gene, self.ui.plot_sheep_gene]:
+            if plot_widget is not None:
+                plot_item = plot_widget.getPlotItem()
+                if plot_item is not None:
+                    plot_item.autoRange()
+
 
 app = QApplication([])
 evolution = Evolution()
+# Show at default 1280x720; user can resize/maximize manually if screen permits
 evolution.ui.show()
 app.exec_()
-
-
-
-
-

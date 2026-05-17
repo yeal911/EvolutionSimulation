@@ -21,6 +21,18 @@ class Gene:
     # gene variation max digits
     __geneVariationMaxValue = 2
 
+    # Gene digit meanings (0-5 used originally, 6-9 for new features)
+    # 0: lifespan
+    # 1: fightCapability
+    # 2: attackPossibility
+    # 3: defendPossibility
+    # 4: totalBreedingTimes
+    # 5: runningSpeed
+    # 6: camouflage (0-99, for mimicry/camouflage simulation)
+    # 7: greenbeardBadge (0-9, for greenbeard effect)
+    # 8: attractiveness (0-99, for sexual selection)
+    # 9: territoryNestTendency (0-99, for territorial behavior & extended phenotype)
+
     # initialize a new gene
     def __init__(self, gene_digits=None):
         # gene digits
@@ -76,3 +88,14 @@ class Gene:
         for i in range(0, Gene.GENE_LENGTH):
             summaryValue += self.geneDigits[i]
         return summaryValue
+
+    # compute genetic similarity with another gene (for kin selection)
+    def similarity(self, other):
+        """Return similarity ratio 0.0~1.0 based on how many digits are close."""
+        if other is None or not isinstance(other, Gene):
+            return 0.0
+        matches = 0
+        for i in range(Gene.GENE_LENGTH):
+            if abs(self.geneDigits[i] - other.geneDigits[i]) <= 10:
+                matches += 1
+        return matches / Gene.GENE_LENGTH

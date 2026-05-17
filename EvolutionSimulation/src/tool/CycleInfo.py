@@ -24,6 +24,19 @@ class CycleInfo:
         self.defendPeaceTimes = 0
         self.defendFailureTimes = 0
 
+        # New stats for enhanced features
+        self.kinAltruismTimes = 0
+        self.greenbeardTimes = 0
+        self.pdCooperateTimes = 0
+        self.pdDefectTimes = 0
+        self.sexualRejections = 0
+        self.nestBuilt = 0
+        self.nestUsed = 0
+        self.territoryDefenses = 0
+        self.parasiteAttachments = 0
+        self.parasiteCleared = 0
+        self.camouflageSuccess = 0
+
         # average info of a population in one cycle
         self.popAvgHungryLevel = 0
         self.popAvgAge = 0
@@ -32,3 +45,6 @@ class CycleInfo:
         self.popAvgAttackPossibility = 0
         self.popAvgDefendPossibility = 0
         self.popAvgTotalBreedingTimes = 0
+        self.popAvgCamouflage = 0
+        self.popAvgAttractiveness = 0
+        self.popAvgTerritoryTendency = 0

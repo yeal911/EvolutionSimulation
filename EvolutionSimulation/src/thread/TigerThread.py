@@ -41,6 +41,9 @@ class TigerThread(threading.Thread, PopulationThread):
         self.avgAttackPossibility = []
         self.avgDefendPossibility = []
         self.avgTotalBreedingTimes =[]
+        self.avgCamouflage = []
+        self.avgAttractiveness = []
+        self.avgTerritoryTendency = []
         self.cycleNumber = 0
         for i in range(0, tiger_count):
             # need to randomly initialize the coordinates of the tiger

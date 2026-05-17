@@ -150,6 +150,9 @@ class Evolution:
         # Disable user zoom/pan on original plots; ranges managed manually
         self._setup_plot_interaction()
 
+        # Apply unified visual style for readability
+        self._setup_plot_style()
+
         # Put simple PlotWidget-only tabs into a layout so they auto-fill
         self._setup_tab_layouts()
 
@@ -166,6 +169,7 @@ class Evolution:
 
         self.timer = None
         self.env_thread = None
+        self._frame_counter = 0
 
     def _add_new_gene_curves(self):
         """Add curves for camouflage, attractiveness, territory tendency."""
@@ -358,6 +362,39 @@ class Evolution:
                     # Ensure Y axis never goes below 0 so the origin is always in view
                     plot_item.getViewBox().setLimits(yMin=0)
 
+
+    def _setup_plot_style(self):
+        """Improve readability of all real-time charts."""
+        pg.setConfigOptions(antialias=True, foreground='#D6E2F0')
+
+        style_configs = [
+            (self.ui.plot_animals, 'Population Size', 'Count'),
+            (self.ui.plot_animals_change, 'Population Delta', 'Delta'),
+            (self.ui.plot_tiger_gene, 'Tiger Gene Trend', 'Value'),
+            (self.ui.plot_wolf_gene, 'Wolf Gene Trend', 'Value'),
+            (self.ui.plot_sheep_gene, 'Sheep Gene Trend', 'Value'),
+        ]
+
+        for plot_widget, title, y_label in style_configs:
+            if plot_widget is None:
+                continue
+            plot_item = plot_widget.getPlotItem()
+            if plot_item is None:
+                continue
+
+            plot_item.showGrid(x=True, y=True, alpha=0.25)
+            plot_item.setLabel('bottom', 'Time (tick)')
+            plot_item.setLabel('left', y_label)
+            plot_item.setTitle(f'<span style="font-size:12pt; font-weight:600; color:#EAF2FF;">{title}</span>')
+            plot_item.getAxis('bottom').setStyle(tickTextOffset=10, autoExpandTextSpace=True)
+            plot_item.getAxis('left').setStyle(autoExpandTextSpace=True)
+            plot_item.layout.setContentsMargins(10, 10, 16, 16)
+
+            legend = plot_item.legend
+            if legend is not None:
+                legend.setBrush(pg.mkBrush(20, 30, 45, 180))
+                legend.setPen(pg.mkPen((120, 150, 180), width=1))
+
     def _setup_tab_layouts(self):
         """Add QVBoxLayout to simple tabs so PlotWidgets auto-fill the tab page.
         Bottom margin is generous so X-axis labels are never clipped."""
@@ -374,7 +411,7 @@ class Evolution:
                 continue
             layout = QVBoxLayout(tab_page)
             # Large bottom margin specifically for pyqtgraph X-axis tick labels
-            layout.setContentsMargins(4, 4, 4, 30)
+            layout.setContentsMargins(8, 8, 8, 42)
             layout.setSpacing(0)
             layout.addWidget(plot_widget)
 
@@ -421,7 +458,7 @@ class Evolution:
         tabs_y = 68
         tabs = getattr(self.ui, 'plot_tabs', None)
         if tabs is not None:
-            tabs.setGeometry(10, tabs_y, w - 20, h - tabs_y - 10)
+            tabs.setGeometry(10, tabs_y, w - 20, h - tabs_y - 14)
 
     def _update_plot_ranges(self):
         """Let pyqtgraph auto-range handle everything; it knows best how to keep axes visible.

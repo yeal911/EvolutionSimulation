@@ -33,10 +33,10 @@ from EvolutionSimulation.src.visualization.StrategyMatrix import StrategyMatrixW
 from EvolutionSimulation.src.visualization.HeatmapWidget import HeatmapWidget
 from EvolutionSimulation.src.visualization.PhylogenyGraph import PhylogenyWidget
 
-TIGER_AMOUNT = 40
-WOLF_AMOUNT = 60
+TIGER_AMOUNT = 15
+WOLF_AMOUNT = 25
 SHEEP_AMOUNT = 80
-GRASS_AMOUNT = 50
+GRASS_AMOUNT = 100
 
 dreamland = Dreamland()
 recorder = Recorder(dreamland)
@@ -76,10 +76,10 @@ class EvolutionBackground:
     def __init__(self):
         self.__end = False
         self.__pause = False
-        self.tiger_amount = 40
-        self.wolf_amount = 60
+        self.tiger_amount = 15
+        self.wolf_amount = 25
         self.sheep_amount = 80
-        self.grass_amount = 50
+        self.grass_amount = 100
         self.loop_times = 0
 
     def terminate(self):
@@ -111,7 +111,7 @@ class EvolutionBackground:
 class Evolution:
 
     # Names of the original pyqtgraph PlotWidget tabs (for resize handling)
-    _PLOT_TAB_NAMES = ['plot_animals', 'plot_animals_change',
+    _PLOT_TAB_NAMES = ['plot_animals_change',
                        'plot_tiger_gene', 'plot_wolf_gene', 'plot_sheep_gene']
 
     def __init__(self):
@@ -127,12 +127,36 @@ class Evolution:
         self._original_resize = self.ui.resizeEvent
         self.ui.resizeEvent = self._on_window_resize
 
-        # Original plots
-        self.ui.plot_animals.addLegend()
-        self.curve_amount_tiger = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen(_CLR_POP_TIGER, width=2), name='Tiger Amount')
-        self.curve_amount_wolf = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen(_CLR_POP_WOLF, width=2), name='Wolf Amount')
-        self.curve_amount_sheep = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen(_CLR_POP_SHEEP, width=2), name='Sheep Amount')
-        self.curve_amount_grass = self.ui.plot_animals.getPlotItem().plot(pen=pg.mkPen(_CLR_POP_GRASS, width=2), name='Grass Amount')
+        # --- Split "Number of Population" tab into Plant (top) + Animals (bottom) ---
+        old_plot = self.ui.plot_animals
+        tab_page = old_plot.parentWidget()
+        # Remove old single plot from tab
+        old_plot.setParent(None)
+
+        # Create two new plots
+        self.plot_plants = pg.PlotWidget()
+        self.plot_animals = pg.PlotWidget()
+
+        # Layout: top = Plant, bottom = Animals
+        pop_layout = QVBoxLayout(tab_page)
+        pop_layout.setContentsMargins(4, 4, 4, 4)
+        pop_layout.setSpacing(2)
+        pop_layout.addWidget(self.plot_plants, 1)
+        pop_layout.addWidget(self.plot_animals, 1)
+
+        # Plant curves (top)
+        self.plot_plants.addLegend()
+        self.curve_amount_grass = self.plot_plants.getPlotItem().plot(pen=pg.mkPen(_CLR_POP_GRASS, width=2), name='Grass Amount')
+
+        # Animal curves (bottom)
+        self.plot_animals.addLegend()
+        self.curve_amount_tiger = self.plot_animals.getPlotItem().plot(pen=pg.mkPen(_CLR_POP_TIGER, width=2), name='Tiger Amount')
+        self.curve_amount_wolf = self.plot_animals.getPlotItem().plot(pen=pg.mkPen(_CLR_POP_WOLF, width=2), name='Wolf Amount')
+        self.curve_amount_sheep = self.plot_animals.getPlotItem().plot(pen=pg.mkPen(_CLR_POP_SHEEP, width=2), name='Sheep Amount')
+
+        # Style the two new plots
+        self._style_plot(self.plot_plants, 'Plant Population', 'Count')
+        self._style_plot(self.plot_animals, 'Animal Population', 'Count')
 
         self.ui.plot_animals_change.addLegend()
         self.curve_add_tiger = self.ui.plot_animals_change.getPlotItem().plot(pen=pg.mkPen(_CLR_BORN_TIGER, width=2), name='Tiger Born')
@@ -199,6 +223,7 @@ class Evolution:
         self.timer = None
         self.env_thread = None
         self._frame_counter = 0
+        self._last_logged_cycle = 0
 
         # NOW apply the initial window size - AFTER all layouts are set up
         # so that QVBoxLayout can properly size the PlotWidgets on first resize
@@ -311,8 +336,57 @@ class Evolution:
             self.ui.pause_btn.setEnabled(True)
             self.ui.pause_btn.setText("Continue")
 
+    def _alive_count(self, thread):
+        return sum(1 for ind in thread.group if getattr(ind, 'lifeStatus', 'Dead') == 'Alive')
+
+    def _avg_hunger(self, thread):
+        alive = [ind for ind in thread.group if getattr(ind, 'lifeStatus', 'Dead') == 'Alive']
+        if not alive:
+            return 0
+        return round(sum(ind.hungryLevel for ind in alive) / len(alive), 1)
+
+    def _death_summary(self, thread):
+        """Count deaths by cause from dead list (last cycle's deaths)."""
+        starve = fight = old = 0
+        # Only count recently dead (within last 2 seconds)
+        import time as _t
+        now = _t.strftime("%Y%m%d%H%M%S", _t.localtime())
+        for ind in thread.dead[-20:]:  # check last 20 deaths for efficiency
+            if ind.deathCause == "Starve to death":
+                starve += 1
+            elif ind.deathCause == "Fight to death":
+                fight += 1
+            elif ind.deathCause == "Natural death":
+                old += 1
+        return starve, fight, old
+
     def draw_amounts(self):
-        self.ui.loop_count_label.setText(str(len(tigerThread.num)))
+        cycle = len(tigerThread.num)
+        self.ui.loop_count_label.setText(str(cycle))
+
+        # Detailed diagnostic logging each cycle
+        if cycle != self._last_logged_cycle and cycle > 0:
+            self._last_logged_cycle = cycle
+            ta = self._alive_count(tigerThread)
+            wa = self._alive_count(wolfThread)
+            sa = self._alive_count(sheepThread)
+            pa = self._alive_count(plantThread)
+            th = self._avg_hunger(tigerThread)
+            wh = self._avg_hunger(wolfThread)
+            sh = self._avg_hunger(sheepThread)
+            ts, tf, to = self._death_summary(tigerThread)
+            ws, wf, wo = self._death_summary(wolfThread)
+            ss, sf, so = self._death_summary(sheepThread)
+            tb = tigerThread.newBronNum[-1] if tigerThread.newBronNum else 0
+            wb = wolfThread.newBronNum[-1] if wolfThread.newBronNum else 0
+            sb = sheepThread.newBronNum[-1] if sheepThread.newBronNum else 0
+            td = tigerThread.newDeathNum[-1] if tigerThread.newDeathNum else 0
+            wd = wolfThread.newDeathNum[-1] if wolfThread.newDeathNum else 0
+            sd = sheepThread.newDeathNum[-1] if sheepThread.newDeathNum else 0
+            print(f"[Cycle {cycle}] Pop: Tiger={ta} Wolf={wa} Sheep={sa} Plant={pa}")
+            print(f"  Hunger: Tiger={th} Wolf={wh} Sheep={sh}")
+            print(f"  Born/Dead: Tiger {tb}/{td}  Wolf {wb}/{wd}  Sheep {sb}/{sd}")
+            print(f"  Death cause: Tiger S={ts} F={tf} O={to}  Wolf S={ws} F={wf} O={wo}  Sheep S={ss} F={sf} O={so}")
 
         # Original curves
         self.curve_amount_tiger.setData(range(0, len(tigerThread.num)), tigerThread.num)
@@ -382,9 +456,28 @@ class Evolution:
         # Update plot ranges: Y-axis dynamically fits current data with padding
         self._update_plot_ranges()
 
+    def _style_plot(self, plot_widget, title, y_label):
+        """Apply consistent visual style to a PlotWidget."""
+        pg.setConfigOptions(antialias=True, foreground='#C8D6E5')
+        plot_item = plot_widget.getPlotItem()
+        plot_item.showGrid(x=True, y=True, alpha=0.15)
+        plot_item.setLabel('bottom', 'Time (tick)')
+        plot_item.setLabel('left', y_label)
+        plot_item.setTitle(f'<span style="font-size:13pt; font-weight:600; color:#EAF2FF;">{title}</span>')
+        plot_item.getAxis('bottom').setStyle(tickTextOffset=12, autoExpandTextSpace=True)
+        plot_item.getAxis('left').setStyle(autoExpandTextSpace=True)
+        plot_item.getAxis('bottom').setHeight(56)
+        plot_item.getAxis('left').setWidth(68)
+        plot_item.layout.setContentsMargins(16, 14, 40, 36)
+        plot_item.getViewBox().setBackgroundColor('#0F1923')
+        legend = plot_item.legend
+        if legend is not None:
+            legend.setBrush(pg.mkBrush(15, 25, 40, 200))
+            legend.setPen(pg.mkPen((80, 120, 160), width=1))
+
     def _setup_plot_interaction(self):
         """Disable user zoom/pan on original plots; lock Y-min to 0 so origin is always visible."""
-        for plot_widget in [self.ui.plot_animals, self.ui.plot_animals_change,
+        for plot_widget in [self.plot_plants, self.plot_animals, self.ui.plot_animals_change,
                             self.ui.plot_tiger_gene, self.ui.plot_wolf_gene, self.ui.plot_sheep_gene]:
             if plot_widget is not None:
                 plot_item = plot_widget.getPlotItem()
@@ -400,7 +493,6 @@ class Evolution:
         pg.setConfigOptions(antialias=True, foreground='#C8D6E5')
 
         style_configs = [
-            (self.ui.plot_animals, 'Population Size', 'Count'),
             (self.ui.plot_animals_change, 'Population Delta', 'Delta'),
             (self.ui.plot_tiger_gene, 'Tiger Gene Trend', 'Value'),
             (self.ui.plot_wolf_gene, 'Wolf Gene Trend', 'Value'),
@@ -522,7 +614,7 @@ class Evolution:
         so the coordinate origin is always visible."""
         self._frame_counter += 1
         if self._frame_counter % 10 == 0:
-            for plot_widget in [self.ui.plot_animals, self.ui.plot_animals_change,
+            for plot_widget in [self.plot_plants, self.plot_animals, self.ui.plot_animals_change,
                                 self.ui.plot_tiger_gene, self.ui.plot_wolf_gene, self.ui.plot_sheep_gene]:
                 if plot_widget is not None:
                     plot_item = plot_widget.getPlotItem()

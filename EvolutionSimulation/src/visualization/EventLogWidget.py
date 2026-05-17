@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QListWidget, QListWidgetItem, QCheckBox, QHBoxLayout
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QListWidget, QListWidgetItem, QCheckBox, QHBoxLayout, QPushButton
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
 
@@ -35,6 +35,19 @@ class EventLogWidget(QWidget):
             self.type_checks[event_type] = cb
             self.filter_layout.addWidget(cb)
         self.filter_layout.addStretch()
+
+        # Copy all button
+        self.copy_btn = QPushButton("Copy All")
+        self.copy_btn.setFixedSize(70, 22)
+        self.copy_btn.setStyleSheet(
+            "QPushButton { background-color: #2D3748; color: #C8D6E5; border: 1px solid #4A5568; "
+            "border-radius: 3px; font-size: 10px; }"
+            "QPushButton:hover { background-color: #4A5568; }"
+            "QPushButton:pressed { background-color: #1A2332; }"
+        )
+        self.copy_btn.clicked.connect(self._copy_all)
+        self.filter_layout.addWidget(self.copy_btn)
+
         self.layout.addLayout(self.filter_layout)
 
         self.list_widget = QListWidget()
@@ -55,6 +68,21 @@ class EventLogWidget(QWidget):
         self.layout.addWidget(self.list_widget)
 
         EventLogger().register_listener(self.on_event)
+
+    def _copy_all(self):
+        """Copy all log entries to clipboard."""
+        lines = []
+        for i in range(self.list_widget.count()):
+            item = self.list_widget.item(i)
+            if item:
+                lines.append(item.text())
+        if lines:
+            from PySide6.QtWidgets import QApplication
+            clipboard = QApplication.clipboard()
+            clipboard.setText("\n".join(lines))
+            self.copy_btn.setText("Copied!")
+            from PySide6.QtCore import QTimer
+            QTimer.singleShot(1500, lambda: self.copy_btn.setText("Copy All"))
 
     def on_event(self, entry):
         event_type = entry.get("type", "")

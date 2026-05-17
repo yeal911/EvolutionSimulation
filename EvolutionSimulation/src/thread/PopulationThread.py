@@ -70,12 +70,16 @@ class PopulationThread:
                         if (individual.populationFeedingType == Population.CARNIVORE and food.populationType == Population.ANIMAL and individual.populationName != food.populationName) or (individual.populationFeedingType == Population.HERBIVORE and food.populationType == Population.PLANT):
                             # check target's threat (e.g. wolf won't attach tiger)
                             if individual.populationThreat >= food.populationThreat:
-                                # Camouflage check: if prey camouflage matches terrain, predator may miss it
+                                # Camouflage check: terrain type affects detectability
                                 if food.populationType == Population.ANIMAL:
                                     terrain = self.dreamland.getTerrain(targetSlot)
-                                    # Simple camouflage logic: higher camouflage = harder to detect
                                     if hasattr(food, 'camouflage'):
-                                        detect_chance = 1.0 - (food.camouflage / 150.0)
+                                        # Base detect chance from camouflage
+                                        camo = food.camouflage
+                                        # Terrain bonus: Forest/Desert boost camouflage
+                                        if terrain in (Dreamland.TERRAIN_FOREST, Dreamland.TERRAIN_DESERT):
+                                            camo = min(99, camo + 30)
+                                        detect_chance = 1.0 - (camo / 150.0)
                                         if random.random() > detect_chance:
                                             continue  # missed due to camouflage
                                 return food
@@ -230,13 +234,19 @@ class PopulationThread:
             self.dreamland.updateEnvironment(self.cycleNumber)
             if len(self.group) != 0:
                 self.cycleNumber += 1
+                dead_this_cycle = []
                 for individual in self.group:
+                    # Skip if already marked dead (e.g. by another thread's fight)
+                    if individual.lifeStatus == "Dead":
+                        dead_this_cycle.append(individual)
+                        continue
+
                     # Parasite handling
                     if hasattr(individual, 'parasites'):
                         self._handle_parasites(individual, cycleInfo)
 
                     # check if individual should die naturally
-                    if individual.hungryLevel > 10:
+                    if individual.hungryLevel > 15:
                         individual.lifeStatus = "Dead"
                         individual.deathCause = "Starve to death"
                         cycleInfo.newDeathFromStarve += 1
@@ -248,15 +258,7 @@ class PopulationThread:
                         cycleInfo.newDeathFromFight += 1
                     # check individual life status first, move to different category if dead
                     if individual.lifeStatus == "Dead":
-                        individual.deathTime = time.strftime("%Y%m%d%H%M%S", time.localtime())
-                        self.group.remove(individual)
-                        self.dead.append(individual)
-                        cycleInfo.newDeath += 1
-                        # Clean up nest
-                        if hasattr(individual, 'ownedNest') and individual.ownedNest:
-                            slot = individual.ownedNest.slotCode
-                            if individual.ownedNest in self.dreamland.nestMap.get(slot, []):
-                                self.dreamland.nestMap[slot].remove(individual.ownedNest)
+                        dead_this_cycle.append(individual)
                         continue
                     if not individual.isBusy:
                         individual.isBusy = True
@@ -273,38 +275,51 @@ class PopulationThread:
                         if hasattr(individual, 'pdStrategy'):
                             self._pd_interaction(individual, cycleInfo)
 
-                        # add logic for searching food and fight
-                        if individual.hungryLevel > 5:
-                            # find food in its own slot, if there is, then fight, if none, change position
+                        # Core action logic: always try to eat first, breed only when not hungry
+                        ate_this_cycle = False
+                        # Search for food when hungry (threshold lowered to 1 so predators hunt more often)
+                        if individual.hungryLevel > 1:
                             food = self.searchFood(individual)
                             if food is not None and not food.isBusy:
-                                cycleInfo.fightTimes += 1
-                                fightResult = individual.fight(food)
-                                # if wins, update location to food's location, and remove food from map
-                                if fightResult == "Success":
-                                    individual.coordinateX = food.coordinateX
-                                    individual.coordinateY = food.coordinateY
-                                    self.updateDreamLandMap(individual, individual.slotCode, food.slotCode)
-                                    self.removeIndividualFromMap(food.slotCode, food)
-                                    cycleInfo.fightSuccessTimes += 1
-                                    individual.moveHistory[self.cycleNumber] = str(individual.coordinateX) + "|" + str(individual.coordinateY) + "," + individual.slotCode
-                                # if fails, remove individual from map
-                                elif fightResult == "Failure":
-                                    self.removeIndividualFromMap(individual.slotCode, individual)
-                                    cycleInfo.fightFailureTimes += 1
-                                elif fightResult == "Flee":
-                                    cycleInfo.FleeSuccessTimes += 1
-                            # if no food found, move location and become more hungry
+                                # Hunt success check: predators don't always catch prey
+                                # Prey has a chance to escape before the fight even starts
+                                hunt_succeeds = True
+                                if food.populationType == Population.ANIMAL:
+                                    # Base escape chance: prey escapes ~25% of encounters
+                                    # Faster prey escapes more often
+                                    prey_speed = getattr(food, 'runningSpeed', 50)
+                                    escape_chance = 0.15 + (prey_speed / 300.0)
+                                    if random.random() < escape_chance:
+                                        hunt_succeeds = False
+                                        cycleInfo.FleeSuccessTimes += 1
+                                if hunt_succeeds:
+                                    cycleInfo.fightTimes += 1
+                                    fightResult = individual.fight(food)
+                                    if fightResult == "Success":
+                                        individual.coordinateX = food.coordinateX
+                                        individual.coordinateY = food.coordinateY
+                                        self.updateDreamLandMap(individual, individual.slotCode, food.slotCode)
+                                        self.removeIndividualFromMap(food.slotCode, food)
+                                        cycleInfo.fightSuccessTimes += 1
+                                        ate_this_cycle = True
+                                        individual.moveHistory[self.cycleNumber] = str(individual.coordinateX) + "|" + str(individual.coordinateY) + "," + individual.slotCode
+                                    elif fightResult == "Failure":
+                                        self.removeIndividualFromMap(individual.slotCode, individual)
+                                        cycleInfo.fightFailureTimes += 1
+                                    elif fightResult == "Flee":
+                                        cycleInfo.FleeSuccessTimes += 1
                             else:
                                 self.moveLocation(individual)
-                                individual.hungryLevel += 1
                                 individual.moveHistory[self.cycleNumber] = str(individual.coordinateX) + "|" + str(individual.coordinateY) + "," + individual.slotCode
-                        # if not hungry enough, prepare for breeding
-                        else:
+
+                        # Hunger increases only if didn't eat this cycle
+                        if not ate_this_cycle:
                             individual.hungryLevel += 1
-                            # Nest bonus before breeding
+
+                        # Breed when not too hungry (herbivores: <=4, carnivores: <=8)
+                        breed_threshold = 4 if individual.populationFeedingType == Population.HERBIVORE else 8
+                        if individual.hungryLevel <= breed_threshold:
                             self._handle_nest_bonus(individual, cycleInfo)
-                            # breed logic
                             spouse = self.searchSpouse(individual)
                             if spouse is not None and not spouse.isBusy:
                                 cycleInfo.breedTimes += 1
@@ -329,6 +344,23 @@ class PopulationThread:
                         cycleInfo.popAvgAttractiveness += individual.attractiveness
                     if hasattr(individual, 'territoryTendency'):
                         cycleInfo.popAvgTerritoryTendency += individual.territoryTendency
+
+                # Remove dead individuals after iteration (avoids modifying list during iteration)
+                for ind in dead_this_cycle:
+                    ind.deathTime = time.strftime("%Y%m%d%H%M%S", time.localtime())
+                    if ind in self.group:
+                        self.group.remove(ind)
+                    # Remove from coordinate map too (critical: dead individuals must not linger in map)
+                    if hasattr(ind, 'slotCode') and ind.slotCode in self.dreamland.coordinateMap:
+                        if ind in self.dreamland.coordinateMap[ind.slotCode]:
+                            self.dreamland.coordinateMap[ind.slotCode].remove(ind)
+                    self.dead.append(ind)
+                    cycleInfo.newDeath += 1
+                    # Clean up nest
+                    if hasattr(ind, 'ownedNest') and ind.ownedNest:
+                        slot = ind.ownedNest.slotCode
+                        if ind.ownedNest in self.dreamland.nestMap.get(slot, []):
+                            self.dreamland.nestMap[slot].remove(ind.ownedNest)
                 # if there is still live population
                 cycleInfo.liveIndividuals = len(self.group)
                 cycleInfo.deadIndividuals = len(self.dead)
@@ -343,11 +375,28 @@ class PopulationThread:
                     cycleInfo.popAvgCamouflage = round(cycleInfo.popAvgCamouflage / len(self.group), 2)
                     cycleInfo.popAvgAttractiveness = round(cycleInfo.popAvgAttractiveness / len(self.group), 2)
                     cycleInfo.popAvgTerritoryTendency = round(cycleInfo.popAvgTerritoryTendency / len(self.group), 2)
+
+                # Detailed per-thread diagnostic log
+                alive = len(self.group)
+                print(f"  [Cycle {self.cycleNumber}][{self.THREAD_NAME}] alive={alive} born={cycleInfo.newBorn} died={cycleInfo.newDeath} "
+                      f"starve={cycleInfo.newDeathFromStarve} fight={cycleInfo.newDeathFromFight} old={cycleInfo.newDeathFromNatural} "
+                      f"breedTry={cycleInfo.breedTimes} avgHunger={cycleInfo.popAvgHungryLevel} "
+                      f"fightTry={cycleInfo.fightTimes} fightWin={cycleInfo.fightSuccessTimes} flee={cycleInfo.FleeSuccessTimes}")
+
                 self.recorder.saveCycleInfo(self.cycleNumber, self, cycleInfo)
                 # sleep for 1 day (1s)
                 time.sleep(1)
             # if all individuals are dead
             else:
+                # Final cleanup: remove any dead individuals still in group
+                for ind in list(self.group):
+                    if ind.lifeStatus == "Dead":
+                        self.group.remove(ind)
+                        if ind not in self.dead:
+                            self.dead.append(ind)
+                        if hasattr(ind, 'slotCode') and ind.slotCode in self.dreamland.coordinateMap:
+                            if ind in self.dreamland.coordinateMap[ind.slotCode]:
+                                self.dreamland.coordinateMap[ind.slotCode].remove(ind)
                 break
             self.newBronNum.append(cycleInfo.newBorn)
             self.newDeathNum.append(cycleInfo.newDeath)
@@ -370,21 +419,35 @@ class PopulationThread:
             self.cycleNumber += 1
             cycleInfo = CycleInfo(self.THREAD_NAME)
             # Environment affects plant growth (r/K selection)
-            base_limit = int(Dreamland.SIZE_X * Dreamland.SIZE_Y) / 100
+            base_limit = int(Dreamland.SIZE_X * Dreamland.SIZE_Y) / 200
             harshness = self.dreamland.environmentHarshness
             adjusted_limit = int(base_limit * (1.0 - harshness * 0.6))
-            # generate new plants in each round if plants count is less than adjusted limit
+            # Logistic plant growth: regrow proportionally to gap from carrying capacity
             if len(self.group) < adjusted_limit:
-                # Rich slots produce more plants
-                actual_count = self.cyclePlantCount
+                gap = adjusted_limit - len(self.group)
+                # Grow ~8% of the gap each cycle, minimum 3
+                actual_count = max(3, int(gap * 0.08))
                 if harshness > 0.5:
-                    actual_count = max(1, self.cyclePlantCount // 2)
+                    actual_count = max(1, actual_count // 2)
+                # Rich slots boost: count rich slots with few plants, add bonus growth
+                rich_bonus = 0
+                for slot_code in self.dreamland.richSlots:
+                    plants_in_slot = sum(1 for p in self.dreamland.coordinateMap.get(slot_code, [])
+                                         if getattr(p, 'populationType', None) == Population.PLANT
+                                         and p.lifeStatus == "Alive")
+                    if plants_in_slot < 2:
+                        rich_bonus += 1
+                actual_count += min(rich_bonus, 5)
                 for i in range(0, actual_count):
                     plant = Plant()
                     self.addIndividual2Thread(plant)
                 cycleInfo.newBorn = actual_count
             if len(self.group) != 0:
+                dead_this_cycle = []
                 for individual in self.group:
+                    if individual.lifeStatus == "Dead":
+                        dead_this_cycle.append(individual)
+                        continue
                     # check if individual should die naturally
                     if individual.age >= individual.lifespan:
                         individual.lifeStatus = "Dead"
@@ -394,10 +457,7 @@ class PopulationThread:
                         cycleInfo.newDeathFromFight += 1
                     # check individual life status first, move to different category if dead
                     if individual.lifeStatus == "Dead":
-                        individual.deathTime = time.strftime("%Y%m%d%H%M%S", time.localtime())
-                        self.group.remove(individual)
-                        self.dead.append(individual)
-                        cycleInfo.newDeath += 1
+                        dead_this_cycle.append(individual)
                         continue
                     individual.age += 1
                     cycleInfo.popAvgAge += individual.age
@@ -405,6 +465,17 @@ class PopulationThread:
                     cycleInfo.popAvgFightCapability += individual.fightCapability
                     cycleInfo.popAvgAttackPossibility += individual.attackPossibility
                     cycleInfo.popAvgDefendPossibility += individual.defendPossibility
+                # Remove dead plants after iteration
+                for ind in dead_this_cycle:
+                    ind.deathTime = time.strftime("%Y%m%d%H%M%S", time.localtime())
+                    if ind in self.group:
+                        self.group.remove(ind)
+                    # Remove from coordinate map
+                    if hasattr(ind, 'slotCode') and ind.slotCode in self.dreamland.coordinateMap:
+                        if ind in self.dreamland.coordinateMap[ind.slotCode]:
+                            self.dreamland.coordinateMap[ind.slotCode].remove(ind)
+                    self.dead.append(ind)
+                    cycleInfo.newDeath += 1
             # if there is still live population
             cycleInfo.liveIndividuals = len(self.group)
             cycleInfo.deadIndividuals = len(self.dead)

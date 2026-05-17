@@ -48,11 +48,11 @@ class Sheep(Population):
         self.moveHistory = {}
 
         # gene related properties initialization
-        self.lifespan = 15  # initialize life with 15, maximum 20 after computation based on gene_set
+        self.lifespan = 25  # initialize life with 25, maximum 30 after computation based on gene_set
         self.fightCapability = 30  # initialize fight capability with 30, maximum 60 after computation based on gene_set
         self.attackPossibility = 20  # initialize attack possibility with 20, maximum 50 after computation based on gene_set
         self.defendPossibility = 20  # initialize defend possibility with 20, maximum 50 after computation based on gene_set
-        self.totalBreedingTimes = 5  # initialize Total breeding times with 5, maximum 10 after computation based on gene_set
+        self.totalBreedingTimes = 6  # initialize Total breeding times with 6, maximum 11 after computation based on gene_set
         self.runningSpeed = 30  # initialize running speed with 30, maximum 50 after computation based on gene_set
 
         # the 1st bit of Gene controls lifespan
@@ -95,6 +95,7 @@ class Sheep(Population):
 
         # Nest ownership (extended phenotype)
         self.ownedNest = None
+        self._last_breed_cycle = None
 
         # lower limit of growth period
         self.lowerGrowthPeriod = math.ceil(self.lifespan / 5)

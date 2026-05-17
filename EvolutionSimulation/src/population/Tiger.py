@@ -48,11 +48,11 @@ class Tiger(Population):
         self.moveHistory = {}
 
         # gene related properties initialization
-        self.lifespan = 10  # initialize life with 10, maximum 15 after computation based on gene_set
+        self.lifespan = 20  # initialize life with 20, maximum 25 after computation based on gene_set
         self.fightCapability = 70  # initialize fight capability with 70, maximum 100 after computation based on gene_set
         self.attackPossibility = 70  # initialize attack possibility with 70, maximum 100 after computation based on gene_set
         self.defendPossibility = 70  # initialize defend possibility with 70, maximum 100 after computation based on gene_set
-        self.totalBreedingTimes = 1  # initialize remaining breeding times with 1, maximum 2 after computation based on gene_set
+        self.totalBreedingTimes = 3  # initialize remaining breeding times with 3, maximum 5 after computation based on gene_set
         self.runningSpeed = 70  # initialize running speed with 70, maximum 100 after computation based on gene_set
 
         # the 1st bit of Gene controls lifespan
@@ -69,7 +69,7 @@ class Tiger(Population):
         self.defendPossibility += math.ceil(self.gene.geneDigits[3] / 3.3)
         # the 5th bit of Gene controls totalBreedingTimes
         # then compute the addition to be added to initial value of totalBreedingTimes
-        self.totalBreedingTimes += round(math.ceil(self.gene.geneDigits[4] / 50))
+        self.totalBreedingTimes += round(math.ceil(self.gene.geneDigits[4] / 33))
         # the 6th bit of Gene controls runningSpeed
         # then compute the addition to be added to initial value of runningSpeed
         self.runningSpeed += round(self.gene.geneDigits[5] / 3.3)
@@ -87,11 +87,12 @@ class Tiger(Population):
 
         self.parasites = []
         self.ownedNest = None
+        self._last_breed_cycle = None
 
         # lower limit of growth period
-        self.lowerGrowthPeriod = math.ceil(self.lifespan / 3)
+        self.lowerGrowthPeriod = math.ceil(self.lifespan / 5)
         # upper limit of growth period
-        self.upperGrowthPeriod = 2 * self.lowerGrowthPeriod
+        self.upperGrowthPeriod = 4 * self.lowerGrowthPeriod
 
     # new child born
     @staticmethod

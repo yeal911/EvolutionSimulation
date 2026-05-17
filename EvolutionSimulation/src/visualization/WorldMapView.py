@@ -5,12 +5,12 @@ from PySide6.QtGui import QColor, QBrush, QPen
 
 
 class _LegendItem(QWidget):
-    """Single row in the legend: color swatch + label."""
-    def __init__(self, color, text, parent=None):
+    """Single row in the legend: color swatch + label + optional count."""
+    def __init__(self, color, text, count=None, parent=None):
         super().__init__(parent)
         layout = QHBoxLayout(self)
         layout.setContentsMargins(2, 1, 2, 1)
-        layout.setSpacing(6)
+        layout.setSpacing(4)
 
         swatch = QLabel()
         swatch.setFixedSize(12, 12)
@@ -20,7 +20,17 @@ class _LegendItem(QWidget):
         lbl = QLabel(text)
         lbl.setStyleSheet("color: #C8D6E5; font-size: 11px;")
         layout.addWidget(lbl)
+
+        self.count_label = None
+        if count is not None:
+            self.count_label = QLabel(str(count))
+            self.count_label.setStyleSheet("color: #FFD93D; font-size: 11px; font-weight: bold;")
+            layout.addWidget(self.count_label)
         layout.addStretch()
+
+    def set_count(self, count):
+        if self.count_label:
+            self.count_label.setText(str(count))
 
 
 class WorldMapView(QGraphicsView):
@@ -51,7 +61,7 @@ class WorldMapView(QGraphicsView):
         self.setDragMode(QGraphicsView.NoDrag)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scene.setSceneRect(0, 0, 500, 500)
+        self.scene.setSceneRect(0, 0, 700, 350)
         self.showTrails = True
         self._terrain_items = []
         self._draw_terrain()
@@ -61,37 +71,51 @@ class WorldMapView(QGraphicsView):
         self.setStyleSheet("background-color: #0F1923;")
 
     def _build_legend_overlay(self):
-        """Create a floating legend widget on top of the viewport."""
+        """Create a floating legend widget on the right side of the viewport."""
         self._legend_panel = QWidget(self)
         self._legend_panel.setStyleSheet("background-color: rgba(15, 25, 35, 210); border-radius: 6px;")
         vbox = QVBoxLayout(self._legend_panel)
         vbox.setContentsMargins(8, 6, 8, 6)
         vbox.setSpacing(2)
 
-        entries = [
-            (self.COLORS["Tiger"], "Tiger"),
-            (self.COLORS["Wolf"], "Wolf"),
-            (self.COLORS["Sheep"], "Sheep"),
-            (self.COLORS["Plant"], "Plant"),
+        # Species entries with population count labels
+        self._species_legend_items = {}
+        species_entries = [
+            ("Tiger", self.COLORS["Tiger"]),
+            ("Wolf", self.COLORS["Wolf"]),
+            ("Sheep", self.COLORS["Sheep"]),
+            ("Plant", self.COLORS["Plant"]),
+        ]
+        for name, color in species_entries:
+            item = _LegendItem(color, name, count=0, parent=self._legend_panel)
+            self._species_legend_items[name] = item
+            vbox.addWidget(item)
+
+        # Separator
+        sep = QLabel("─" * 14)
+        sep.setStyleSheet("color: #4A5568; font-size: 9px;")
+        vbox.addWidget(sep)
+
+        # Static entries (terrain types, etc.)
+        static_entries = [
             (QColor(139, 69, 19), "Nest"),
-            (QColor(255, 215, 0), "Gold = Rich"),
             (self.TERRAIN_COLORS[0], "Plain"),
             (self.TERRAIN_COLORS[1], "Forest"),
             (self.TERRAIN_COLORS[2], "Desert"),
             (self.TERRAIN_COLORS[3], "Water"),
             (self.TERRAIN_COLORS[4], "Mountain"),
         ]
-        for color, text in entries:
-            vbox.addWidget(_LegendItem(color, text, self._legend_panel))
+        for color, text in static_entries:
+            vbox.addWidget(_LegendItem(color, text, parent=self._legend_panel))
 
-        self._legend_panel.setFixedSize(150, 220)
-        self._legend_panel.move(8, 8)
+        self._legend_panel.setFixedSize(140, 280)
+        self._legend_panel.move(self.viewport().width() - 148, 8)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
         self._apply_transform()
         if hasattr(self, '_legend_panel'):
-            self._legend_panel.move(8, 8)
+            self._legend_panel.move(self.viewport().width() - 148, 8)
 
     def _draw_terrain(self):
         slot_size = 10
@@ -101,12 +125,7 @@ class WorldMapView(QGraphicsView):
             y = int(parts[1]) - slot_size
             rect = QGraphicsRectItem(x, y, slot_size, slot_size)
             color = self.TERRAIN_COLORS.get(terrain_type, QColor(40, 40, 45))
-            if slot_code in self.dreamland.richSlots:
-                pen = QPen(QColor(255, 215, 0))
-                pen.setWidth(2)
-                rect.setPen(pen)
-            else:
-                rect.setPen(QPen(Qt.NoPen))
+            rect.setPen(QPen(Qt.NoPen))
             rect.setBrush(QBrush(color))
             self.scene.addItem(rect)
             self._terrain_items.append(rect)
@@ -118,6 +137,13 @@ class WorldMapView(QGraphicsView):
 
     def update_map(self, threads):
         self._clear_dynamic_items()
+
+        # Update population counts in legend (only count alive individuals)
+        for thread in threads:
+            species = thread.THREAD_NAME.replace("Thread", "")
+            if species in self._species_legend_items:
+                alive_count = sum(1 for ind in thread.group if getattr(ind, 'lifeStatus', 'Dead') == 'Alive')
+                self._species_legend_items[species].set_count(alive_count)
 
         for slot_code, nests in self.dreamland.nestMap.items():
             for nest in nests:
@@ -133,7 +159,11 @@ class WorldMapView(QGraphicsView):
         for thread in threads:
             species = thread.THREAD_NAME.replace("Thread", "")
             base_color = self.COLORS.get(species, QColor(200, 200, 200))
-            for ind in thread.group:
+            # Snapshot group list to avoid threading race condition
+            group_snapshot = list(thread.group)
+            for ind in group_snapshot:
+                if getattr(ind, 'lifeStatus', 'Dead') != 'Alive':
+                    continue
                 x = ind.coordinateX
                 y = ind.coordinateY
                 size = min(14, max(5, ind.fightCapability / 8))
@@ -151,7 +181,8 @@ class WorldMapView(QGraphicsView):
                 if thread.THREAD_TYPE != "Animal":
                     continue
                 base_color = self.COLORS.get(thread.THREAD_NAME.replace("Thread", ""), QColor(200, 200, 200))
-                for ind in thread.group:
+                group_snapshot = list(thread.group)
+                for ind in group_snapshot:
                     hist = list(ind.moveHistory.items())
                     if len(hist) < 2:
                         continue
@@ -176,7 +207,7 @@ class WorldMapView(QGraphicsView):
         vh = self.viewport().height()
         if vw <= 0 or vh <= 0:
             return
-        scale = min(vw / 500.0, vh / 500.0)
+        scale = min(vw / 700.0, vh / 350.0)
         self.resetTransform()
         self.scale(scale, scale)
         self.setAlignment(Qt.AlignLeft | Qt.AlignTop)

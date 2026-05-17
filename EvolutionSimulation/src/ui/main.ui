@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1280</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,10 +19,10 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>480</x>
-     <y>30</y>
-     <width>91</width>
-     <height>31</height>
+     <x>10</x>
+     <y>6</y>
+     <width>72</width>
+     <height>28</height>
     </rect>
    </property>
    <property name="font">
@@ -34,13 +34,175 @@
     <string>Start</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="pause_btn">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>6</y>
+     <width>72</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Pause</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget_5">
+   <property name="geometry">
+    <rect>
+     <x>178</x>
+     <y>6</y>
+     <width>120</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="TigerGroup">
+    <item>
+     <widget class="QLabel" name="label_5">
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Tiger</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="tiger_num_edit">
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>15</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>306</x>
+     <y>6</y>
+     <width>130</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="GrassGroup">
+    <item>
+     <widget class="QLabel" name="label_2">
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Plant</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="grass_num_edit">
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>100</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget_4">
+   <property name="geometry">
+    <rect>
+     <x>444</x>
+     <y>6</y>
+     <width>120</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="WolfGroup">
+    <item>
+     <widget class="QLabel" name="label_4">
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Wolf</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="wolf_num_edit">
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>25</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget_3">
+   <property name="geometry">
+    <rect>
+     <x>572</x>
+     <y>6</y>
+     <width>130</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="SheepGroup">
+    <item>
+     <widget class="QLabel" name="label_3">
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Sheep</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="sheep_num_edit">
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>80</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
   <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>130</y>
-     <width>171</width>
-     <height>22</height>
+     <x>10</x>
+     <y>40</y>
+     <width>150</width>
+     <height>24</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="RoundGroup">
@@ -70,13 +232,39 @@
     </item>
    </layout>
   </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget_10">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>40</y>
+     <width>150</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_5">
+    <item>
+     <widget class="QLabel" name="label_10">
+      <property name="text">
+       <string>区间大小</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="age_range_edit">
+      <property name="text">
+       <string>20</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
   <widget class="QTabWidget" name="plot_tabs">
    <property name="geometry">
     <rect>
      <x>8</x>
-     <y>68</y>
+     <y>70</y>
      <width>1264</width>
-     <height>634</height>
+     <height>646</height>
     </rect>
    </property>
    <property name="font">
@@ -92,21 +280,13 @@
      <string>Number of Population</string>
     </attribute>
     <widget class="PlotWidget" name="plot_animals" native="true">
-
      <property name="geometry">
-
       <rect>
-
        <x>0</x>
-
        <y>0</y>
-
        <width>100</width>
-
        <height>100</height>
-
       </rect>
-
      </property>
     </widget>
    </widget>
@@ -115,21 +295,13 @@
      <string>Population Change Data</string>
     </attribute>
     <widget class="PlotWidget" name="plot_animals_change" native="true">
-
      <property name="geometry">
-
       <rect>
-
        <x>0</x>
-
        <y>0</y>
-
        <width>100</width>
-
        <height>100</height>
-
       </rect>
-
      </property>
     </widget>
    </widget>
@@ -138,21 +310,13 @@
      <string>Tiger Gene</string>
     </attribute>
     <widget class="PlotWidget" name="plot_tiger_gene" native="true">
-
      <property name="geometry">
-
       <rect>
-
        <x>0</x>
-
        <y>0</y>
-
        <width>100</width>
-
        <height>100</height>
-
       </rect>
-
      </property>
     </widget>
    </widget>
@@ -161,21 +325,13 @@
      <string>Wolf Gene</string>
     </attribute>
     <widget class="PlotWidget" name="plot_wolf_gene" native="true">
-
      <property name="geometry">
-
       <rect>
-
        <x>0</x>
-
        <y>0</y>
-
        <width>100</width>
-
        <height>100</height>
-
       </rect>
-
      </property>
     </widget>
    </widget>
@@ -184,21 +340,13 @@
      <string>Sheep Gene</string>
     </attribute>
     <widget class="PlotWidget" name="plot_sheep_gene" native="true">
-
      <property name="geometry">
-
       <rect>
-
        <x>0</x>
-
        <y>0</y>
-
        <width>100</width>
-
        <height>100</height>
-
       </rect>
-
      </property>
     </widget>
    </widget>
@@ -207,21 +355,13 @@
      <string>Customise</string>
     </attribute>
     <widget class="PlotWidget" name="plot_custom" native="true">
-
      <property name="geometry">
-
       <rect>
-
        <x>0</x>
-
        <y>0</y>
-
        <width>100</width>
-
        <height>100</height>
-
       </rect>
-
      </property>
     </widget>
     <widget class="QWidget" name="horizontalLayoutWidget_6">
@@ -333,194 +473,6 @@
      </property>
     </widget>
    </widget>
-  </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget_2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>30</y>
-     <width>171</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="GrassGroup">
-    <item>
-     <widget class="QLabel" name="label_2">
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Plant</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="grass_num_edit">
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>100</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget_3">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>80</y>
-     <width>171</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="SheepGroup">
-    <item>
-     <widget class="QLabel" name="label_3">
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Sheep</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="sheep_num_edit">
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>80</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget_4">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>80</y>
-     <width>141</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="WolfGroup">
-    <item>
-     <widget class="QLabel" name="label_4">
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Wolf</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="wolf_num_edit">
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>60</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget_5">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>30</y>
-     <width>141</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="TigerGroup">
-    <item>
-     <widget class="QLabel" name="label_5">
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Tiger</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="tiger_num_edit">
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>40</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QPushButton" name="pause_btn">
-   <property name="geometry">
-    <rect>
-     <x>480</x>
-     <y>90</y>
-     <width>91</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>12</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>Pause</string>
-   </property>
-  </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget_10">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>130</y>
-     <width>166</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_5">
-    <item>
-     <widget class="QLabel" name="label_10">
-      <property name="text">
-       <string>区间大小</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="age_range_edit">
-      <property name="text">
-       <string>20</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
   </widget>
  </widget>
  <customwidgets>

@@ -30,13 +30,14 @@ class PlantThread(threading.Thread, PopulationThread):
         self.dreamland = dreamland
         self.recorder = recorder
         self.continueRunning = True
-        self.cyclePlantCount = cycle_plant_count
+        self.initCount = cycle_plant_count
+        self.cyclePlantCount = max(3, cycle_plant_count // 10)
         self.group = []
         self.dead = []
         self.num = []
         self.newDeathNum = []
         self.cycleNumber = 0
-        for i in range(0, self.cyclePlantCount):
+        for i in range(0, self.initCount):
             # need to randomly initialize the coordinates of the plant
             plant = Plant()
             self.addIndividual2Thread(plant)

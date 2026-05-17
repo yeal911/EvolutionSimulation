@@ -42,13 +42,19 @@ class Population:
 
         # if competitor is animal, check if competitor will try to escape
         if competitor.populationType == Population.ANIMAL:
-            # competitor will try to flee
+            # Base flee chance: prey always has some chance to escape
+            prey_speed = getattr(competitor, 'runningSpeed', 50)
+            predator_speed = getattr(self, 'runningSpeed', 50)
+            # Faster prey = higher escape chance; base 20% + speed bonus
+            base_flee_chance = 0.20 + max(0, (prey_speed - predator_speed)) / 200.0
+            if random.random() < base_flee_chance:
+                competitor.fleeSuccessTimes += 1
+                return "Flee"
+            # Original distance-based flee logic (secondary check)
             if self.populationThreat - competitor.populationThreat >= 2:
                 distance = math.sqrt(math.pow(self.coordinateX - competitor.coordinateX, 2) + math.pow(self.coordinateY - competitor.coordinateY, 2))
-                # competitor escapes successful
-                if self.runningSpeed <= competitor.runningSpeed or distance * 10 / (self.runningSpeed - competitor.runningSpeed) > 10:
+                if self.runningSpeed <= competitor.runningSpeed or distance * 10 / max(1, self.runningSpeed - competitor.runningSpeed) > 10:
                     competitor.fleeSuccessTimes += 1
-                    # print("Flee")
                     return "Flee"
                 else:
                     competitor.fleeFailureTimes += 1
@@ -129,11 +135,18 @@ class Population:
                 log_event("SexualSelection", f"{spouse.name} rejected {self.name} (attractiveness too low)")
                 return None
 
-        if (self.breedTimes <= self.totalBreedingTimes and self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod) and (spouse.breedTimes <= spouse.totalBreedingTimes and spouse.lowerGrowthPeriod < spouse.age < spouse.upperGrowthPeriod):
+        if (self.lowerGrowthPeriod < self.age < self.upperGrowthPeriod) and (spouse.lowerGrowthPeriod < spouse.age < spouse.upperGrowthPeriod):
+            # Cooldown: can't breed if bred in the last 1 cycle
+            if hasattr(self, '_last_breed_cycle') and self._last_breed_cycle is not None and (self.ownThread.cycleNumber - self._last_breed_cycle) < 1:
+                return None
+            if hasattr(spouse, '_last_breed_cycle') and spouse._last_breed_cycle is not None and (spouse.ownThread.cycleNumber - spouse._last_breed_cycle) < 1:
+                return None
             self.breedTimes += 1
             spouse.breedTimes += 1
-            self.hungryLevel += 1
-            spouse.hungryLevel += 1
+            self._last_breed_cycle = self.ownThread.cycleNumber
+            spouse._last_breed_cycle = spouse.ownThread.cycleNumber
+            self.hungryLevel += 2
+            spouse.hungryLevel += 2
             # rebuild gene_set for new baby tiger, get first half gene set from self, another half from spouse
             childGeneDigits = []
             # get first half gene set from self after variation
@@ -148,9 +161,8 @@ class Population:
         return None
 
     def _evaluate_mate(self, male):
-        """Female mate choice based on attractiveness and fitness."""
-        # Attractiveness threshold: female prefers males with higher (attractiveness + fightCapability)
-        male_score = male.attractiveness * 0.6 + male.fightCapability * 0.4
-        female_standard = self.attractiveness * 0.5 + self.fightCapability * 0.3 + 20
-        # Some randomness in choice
-        return male_score >= female_standard * random.uniform(0.7, 1.0)
+        """Female mate choice - mostly permissive to ensure population sustainability."""
+        male_score = male.attractiveness * 0.5 + male.fightCapability * 0.5
+        female_standard = self.attractiveness * 0.2 + self.fightCapability * 0.1 + 5
+        # Very lenient: most pairs should be accepted
+        return male_score >= female_standard * random.uniform(0.3, 1.0)

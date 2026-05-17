@@ -93,12 +93,10 @@ class Evolution:
         ui_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ui", "main.ui")
         self.ui = loader.load(ui_path)
         self.cur_draw_age = 0
-        # Set a reasonable default window size; maximize on show
-        # Reasonable default size; maximize often overflows small screens
-        self.ui.resize(1280, 720)
-        # Hook resize so plot widgets fill the window dynamically
+        # Hook resize FIRST, then resize, so the initial layout is applied immediately
         self._original_resize = self.ui.resizeEvent
         self.ui.resizeEvent = self._on_window_resize
+        self.ui.resize(1280, 720)
 
         # Original plots
         self.ui.plot_animals.addLegend()
@@ -348,7 +346,7 @@ class Evolution:
         self._update_plot_ranges()
 
     def _setup_plot_interaction(self):
-        """Disable user zoom/pan on original plots."""
+        """Disable user zoom/pan on original plots; lock Y-min to 0 so origin is always visible."""
         for plot_widget in [self.ui.plot_animals, self.ui.plot_animals_change,
                             self.ui.plot_tiger_gene, self.ui.plot_wolf_gene, self.ui.plot_sheep_gene]:
             if plot_widget is not None:
@@ -357,10 +355,12 @@ class Evolution:
                     plot_item.setMouseEnabled(x=False, y=False)
                     plot_item.setMenuEnabled(False)
                     plot_item.hideButtons()
+                    # Ensure Y axis never goes below 0 so the origin is always in view
+                    plot_item.getViewBox().setLimits(yMin=0)
 
     def _setup_tab_layouts(self):
         """Add QVBoxLayout to simple tabs so PlotWidgets auto-fill the tab page.
-        This avoids manual geometry calculations in resizeEvent."""
+        Bottom margin is generous so X-axis labels are never clipped."""
         plot_names = ['plot_animals', 'plot_animals_change',
                       'plot_tiger_gene', 'plot_wolf_gene', 'plot_sheep_gene']
         for plot_name in plot_names:
@@ -373,7 +373,8 @@ class Evolution:
             if tab_page.layout() is not None:
                 continue
             layout = QVBoxLayout(tab_page)
-            layout.setContentsMargins(4, 4, 4, 4)
+            # Large bottom margin specifically for pyqtgraph X-axis tick labels
+            layout.setContentsMargins(4, 4, 4, 30)
             layout.setSpacing(0)
             layout.addWidget(plot_widget)
 
@@ -423,44 +424,16 @@ class Evolution:
             tabs.setGeometry(10, tabs_y, w - 20, h - tabs_y - 10)
 
     def _update_plot_ranges(self):
-        """Dynamically fit Y-axis to current data max * 1.15 so curves are always clearly visible.
-        X-axis shows full history."""
-
-        def safe_max(data_list):
-            return max(data_list) if data_list else 0
-
-        # --- plot_animals ---
-        pi_animals = self.ui.plot_animals.getPlotItem()
-        max_val = max(
-            safe_max(tigerThread.num),
-            safe_max(wolfThread.num),
-            safe_max(sheepThread.num),
-            safe_max(plantThread.num),
-        )
-        y_max = max(max_val * 1.15, 10)
-        # Use ViewBox.setRange with explicit padding so origin (0) stays visible
-        pi_animals.getViewBox().setRange(xRange=(0, max(len(tigerThread.num), 1)),
-                                          yRange=(0, y_max), padding=0.02)
-
-        # --- plot_animals_change ---
-        pi_change = self.ui.plot_animals_change.getPlotItem()
-        all_change_data = (
-            tigerThread.newBronNum + tigerThread.newDeathNum +
-            wolfThread.newBronNum + wolfThread.newDeathNum +
-            sheepThread.newBronNum + sheepThread.newDeathNum +
-            plantThread.newDeathNum
-        )
-        max_val = max(all_change_data) if all_change_data else 0
-        y_max = max(max_val * 1.15, 5)
-        pi_change.getViewBox().setRange(xRange=(0, max(len(tigerThread.newBronNum), 1)),
-                                         yRange=(0, y_max), padding=0.02)
-
-        # --- gene plots ---
-        for plot_widget in [self.ui.plot_tiger_gene, self.ui.plot_wolf_gene, self.ui.plot_sheep_gene]:
-            if plot_widget is not None:
-                plot_item = plot_widget.getPlotItem()
-                if plot_item is not None:
-                    plot_item.autoRange()
+        """Let pyqtgraph auto-range handle everything; it knows best how to keep axes visible.
+        We only ensure Y never drops below 0 (already set via setLimits in _setup_plot_interaction)."""
+        self._frame_counter += 1
+        if self._frame_counter % 10 == 0:
+            for plot_widget in [self.ui.plot_animals, self.ui.plot_animals_change,
+                                self.ui.plot_tiger_gene, self.ui.plot_wolf_gene, self.ui.plot_sheep_gene]:
+                if plot_widget is not None:
+                    plot_item = plot_widget.getPlotItem()
+                    if plot_item is not None:
+                        plot_item.autoRange()
 
 
 app = QApplication([])

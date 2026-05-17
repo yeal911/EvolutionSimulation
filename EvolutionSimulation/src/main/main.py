@@ -388,7 +388,9 @@ class Evolution:
             plot_item.setTitle(f'<span style="font-size:12pt; font-weight:600; color:#EAF2FF;">{title}</span>')
             plot_item.getAxis('bottom').setStyle(tickTextOffset=10, autoExpandTextSpace=True)
             plot_item.getAxis('left').setStyle(autoExpandTextSpace=True)
-            plot_item.layout.setContentsMargins(10, 10, 16, 16)
+            plot_item.getAxis('bottom').setHeight(48)
+            plot_item.getAxis('left').setWidth(62)
+            plot_item.layout.setContentsMargins(12, 10, 28, 22)
 
             legend = plot_item.legend
             if legend is not None:
@@ -411,7 +413,7 @@ class Evolution:
                 continue
             layout = QVBoxLayout(tab_page)
             # Large bottom margin specifically for pyqtgraph X-axis tick labels
-            layout.setContentsMargins(8, 8, 8, 42)
+            layout.setContentsMargins(10, 8, 26, 52)
             layout.setSpacing(0)
             layout.addWidget(plot_widget)
 
@@ -458,7 +460,7 @@ class Evolution:
         tabs_y = 68
         tabs = getattr(self.ui, 'plot_tabs', None)
         if tabs is not None:
-            tabs.setGeometry(10, tabs_y, w - 20, h - tabs_y - 14)
+            tabs.setGeometry(8, tabs_y, w - 16, h - tabs_y - 18)
 
     def _update_plot_ranges(self):
         """Let pyqtgraph auto-range handle everything; it knows best how to keep axes visible.
